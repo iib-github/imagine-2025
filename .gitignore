@@ -1,0 +1,6 @@
+/session
+/member/contents
+
+# Windows thumbnail cache
+Thumbs.db
+*.db

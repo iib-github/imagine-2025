@@ -1,0 +1,148 @@
+/* CSS Document */
+
+img {
+  border: 0px;}
+.clear {
+  clear:both;}
+a {
+  text-decoration: none;}
+a:link {
+  color:#FF9900;}
+a:visited {
+  color:#E2266E;}
+a:hover {
+  color:#E2266E;}
+a:active {
+  color:#E2266E;}
+.fl-l {
+  float:left;}
+.fl-r {
+  float:right;}
+.ta-c {text-align:center;}
+.ta-l {text-align:left;}
+.ta-r {text-align:right;}
+
+.transparent a:hover img {
+  opacity:0.7;
+  filter: alpha(opacity=70);
+  -ms-filter: "alpha( opacity=70 )";}
+.gray {
+  color:#4D4D4D;}
+.pad-b-300 {
+  padding-bottom:300px;
+}
+.fc-red, red {
+  color:#FF0000;}
+
+/* MAIN2 -------------------------- */
+
+body {
+  font-size:12px;
+  line-height:18px;
+  font-family:"ヒラギノ角ゴ Pro W3", "Hiragino Kaku Gothic Pro", "メイリオ", Meiryo, Osaka, "ＭＳ Ｐゴシック", "MS PGothic", sans-serif;
+  margin:0 auto;}
+#wrapper { color:#1A1A1A; font-size:12px;margin:0 auto;height:auto;}
+#Head { width:1000px; height:100px; margin:30px auto;}
+#Head .Logo { float:left; height:65px; width:443px;}
+#Head .Summary {float:right; width:400px;}
+#Head .Summary table { border-collapse:collapse; border-spacing:0;}
+#Head .Summary table th { border:1px solid #999; background:#CCCCCC; padding:5px 10px; width:150px;}
+#Head .Summary table td { border:1px solid #999; background:#FFF; text-align:right; padding: 5px 10px; width:210px;}
+
+.LoginBox {border:1px solid #000; width:220px; overflow:hidden; padding:15px; margin:100px auto;}
+.LoginBox h1 { font-size:14px; text-align:center; border-bottom:1px solid #000; margin-bottom:10px; font-weight:bold;}
+.LoginBox table { width:200px; margin:0 auto;}
+.LoginBox table th { padding:5px;}
+.LoginBox table td { padding:5px;}
+.send { text-align:center; margin:0 auto;}
+
+.Btn {text-align:center;background-color:#333;border-color:#000;font-size:100%;color:#ffffff; font-weight:bold; width:150px; height:30px;}
+.DL-Btn {text-align:center;background-color:#333;border-color:#000;font-size:100%;color:#ffffff; font-weight:bold; width:200px; height:30px;}
+
+.Tab {text-align:center;background:#333;border:3px solid #B0B0B0;color:#ffffff; font-weight:bold; width:200px; height:30px; padding-top:10px;}
+.Tab-Active {text-align:center;background:#FF9900;border:3px solid #B0B0B0;color:#ffffff; font-weight:bold; width:200px; height:30px; padding-top:10px;}
+
+.InBox {border:1px solid #000; width:100%; overflow:hidden; padding:15px; box-sizing: border-box;}
+.InBox h1 { font-size:18px; text-align:left; border-bottom:1px solid #F66; color:#F66; margin-bottom:20px; font-weight:bold; padding-bottom:5px;}
+.InBox h2 { font-size:14px; text-align:left; border-bottom:1px solid #000; margin-bottom:20px; font-weight:bold; padding-bottom:5px;}
+.InBox .Selection { overflow:hidden; width:100%; margin-bottom:10px; padding-bottom:10px; border-bottom:1px solid #000;}
+.InBox .Selection li{float:left;margin-right: 4px;margin-bottom: 4px;}
+.InBox table.member { width:100%; margin:0 auto 20px; border-collapse:collapse; border-spacing:0;}
+.InBox table.member th {border:1px solid #333; padding:5px 10px; background:#686868; color:#FFFFFF; text-align:center;}
+.InBox table.member td {border:1px solid #333; padding:5px 10px;}
+.InBox table.member td:nth-child(4) {word-break: break-all;}
+.InBox table.member td img { width:20%; height:auto;}
+.InBox .Btn {text-align:center;background-color:#333;border-color:#000;font-size:11px;color:#ffffff; font-weight:bold; width:100px; height:30px;}
+
+.InBox .Pager { overflow:hidden; width:900px; margin-bottom:30px;}
+.InBox .Pager li{ float:left; margin-right:10px;}
+.InBox .Pager li a{ text-decoration:underline; color:#333333;}
+.InBox .Pager li a:hover{ text-decoration:underline; color:#F60;}
+.Bred {color:#FF0033; font-weight:bold;}
+
+
+.InBox table.Order {  margin-bottom:30px; font-size:11px; width:1100px;}
+.InBox table.Order th {border:1px solid #333; padding:10px 10px; background:#FF6600; color:#FFFFFF; text-align:center;}
+.InBox table.Order td {border:1px solid #333; padding:10px 10px;}
+.InBox table.Order td.Date, .InBox table.Order td.OrderNumber, .InBox table.Order td.Name, .InBox table.Order td.Status, .InBox table.Order td.EditBtn { text-align:center;}
+.InBox table.Order td.Total { text-align:right;}
+
+.OrderDetail table { margin-bottom:30px; font-size:13px; width:1100px;}
+.OrderDetail table th {border:1px solid #333; padding:10px 10px; background:#FF6600; color:#FFFFFF; text-align:center; width:30%; text-align:left;}
+.OrderDetail table td {border:1px solid #333; padding:10px 10px; width:70%;}
+
+.OrderProductDetail table { margin-bottom:30px; font-size:13px; width:1100px;}
+.OrderProductDetail table th {border:1px solid #333; padding:10px 10px; background:#FF6600; color:#FFFFFF; text-align:center; text-align:center;}
+.OrderProductDetail table td {border:1px solid #333; padding:10px 10px;}
+.OrderProductDetail table .Total { text-align:right;}
+
+.BNR {overflow:hidden; margin-bottom:20px; border-bottom:1px solid #CCC; padding-bottom:10px;}
+
+
+.submenu{ text-align:right; margin-bottom:10px; }
+
+.FS120 {font-size:120%;}
+.FS140 {font-size:140%;}
+.FS160 {font-size:160%;}
+.FS180 {font-size:180%;}
+.FS200 {font-size:200%;}
+.F-Bold { font-weight:bold;}
+.FC-Red { color:#E84040;}
+.FC-Blue { color:#3C71EC;}
+.U-L { text-decoration:underline;}
+.GrBlock { background:#D6D3CD; padding:10px;}
+.PrevBtn { width:60px; padding:5px 10px; border-radius:3px; background:#BFBFBF;}
+
+.NarrowBlock { width:400px; overflow:hidden; margin-bottom:15px;}
+.NarrowBlock input { float:left; width:100px; margin-right:15px;}
+.NarrowBlock select { float:left; font-size: 14px; width: 120px; margin-right:15px;}
+.NarrowBlock .Btn { float:left;text-align: center; margin-right:15px; background-color:#2E87C8; border-color: #2E87C8; font-size: 12px; color: #ffffff; width: 80px; border-radius:3px;height: 20px;padding: 2px 0 0;}
+.NarrowBlock .Btn2 { float:left;text-align: center; margin-right:15px; background-color:#999; border-color: #999; font-size: 12px; color: #ffffff; width: 80px; border-radius:3px;height: 20px;padding: 2px 0 0;}
+
+.list-link { color:blue;}
+.Block { width:100%; margin-bottom:10px; overflow:hidden;padding-top: 10px;}
+.EntBtn {text-align:center; line-height:1.4; font-size:16px; float:left; margin:0 0 20px 0; float:left;}
+.EntBtn a{background:#009999; padding:10px 20px;color:#FFFFFF;-moz-transition-property:all;-moz-transition-duration: 0.5s;-moz-transition-timing-function: ease;-moz-transition-delay: 0.1s;-webkit-transition-property:all;-webkit-transition-duration: 0.5s;-webkit-transition-timing-function: ease;-webkit-transition-delay: 0.1s;-o-transition-property:all;-o-transition-duration: 0.5s;-o-transition-timing-function: ease;-o-transition-delay: 0.1s;}
+.EntBtn a:hover{color:#FFFFFF; text-decoration:none; background-color:#CC0033;-moz-transition-property:all;-moz-transition-duration: 0.5s;-moz-transition-timing-function: ease;-moz-transition-delay: 0.1s;-webkit-transition-property:all;-webkit-transition-duration: 0.5s;-webkit-transition-timing-function: ease;-webkit-transition-delay: 0.1s;-o-transition-property:all;-o-transition-duration: 0.5s;-o-transition-timing-function: ease;-o-transition-delay: 0.1s;}
+.Block .EntBtn a { float:left; margin-right:20px; background:#7E7E7E;}
+.Block .name { float:left; padding-top:5px;}
+
+.muko { background-color:#ccc; vertical-align:middle;}
+.gaibu { background-color:#caf7f7; vertical-align:middle;}
+.mikakunin { background-color:#FAF4B7; vertical-align:middle;}
+
+.gaiburadio1 {height:20px;width:20px;margin-bottom: 5px;margin-right: 15px;}
+.gaiburadio1::after {position: relative;content:"内";left: 20px;top: 2px;}
+.gaiburadio2 {height:20px;width:20px;margin-bottom: 5px;;margin-right: 15px}
+.gaiburadio2::after {position: relative;content:"外";left: 20px;top: 2px;}
+.gaiburadio3 {display:none;}
+
+
+/* 芦田追記スタイル */
+.submenu.Tab {
+  text-align: center;
+  display: inline-block;
+}
+.submenu .register {
+  color: #ffffff;
+}
