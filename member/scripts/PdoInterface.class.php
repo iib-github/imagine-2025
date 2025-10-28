@@ -1,10 +1,10 @@
 <?php
-  class PdoInterface {
-    const DB_NAME = "_the_imagine2020";
-    const DB_ADDR = "mysql015.phy.heteml.lan";
-    const DB_USER = "_the_imagine2020";
-    const DB_PASS = "doinatsumi";
+  require_once dirname(__FILE__) . '/env.php';
+  
+  // .envファイルを読み込む
+  loadEnv();
 
+  class PdoInterface {
     /**
      *
      * @var PDO
@@ -13,17 +13,19 @@
     private $pdo_statement = null;
 
     private function __construct(){
+      // .envファイルから環境変数を取得
+      $db_name = env('DB_NAME');
+      $db_addr = env('DB_ADDR');
+      $db_user = env('DB_USER');
+      $db_pass = env('DB_PASS');
 
-      $dsn = "mysql:dbname=" . PdoInterface::DB_NAME . ";host=" . PdoInterface::DB_ADDR;
-      $username = PdoInterface::DB_USER;
-      $passwd   = PdoInterface::DB_PASS;
+      if (empty($db_name) || empty($db_addr) || empty($db_user)) {
+        throw new Exception('データベース接続情報が設定されていません。.envファイルを確認してください。');
+      }
 
-      //ローカル環境用
-      // if($_SERVER['SERVER_NAME'] == 'datsumo.localhost'){
-      //   $dsn = "mysql:dbname=datsumo_db;host=127.0.0.1";
-      //   $username = "cheki_user";
-      //   $passwd   = "cheki_pw";
-      // }
+      $dsn = "mysql:dbname=" . $db_name . ";host=" . $db_addr;
+      $username = $db_user;
+      $passwd = $db_pass ? $db_pass : '';
 
       $options = array(
         PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8',

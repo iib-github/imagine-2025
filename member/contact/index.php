@@ -1,6 +1,11 @@
 <?php
+  require_once dirname(__FILE__) . '/../scripts/env.php';
   require_once dirname(__FILE__) . '/../scripts/Session.class.php';
   require_once dirname(__FILE__) . '/send-inquiry.php';
+  
+  // .envファイルを読み込む
+  loadEnv();
+  
   $session = Session::getInstance();
 
   // セッションがなければログイン画面に遷移させる。
@@ -94,7 +99,7 @@
 <div class="Block">
           <p>「メールが届かない」「配信先アドレスを変更したい」<br>
           といった事務的なお問い合わせや「会員サイト」に関するご質問は<br class="pcView">
-          <a href="mailto:info@hoshino-wataru.com" style="text-decoration: underline;">info@hoshino-wataru.com</a>（THE Imagine事務局　あお）へご連絡ください。</p>
+          <a href="mailto:<?php echo env('MAIL_SUPPORT_ADDRESS', 'info@hoshino-wataru.com'); ?>" style="text-decoration: underline;"><?php echo env('MAIL_SUPPORT_ADDRESS', 'info@hoshino-wataru.com'); ?></a>（THE Imagine事務局　あお）へご連絡ください。</p>
 
           <p>日曜日を定休として、それ以外の日は24時間以内にお返事いたします。</p>
         </div>

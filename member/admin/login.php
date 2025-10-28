@@ -1,8 +1,17 @@
 <?php
-  //// 管理画面アカウント
-  define('ADMIN_ID', 'adm1n');
-  define('ADMIN_PW', 'm7ufzanb');
+  require_once dirname(__FILE__) . '/../scripts/env.php';
   require_once dirname(__FILE__) . '/../scripts/Session.class.php';
+  
+  // .envファイルを読み込む
+  loadEnv();
+  
+  //// 管理画面アカウント（環境変数から取得）
+  $admin_id = env('ADMIN_ID');
+  $admin_pw = env('ADMIN_PW');
+  
+  if (empty($admin_id) || empty($admin_pw)) {
+    die('管理画面の設定が正しくありません。.envファイルを確認してください。');
+  }
 
   $session = Session::getInstance();
 
@@ -17,7 +26,7 @@
     $id = @$_POST["ID"];
     $pass = @$_POST["PASS"];
 
-    if($id === ADMIN_ID && $pass == ADMIN_PW) {
+    if($id === $admin_id && $pass == $admin_pw) {
       $session->set('admin', true);
       header("location: list-member.php");
       exit;

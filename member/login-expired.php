@@ -1,5 +1,10 @@
 <?php
+  require_once dirname(__FILE__) . '/scripts/env.php';
   require_once dirname(__FILE__) . '/scripts/Session.class.php';
+  
+  // .envファイルを読み込む
+  loadEnv();
+  
   $session = Session::getInstance();
 
   // ログイン済みであれば自動で遷移させる。
@@ -29,7 +34,7 @@
   <section id="LoginBox">
     <div class="Cnt">
       <h1><img src="common/img/login_logo.png" width="316" alt="THE Imagine Members"/></h1>
-      <p>視聴期限が切れました。<br>THE Imagineに関するお問い合わせは<br><a href="mailto:info@hoshino-wataru.com">THE Imagine事務局</a>までお願いします。</p>
+      <p>視聴期限が切れました。<br>THE Imagineに関するお問い合わせは<br><a href="mailto:<?php echo env('MAIL_SUPPORT_ADDRESS', 'info@hoshino-wataru.com'); ?>">THE Imagine事務局</a>までお願いします。</p>
       <a href="login.php"><p class="Btn-Back">ログイン画面へ</p></a>
     </div>
   </section>

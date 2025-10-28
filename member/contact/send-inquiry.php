@@ -1,6 +1,10 @@
 <?php
+require_once dirname(__FILE__) . '/../scripts/env.php';
 require_once dirname(__FILE__) . '/../scripts/model/MemberModel.class.php';
 require_once dirname(__FILE__) . '/../scripts/model/ContactModel.class.php';
+
+// .envファイルを読み込む
+loadEnv();
 
 function sendInquiry($mid, $category, $content) {
   // メンバー情報取得
@@ -24,10 +28,14 @@ function sendInquiry($mid, $category, $content) {
   mb_language("Japanese");
   mb_internal_encoding("UTF-8");
 
+  // 環境変数からメール設定を取得
+  $mail_from_address = env('MAIL_FROM_ADDRESS', 'mail@cosmamic-space.com');
+  $mail_from_name = env('MAIL_FROM_NAME', 'THE Imagine メンバーズ');
+  $mail_inquiry_to = env('MAIL_INQUIRY_TO', 'starbow737@gmail.com,mail@cosmamic-space.com');
+
   $subject = "THE Imagine会員様よりご質問がありました。"; // メール件名
-  $to = 'starbow737@gmail.com,mail@cosmamic-space.com'; // 宛先
-  // $to = 't.yoshimi@i-i-b.jp'; // 宛先
-  $header = "From: " .mb_encode_mimeheader("THE Imagine メンバーズ") ."<mail@cosmamic-space.com>"; // 差出人
+  $to = $mail_inquiry_to; // 宛先
+  $header = "From: " . mb_encode_mimeheader($mail_from_name) . "<" . $mail_from_address . ">"; // 差出人
 
   $body = "
 THE Imagine会員様より、ご質問がありました。

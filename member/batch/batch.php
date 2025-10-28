@@ -1,12 +1,20 @@
-#!/usr/local/php/7.3/bin/php
+#!/usr/bin/env php
 <?php
 /***********************************************************/
 /* 登録済みのお知らせやコンテンツを取得し、公開日を判定行って公開するスクリプト */
 /***********************************************************/
-require_once '/home/users/2/doinatsumi/web/the-imagine.com/member/member/scripts/BaseModel.class.php';
-require_once '/home/users/2/doinatsumi/web/the-imagine.com/member/member/scripts/model/NewsModel.class.php';
-require_once '/home/users/2/doinatsumi/web/the-imagine.com/member/member/scripts/model/CategoryModel.class.php';
-require_once '/home/users/2/doinatsumi/web/the-imagine.com/member/member/scripts/model/ContentModel.class.php';
+// 注意: シェバン行（#!/usr/bin/env php）は環境によって変更が必要な場合があります
+// .envファイルに PHP_PATH を記載していますが、シェバン行は直接置き換えできません
+// 実際の実行時は、cronやコマンドラインで env('PHP_PATH') を使うか、適切なPHPパスを設定してください
+
+require_once dirname(__FILE__) . '/../scripts/env.php';
+require_once dirname(__FILE__) . '/../scripts/BaseModel.class.php';
+require_once dirname(__FILE__) . '/../scripts/model/NewsModel.class.php';
+require_once dirname(__FILE__) . '/../scripts/model/CategoryModel.class.php';
+require_once dirname(__FILE__) . '/../scripts/model/ContentModel.class.php';
+
+// .envファイルを読み込む
+loadEnv();
 
 $news_model = new NewsModel();
 $category_model = new CategoryModel();

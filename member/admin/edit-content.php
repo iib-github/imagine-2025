@@ -1,7 +1,12 @@
 <?php
+  require_once dirname(__FILE__) . '/../scripts/env.php';
   require_once dirname(__FILE__) . '/../scripts/Session.class.php';
   require_once dirname(__FILE__) . '/../scripts/model/CategoryModel.class.php';
   require_once dirname(__FILE__) . '/../scripts/model/ContentModel.class.php';
+  
+  // .envファイルを読み込む
+  loadEnv();
+  
   $session = Session::getInstance();
 
   // セッションがなければログイン画面に遷移させる。
@@ -132,7 +137,7 @@
           <th>サムネイル画像</th>
           <td>
             <?php if(!empty($content["thumbnail_url"])){ ?>
-            https://the-imagine.com/membership/member/<?php echo $content["thumbnail_url"]; ?><br>
+            https://<?php echo env('SITE_DOMAIN', 'the-imagine.com'); ?>/membership/member/<?php echo $content["thumbnail_url"]; ?><br>
             <img src="<?php echo '../'.$content["thumbnail_url"].'?='.time(); ?>"><br>
             <?php } ?>
             <input type="file" name="thumbnail" id="thumbnail">
@@ -150,7 +155,7 @@
           <th>講座資料ダウンロード</th>
           <td>
             <?php if(!empty($content["text_dl_url"])){ ?>
-            <a href="/membership/member/<?php echo $content["text_dl_url"]; ?>" target="_blank">https://the-imagine.com/membership/member/<?php echo $content["text_dl_url"]; ?></a>
+            <a href="/membership/member/<?php echo $content["text_dl_url"]; ?>" target="_blank">https://<?php echo env('SITE_DOMAIN', 'the-imagine.com'); ?>/membership/member/<?php echo $content["text_dl_url"]; ?></a>
             <?php } ?>
             <br><input type="file" name="txt_url" id="txt_url">
           </td>
@@ -159,7 +164,7 @@
           <th>文字起こし資料の<br>ダウンロード</th>
           <td>
             <?php if(!empty($content["message_dl_url"])){ ?>
-            <a href="/membership/member/<?php echo $content["message_dl_url"]; ?>" target="_blank">https://the-imagine.com/membership/member/<?php echo $content["message_dl_url"]; ?></a>
+            <a href="/membership/member/<?php echo $content["message_dl_url"]; ?>" target="_blank">https://<?php echo env('SITE_DOMAIN', 'the-imagine.com'); ?>/membership/member/<?php echo $content["message_dl_url"]; ?></a>
             <?php } ?>
             <br><input type="file" name="document" id="document">
           </td>

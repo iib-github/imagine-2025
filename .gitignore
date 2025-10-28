@@ -1,6 +1,9 @@
 /session
 /member/contents
 
+# 環境変数ファイル（機密情報を含むためgit管理外）
+.env
+
 # Windows thumbnail cache
 Thumbs.db
 *.db

@@ -1,6 +1,11 @@
 <?php
+  require_once dirname(__FILE__) . '/scripts/env.php';
   require_once dirname(__FILE__) . '/scripts/Session.class.php';
   require_once dirname(__FILE__) . '/scripts/model/MemberModel.class.php';
+  
+  // .envファイルを読み込む
+  loadEnv();
+  
   $session = Session::getInstance();
 
   // セッションがなければログイン画面に遷移させる。
@@ -55,7 +60,7 @@
 <p class="midNote">メニューにある「ご質問BOX」から課題に対する質問や感想・報告などを受けつけています。</p>
 
 <h3>▶ 登録情報の変更について</h3>
-<p class="midNote">登録情報の変更、またログインID/パスワードをお忘れの方は[info@hoshino-wataru.com]宛にメールをお送りください。</p>
+<p class="midNote">登録情報の変更、またログインID/パスワードをお忘れの方は[<?php echo env('MAIL_SUPPORT_ADDRESS', 'info@hoshino-wataru.com'); ?>]宛にメールをお送りください。</p>
 
 
 <h3>▶ 推奨ブラウザについて</h3>
