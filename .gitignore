@@ -1,5 +1,6 @@
 /session
 /member/contents
+/test
 
 # 環境変数ファイル（機密情報を含むためgit管理外）
 .env
