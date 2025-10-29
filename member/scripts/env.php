@@ -47,3 +47,31 @@ function env($key, $default = null) {
   return $value;
 }
 
+/**
+ * デバッグモードが有効かどうかを判定
+ * @return bool デバッグモードが有効な場合true
+ */
+function isDebugMode() {
+  $debug = env('DEBUG_MODE', 'false');
+  return strtolower($debug) === 'true' || $debug === '1';
+}
+
+/**
+ * エラー表示設定を初期化
+ */
+function initializeErrorHandling() {
+  $debugMode = isDebugMode();
+  
+  if ($debugMode) {
+    // デバッグモードが有効な場合
+    error_reporting(E_ALL);
+    ini_set('display_errors', 1);
+  } else {
+    // 本番モード
+    error_reporting(E_ALL);
+    ini_set('display_errors', 0);
+    ini_set('log_errors', 1);
+    ini_set('error_log', dirname(__FILE__) . '/../../logs/error.log');
+  }
+}
+

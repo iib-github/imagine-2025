@@ -67,8 +67,9 @@
           <th>コース</th>
           <td>
             <select name="course">
-              <option value="1" >プレミアムコース</option>
-              <option value="2" >ベーシックコース</option>
+              <option value="1" >アドバンス</option>
+              <option value="2" >ベーシック</option>
+              <option value="3" >その他</option>
             </select>
           </td>
         </tr>

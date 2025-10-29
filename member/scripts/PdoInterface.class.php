@@ -79,10 +79,10 @@
     public function beginTransaction(){
       return $this->pdo->beginTransaction();
     }
-    public function commitTransaction(){
+    public function commit(){
       return $this->pdo->commit();
     }
-    public function rollbackTransaction(){
+    public function rollback(){
       return $this->pdo->rollback();
     }
 

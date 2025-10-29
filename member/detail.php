@@ -1,10 +1,17 @@
 <?php
+  require_once dirname(__FILE__) . '/scripts/env.php';
   require_once dirname(__FILE__) . '/scripts/Session.class.php';
   require_once dirname(__FILE__) . '/scripts/model/MemberModel.class.php';
   require_once dirname(__FILE__) . '/scripts/model/CategoryModel.class.php';
   require_once dirname(__FILE__) . '/scripts/model/ContentModel.class.php';
   require_once dirname(__FILE__) . '/scripts/model/MemberContentRelation.class.php';
   require_once dirname(__FILE__) . '/scripts/model/CommentModel.class.php';
+  require_once dirname(__FILE__) . '/scripts/model/ContentVideoModel.class.php';
+  
+  // .envファイルを読み込み、エラーハンドリングを初期化
+  loadEnv();
+  initializeErrorHandling();
+  
   $session = Session::getInstance();
 
   // セッションがなければログイン画面に遷移させる。
@@ -12,6 +19,16 @@
     header("Location: login.php");
     exit;
   }
+
+  $member_id = $session->get('member');
+  $member_model = new MemberModel();
+  $member_info = $member_model->select(array('member_id' => $member_id));
+  if (empty($member_info)) {
+      header("Location: login.php");
+      exit;
+  }
+  $member_info = $member_info[0];
+  $course_filter = $member_model->getCourseFilter($member_info['select_course']);
 
   // IEだとaタグのdownload属性が使えないのでJSでダウンロードさせる必要がある。
   $ieFlag = strstr($_SERVER['HTTP_USER_AGENT'], 'Trident') || strstr($_SERVER['HTTP_USER_AGENT'], 'MSIE');
@@ -28,6 +45,23 @@
   } else {
     $content = $content[0];
   }
+  
+  // 閲覧権限チェック
+  $has_permission = false;
+  // target_courseが'all'またはNULLの場合は常に表示（旧来のコンテンツ）
+  if (empty($content['target_course']) || $content['target_course'] === ContentModel::TARGET_COURSE_ALL) {
+      $has_permission = true;
+  } elseif ($course_filter === ContentModel::TARGET_COURSE_ADVANCE) {
+      // アドバンス会員は全コンテンツ表示
+      $has_permission = true;
+  } elseif ($content['target_course'] === $course_filter) {
+      // ベーシック会員はベーシックコンテンツのみ表示
+      $has_permission = true;
+  }
+
+  // コンテンツ動画取得
+  $content_video_model = new ContentVideoModel();
+  $content_videos = $content_video_model->getVideosByContentId($content['content_id']);
 
   // カテゴリー取得
   $category_model = new CategoryModel();
@@ -35,10 +69,14 @@
   $category = $category[0];
 
   // カテゴリーに紐づくコンテンツ取得（その他の授業表示用）
-  $content_list = $content_model->select(array(
+  $where_other_contents = array(
     'category_id' => $category['category_id'],
-    'indicate_flag' => 1,
-  ), array('content_week'=>$content_model::ORDER_ASC));
+    'indicate_flag' => ContentModel::ACTIVE,
+  );
+  if ($course_filter !== ContentModel::TARGET_COURSE_ALL) {
+    $where_other_contents['target_course'] = $course_filter;
+  }
+  $content_list = $content_model->select($where_other_contents, array('content_week'=>ContentModel::ORDER_ASC));
 
 
   // コメント取得
@@ -47,9 +85,6 @@
     'content_id'=>$content['content_id']
   ), array('comment_id'=>$comment_model::ORDER_DESC));
   $success_message = '';
-
-  // 会員一覧取得
-  $member_model = new MemberModel();
 
   // 会員表示名とidの紐付け表を作成
   $member_list = $member_model->select();
@@ -112,10 +147,90 @@
 <link href="common/css/main.css?date=20170614220000" rel="stylesheet">
 <link href="common/css/jquery.circliful.css" rel="stylesheet" type="text/css" />
 <link href="https://fonts.googleapis.com/css?family=Questrial" rel="stylesheet">
-
+<style>
+  .video-player-container {
+    margin-bottom: 20px;
+  }
+  .video-thumbnail-list {
+    display: flex;
+    flex-wrap: nowrap; /* 強制的に1行で表示 */
+    overflow-x: auto; /* 横スクロールを可能にする */
+    gap: 10px;
+    margin-top: 15px;
+    padding-bottom: 10px; /* スクロールバーがコンテンツにかぶらないように */
+  }
+  .video-thumbnail-item {
+    flex-shrink: 0; /* 縮小しない */
+    cursor: pointer;
+    border: 2px solid transparent;
+    border-radius: 5px;
+    overflow: hidden;
+    width: 120px; /* サムネイルの幅を調整 */
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+  }
+  .video-thumbnail-item:hover,
+  .video-thumbnail-item.active {
+    border-color: #007bff; /* アクティブなサムネイルのボーダー色 */
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+  }
+  .video-thumbnail-item img {
+    width: 100%;
+    height: 70px; /* サムネイルの高さ */
+    object-fit: cover;
+    display: block;
+  }
+  .video-thumbnail-item span {
+    display: -webkit-box; /* 複数行 ellipsis のために必要 */
+    -webkit-line-clamp: 2; /* 2行で切り詰める */
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding: 5px;
+    font-size: 0.8em;
+    text-align: center;
+    background-color: #f0f0f0;
+    color: #333;
+    min-height: 3em; /* 2行分の高さを確保 */
+  }
+  .youtube {
+    position: relative;
+    width: 100%;
+    padding-top: 56.25%; /* 16:9 Aspect Ratio */
+    height: 0;
+    transition: opacity 0.5s ease-in-out; /* フェードアニメーション */
+  }
+  .youtube.fade-out {
+    opacity: 0;
+  }
+  .youtube.fade-in {
+    opacity: 1;
+  }
+</style>
 <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
 <script src="common/js/jquery.circliful.min.js"></script>
 <script src="common/js/complete.js?=<?php echo time(); ?>"></script>
+<!-- 動画切り替えスクリプト -->
+<script>
+  $(document).ready(function() {
+    $('.video-thumbnail-item').on('click', function() {
+      const newVideoUrl = $(this).data('video-url');
+      const mainPlayer = $('#main-video-player');
+      
+      mainPlayer.addClass('fade-out');
+      setTimeout(() => {
+        mainPlayer.html(newVideoUrl);
+        mainPlayer.removeClass('fade-out').addClass('fade-in');
+        setTimeout(() => {
+          mainPlayer.removeClass('fade-in');
+        }, 500); // フェードインの時間
+      }, 500); // フェードアウトの時間
+      
+      $('.video-thumbnail-item').removeClass('active');
+      $(this).addClass('active');
+    });
+  });
+</script>
 <!--[if lt IE 9]>
 <script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script>
 <script src="common/js/respond.min.js"></script>
@@ -141,37 +256,63 @@
           <h2><span>Lesson<?php echo $category['category_number']; ?></span>Week<?php echo $content['content_week']; ?> :<?php echo $content['content_title']; ?></h2>
         <?php endif; ?>
         <div class="Block">
-          <?php if(isset($content['content_movie_url'])) : ?>
-          <div class="youtube">
-            <?php echo $content['content_movie_url']; ?>
-          </div>
-          <?php endif; ?>
-          <div class="txtBlock">
-            <?php echo $content['content_text']; ?>
-          </div>
-          <div class="BtnBlock">
+          <?php if($has_permission): ?>
+            <?php if(!empty($content_videos)) : ?>
+            <div class="video-player-container">
+              <div id="main-video-player" class="youtube">
+                <?php echo $content_videos[0]['video_url']; // 最初の動画を初期表示 ?>
+              </div>
+              <?php if(count($content_videos) > 1) : // 動画が複数ある場合のみ切り替えUIを表示 ?>
+              <div class="video-thumbnail-list">
+                <?php foreach($content_videos as $index => $video) : ?>
+                <div class="video-thumbnail-item<?php echo ($index === 0) ? ' active' : ''; ?>" data-video-url="<?php echo htmlspecialchars($video['video_url'], ENT_QUOTES, 'UTF-8'); ?>">
+                  <img src="<?php echo !empty($video['thumbnail_url']) ? htmlspecialchars($video['thumbnail_url'], ENT_QUOTES, 'UTF-8') : 'common/img/no_image.png'; ?>" alt="<?php echo htmlspecialchars($video['video_title'], ENT_QUOTES, 'UTF-8'); ?>">
+                  <span><?php echo htmlspecialchars($video['video_title'], ENT_QUOTES, 'UTF-8'); ?></span>
+                </div>
+                <?php endforeach; ?>
+              </div>
+              <?php endif; ?>
+            </div>
+            <?php else: ?>
+            <?php if(isset($content['content_movie_url'])) : ?>
+            <div class="youtube">
+              <?php echo $content['content_movie_url']; // 従来の単一動画表示 ?>
+            </div>
+            <?php endif; ?>
+            <?php endif; ?>
+            <div class="txtBlock">
+              <?php echo $content['content_text']; ?>
+            </div>
+            <div class="BtnBlock">
 <?php if(!empty($content['text_dl_url'])):?>
-            <a href="<?php echo $content['text_dl_url']; ?>" download="<?php echo $content['content_title']; ?>_ワーク.pdf" target="_blank">
-              <div class="BlueBtn">講座資料をダウンロード</div>
-            </a>
+              <a href="<?php echo $content['text_dl_url']; ?>" download="<?php echo $content['content_title']; ?>_ワーク.pdf" target="_blank">
+                <div class="BlueBtn">講座資料をダウンロード</div>
+              </a>
 <?php endif; ?>
 <?php if(!empty($content['message_dl_url'])):?>
-            <a href="<?php echo $content['message_dl_url']; ?>" download="<?php echo $content['content_title']; ?>_書き起こし.pdf" target="_blank">
-              <div class="GreenBtn">書き起こし資料をダウンロード</div>
-            </a>
+              <a href="<?php echo $content['message_dl_url']; ?>" download="<?php echo $content['content_title']; ?>_書き起こし.pdf" target="_blank">
+                <div class="GreenBtn">書き起こし資料をダウンロード</div>
+              </a>
 <?php endif; ?>
-          </div>
-          <?php if(!$is_finished): ?>
-          <div class="BtnBlockSingle" id="complete">
-            <a href="javascript:void(0);" onclick="complete(<?php echo $session->get('member').', '.$category['category_id'].', '.$content['content_id']; ?>);">
-              <div class="RedBtn">この授業を完了にする</div>
-            </a>
-          </div>
+            </div>
+            <?php if(!$is_finished): ?>
+            <div class="BtnBlockSingle" id="complete">
+              <a href="javascript:void(0);" onclick="complete(<?php echo $session->get('member').', '.$category['category_id'].', '.$content['content_id']; ?>);">
+                <div class="RedBtn">この授業を完了にする</div>
+              </a>
+            </div>
+            <?php else: ?>
+            <div class="BtnBlockSingle" id="finished">
+              <div class="GrayBtn">修了済み</div>
+            </div>
+          <?php endif; ?>
           <?php else: ?>
-          <div class="BtnBlockSingle" id="finished">
-            <div class="GrayBtn">修了済み</div>
-          </div>
-        <?php endif; ?>
+            <div class="Block" style="text-align: center; padding: 50px 20px; background-color: #fff; border: 1px solid #ddd; border-radius: 5px;">
+              <p style="font-size: 1.2em; color: #f44336; margin-bottom: 20px;">このコンテンツを閲覧する権限がありません。</p>
+              <p>あなたの契約コースでは、このコンテンツは利用できません。詳細については、サポートにお問い合わせください。</p>
+              <p style="margin-top: 20px;"><a href="index.php" class="Btn">トップページに戻る</a></p>
+            </div>
+          <?php endif; ?>
         </div>
       </section>
 
@@ -185,6 +326,7 @@
           <p class="success_message red"><?php echo $_SESSION['success_message']; ?></p>
           <?php unset($_SESSION['success_message']); ?>
         <?php endif; ?>
+        <?php if($has_permission): // 権限がある場合のみコメントフォームを表示 ?>
         <form class="MyAccount" method="POST" action='detail.php?cont_id=<?php echo($_GET['cont_id']);?>'>
           <input type="hidden" name="mid" value="<?php echo $session->get('member'); ?>">
           <dl>
@@ -197,6 +339,9 @@
           </dl>
           <div class="EntBtn"><input type="submit" value="投稿する"></div>
         </form>
+        <?php else: ?>
+          <p style="text-align: center; color: #999;">このコンテンツへのコメントは、閲覧権限のある方のみ可能です。</p>
+        <?php endif; ?>
         <hr>
 <?php if(!empty($comment_list)): ?>
       <ul class="comments">
@@ -282,10 +427,10 @@
     </div>
     <!-- /Side -->
   </div>
-  <!-- /Contents -->
+   <!-- /Contents -->
 <?php include 'tmp/footer.php';?>
 </div>
-<!-- /Wrapper -->
+   <!-- /Wrapper -->
 
 <script>
 <?php

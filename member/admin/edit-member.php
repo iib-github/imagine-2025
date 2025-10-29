@@ -92,8 +92,9 @@
           <th>コース</th>
           <td>
             <select name="course">
-              <option value="1"<?php if($member['select_course'] == 1) echo ' selected="selected"';?>>プレミアムコース</option>
-              <option value="2"<?php if($member['select_course'] == 2) echo ' selected="selected"';?>>ベーシックコース</option>
+              <option value="1"<?php if($member['select_course'] == 1) echo ' selected="selected"';?>>アドバンス</option>
+              <option value="2"<?php if($member['select_course'] == 2) echo ' selected="selected"';?>>ベーシック</option>
+              <option value="3"<?php if($member['select_course'] == 3) echo ' selected="selected"';?>>その他</option>
             </select>
             </td>
         </tr>

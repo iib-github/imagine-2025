@@ -62,7 +62,11 @@ class TagModel extends BaseModel {
             return false;
         }
 
-        return parent::insert($data);
+        $result = parent::insert($data);
+        if($result) {
+            return $this->lastInsertId();
+        }
+        return false;
     }
 
     /**

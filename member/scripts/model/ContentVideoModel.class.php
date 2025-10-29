@@ -57,7 +57,11 @@ class ContentVideoModel extends BaseModel {
             $data['display_order'] = $this->getNextDisplayOrder($data['content_id']);
         }
 
-        return parent::insert($data);
+        $result = parent::insert($data);
+        if($result) {
+            return $this->lastInsertId();
+        }
+        return false;
     }
 
     /**

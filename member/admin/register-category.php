@@ -21,6 +21,7 @@
       'number_of_contents' => $_POST['number_of_contents'],
       'indicate_flag' => $_POST['indicate_flag'],
       'pub_date' => $_POST['pub_date'],
+      'target_course' => isset($_POST['target_course']) ? $_POST['target_course'] : 'all',
     );
 
     $success = $category_model->registerCategory($category_data);
@@ -113,6 +114,16 @@
             <select name="indicate_flag">
               <option value="1">表示</option>
               <option value="2">非表示</option>
+            </select>
+          </td>
+        </tr>
+        <tr>
+          <th>対象コース</th>
+          <td>
+            <select name="target_course">
+              <option value="all">全コース</option>
+              <option value="basic">ベーシック</option>
+              <option value="advance">アドバンス</option>
             </select>
           </td>
         </tr>

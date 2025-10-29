@@ -49,6 +49,7 @@
         <th>日時</th>
         <th>会員名</th>
         <th>タイトル</th>
+        <th>対象コース</th>
         <th>詳細</th>
         <th>ファイルリンク</th>
       </tr>
@@ -59,6 +60,23 @@
         <td><?php echo htmlspecialchars(mb_substr($n['note_date'], 0, 10), ENT_QUOTES, 'UTF-8'); ?></td>
         <td><?php foreach ($members as $m) : if ($m['member_id']==$n['member_id']) { ?><?php echo htmlspecialchars($m['member_name'], ENT_QUOTES, 'UTF-8'); ?><?php } endforeach; ?></td>
         <td><?php echo htmlspecialchars($n['title'], ENT_QUOTES, 'UTF-8'); ?></td>
+        <td>
+          <?php
+            $target_course = !empty($n['target_course']) ? $n['target_course'] : 'all';
+            switch($target_course) {
+              case 'basic':
+                echo 'ベーシック';
+                break;
+              case 'advance':
+                echo 'アドバンス';
+                break;
+              case 'all':
+              default:
+                echo '全コース';
+                break;
+            }
+          ?>
+        </td>
         <td><?php echo htmlspecialchars($n['note'], ENT_QUOTES, 'UTF-8'); ?></td>
         <td style="text-align:center"><input type="button" value="確認する" onclick="location.href='../<?php echo $n['path']; ?>'"></td>
       </tr>

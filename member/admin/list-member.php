@@ -55,11 +55,11 @@
     </a>
     <table class="member">
       <tr>
-        <th>会員ID</th>
+        <th style="width: 30px;">ID</th>
         <th>名前</th>
         <th>コース</th>
         <th>ログインメールアドレス</th>
-        <th>詳細</th>
+        <th style="width: 30px;">詳細</th>
         <!--th>アカウント連絡</th-->
       </tr>
 
@@ -69,9 +69,11 @@
         <td><?php echo htmlspecialchars($member['member_name'], ENT_QUOTES, 'UTF-8'); ?></td>
         <td><?php
         if ($member['select_course'] == 1) {
-          echo 'プレミアムコース';
-        } else {
-          echo 'ベーシックコース';
+          echo 'アドバンス';
+        } elseif ($member['select_course'] == 2) {
+          echo 'ベーシック';
+        } elseif ($member['select_course'] == 3) {
+          echo 'その他';
         }
         ?></td>
         <td><?php echo htmlspecialchars($member['login_mail'], ENT_QUOTES, 'UTF-8'); ?></td>

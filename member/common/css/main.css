@@ -213,21 +213,83 @@ Contents
 
 }
 
-
-
-
-
-
-
-
-
-
-
-/* ===========================================
- * RESPONSIVE
- * =========================================*/
-
 @media screen and (max-width: 780px) { /* SP Display - width:780px under - */
+/* 進捗表示 */
+.progress-section {
+  padding: 15px;
+  margin-bottom: 20px;
+}
+.progress-section h2 {
+  font-size: 1.3em;
+  margin-bottom: 10px;
+}
+.progress-bar-container {
+  height: 25px;
+}
+.progress-text-overlay {
+  font-size: 1em;
+}
+.category-progress-list li {
+  padding: 10px;
+}
+.category-progress-list li h4 {
+  font-size: 1.1em;
+  margin-bottom: 8px;
+}
+.content-list-item {
+  padding: 6px 0;
+}
+.expand-button {
+  padding: 4px 8px;
+  font-size: 0.8em;
+  margin-top: 8px;
+}
+
+/* タグ検索 */
+.tag-checkbox-group {
+  gap: 10px;
+  padding: 10px;
+  margin-bottom: 15px;
+}
+.tag-checkbox-item label {
+  font-size: 0.9em;
+}
+.tag-actions {
+  text-align: center;
+}
+.tag-actions button {
+  margin: 0 5px;
+  padding: 4px 8px;
+  font-size: 0.8em;
+}
+.search-button-area {
+  margin-bottom: 20px;
+  margin-top: 15px;
+}
+.search-button-area input[type="submit"] {
+  padding: 8px 20px;
+  font-size: 1em;
+}
+.search-results-list li {
+  padding: 10px;
+  flex-direction: column;
+  align-items: flex-start;
+}
+.search-results-list li .thumb {
+  margin-right: 0;
+  margin-bottom: 10px;
+}
+.search-results-list li .txt {
+  width: 100%;
+}
+.search-results-list li .title {
+  font-size: 1.1em;
+}
+.search-results-list li .category-info,
+.search-results-list li .summery {
+  font-size: 0.8em;
+}
+
 .spView {display: block;}
 .pcView {display: none;}
 input[type="button"]{-webkit-appearance: none;}
@@ -257,7 +319,7 @@ nav {background:url(../img/bg-nav.png) repeat;width: 100%;padding:15px 0;color: 
 nav li { text-align:left;padding-left: 5%;}
 nav a { color: #fff;}
 #menuButton {display: block;width: 42px;height:42px;position: fixed;top: 9px;right: 10px;z-index: 3;}
-#menuButton span {display: block;background: #fff;width: 24px;height: 2px;position: absolute;left: 9px;transition: all 0.4s;-webkit-transition: all 0.4s;-moz-transition: all 0.4s;}
+#menuButton span {display: block;background: #fff;width: 24px;height: 2px;position: absolute;left: 9px;transition: all 0.4s;-webkit-transition: all 0.4s;-moz-transition: all 0.4s;-ms-transition: all 0.4s;transform: translateY(8px) rotate(45deg);}
 #menuButton span:first-child {top: 12px;}
 #menuButton span:nth-child(2) {margin-top: -1px;top: 50%;}
 #menuButton span:last-child {bottom: 12px;}
@@ -328,6 +390,130 @@ Contents
 #Main input[type=submit]{width: 80%;margin: 0 10% 20px;}
 #Document { margin-bottom: 5%;}
 #Main .Block .txtBlock {overflow: hidden;width: 94%;margin: 0 auto 20px;}
+
+/* 進捗表示 */
+.progress-section {
+  background-color: #f9f9f9;
+  border: 1px solid #eee;
+  border-radius: 5px;
+  padding: 20px;
+  margin-bottom: 30px;
+}
+.progress-section h3 {
+  font-size: 1.5em;
+  margin-bottom: 15px;
+  color: #333;
+}
+/* progress-bar-container, progress-bar-fill は index.php と共通 */
+.progress-text-overlay {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #333;
+  font-weight: bold;
+  font-size: 1.1em;
+}
+.category-progress-list {
+  list-style: none;
+  padding: 0;
+  margin-top: 20px;
+}
+.category-progress-list li {
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  margin-bottom: 10px;
+  padding: 15px;
+}
+.category-progress-list li h4 {
+  margin-top: 0;
+  margin-bottom: 10px;
+  color: #555;
+}
+.content-list-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px dashed #eee;
+}
+.content-list-item:last-child {
+  border-bottom: none;
+}
+.content-list-item .status.completed {
+  color: #4CAF50;
+  font-weight: bold;
+}
+.content-list-item .status.pending {
+  color: #f44336;
+}
+.expand-button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 0.9em;
+  margin-top: 10px;
+}
+.expand-button:hover {
+  background-color: #0056b3;
+}
+.content-details {
+  display: none;
+  margin-top: 10px;
+  padding-left: 15px;
+  border-left: 2px solid #ddd;
+}
+
+/* タグ検索 */
+.tag-checkbox-group {
+  gap: 10px;
+  padding: 10px;
+  margin-bottom: 15px;
+}
+.tag-checkbox-item label {
+  font-size: 0.9em;
+}
+.tag-actions {
+  text-align: center;
+}
+.tag-actions button {
+  margin: 0 5px;
+  padding: 4px 8px;
+  font-size: 0.8em;
+}
+.search-button-area {
+  margin-bottom: 20px;
+  margin-top: 15px;
+}
+.search-button-area input[type="submit"] {
+  padding: 8px 20px;
+  font-size: 1em;
+}
+.search-results-list li {
+  padding: 10px;
+  flex-direction: column;
+  align-items: flex-start;
+}
+.search-results-list li .thumb {
+  margin-right: 0;
+  margin-bottom: 10px;
+}
+.search-results-list li .txt {
+  width: 100%;
+}
+.search-results-list li .title {
+  font-size: 1.1em;
+}
+.search-results-list li .category-info,
+.search-results-list li .summery {
+  font-size: 0.8em;
+}
 
 
 }
@@ -525,4 +711,135 @@ select:-moz-focusring {
   #circle,.svg-container{
     width: 60%;
   }
+}
+.progress-bar-container {
+  width: 100%;
+  background-color: #e0e0e0;
+  border-radius: 5px;
+  height: 30px;
+  margin-top: 10px;
+  overflow: hidden;
+  position: relative;
+}
+.progress-bar-fill {
+  height: 100%;
+  background-color: #4CAF50;
+  width: 0%;
+  border-radius: 5px 0 0 5px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  color: white;
+  font-weight: bold;
+  transition: width 0.5s ease-in-out;
+  padding-right: 10px;
+  box-sizing: border-box;
+}
+.progress-text {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #333;
+  font-weight: bold;
+  font-size: 1.1em;
+}
+.progress-count {
+  font-size: 1.2em;
+  color: #007bff;
+  margin-left: 5px;
+}
+.progress-count span {
+  font-size: 1.5em;
+}
+.progress-detail-link {
+  text-align: right;
+  margin-top: 10px;
+}
+.progress-detail-link a {
+  color: #007bff;
+  text-decoration: none;
+  font-weight: bold;
+}
+.progress-detail-link a:hover {
+  text-decoration: underline;
+}
+.progress-section {
+  background-color: #f9f9f9;
+  border: 1px solid #eee;
+  border-radius: 5px;
+  padding: 20px;
+  margin-bottom: 30px;
+}
+.progress-section h3 {
+  font-size: 1.5em;
+  margin-bottom: 15px;
+  color: #333;
+}
+/* progress-bar-container, progress-bar-fill は index.php と共通 */
+.progress-text-overlay {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #333;
+  font-weight: bold;
+  font-size: 1.1em;
+}
+.category-progress-list {
+  list-style: none;
+  padding: 0;
+  margin-top: 20px;
+}
+.category-progress-list li {
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  margin-bottom: 10px;
+  padding: 15px;
+}
+.category-progress-list li h4 {
+  margin-top: 0;
+  margin-bottom: 10px;
+  color: #555;
+}
+.content-list-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px dashed #eee;
+}
+.content-list-item:last-child {
+  border-bottom: none;
+}
+.content-list-item .status.completed {
+  color: #4CAF50;
+  font-weight: bold;
+}
+.content-list-item .status.pending {
+  color: #f44336;
+}
+.expand-button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 0.9em;
+  margin-top: 10px;
+}
+.expand-button:hover {
+  background-color: #0056b3;
+}
+.content-details {
+  display: none;
+  margin-top: 10px;
+  padding-left: 15px;
+  border-left: 2px solid #ddd;
 }

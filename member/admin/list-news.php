@@ -41,11 +41,12 @@
     </a>
     <table class="member">
       <tr>
-        <th>更新情報ID</th>
+        <th style="width: 30px;">ID</th>
         <th>お知らせ日時(公開日時)</th>
         <th>タイトル</th>
+        <th>対象コース</th>
         <th>表示 / 非表示</th>
-        <th>詳細</th>
+        <th style="width: 30px;">詳細</th>
       </tr>
 
       <?php foreach ($news_list as $n) : ?>
@@ -53,6 +54,23 @@
         <td><?php echo $n['id']; ?></td>
         <td><?php echo htmlspecialchars(mb_substr($n['note_date'], 0, 10), ENT_QUOTES, 'UTF-8'); ?></td>
         <td><?php echo htmlspecialchars($n['description'], ENT_QUOTES, 'UTF-8'); ?></td>
+        <td>
+          <?php
+            $target_course = !empty($n['target_course']) ? $n['target_course'] : 'all';
+            switch($target_course) {
+              case 'basic':
+                echo 'ベーシック';
+                break;
+              case 'advance':
+                echo 'アドバンス';
+                break;
+              case 'all':
+              default:
+                echo '全コース';
+                break;
+            }
+          ?>
+        </td>
         <td>
           <?php
             if($n['is_active']) {

@@ -134,12 +134,11 @@
      */
     public function getCourseFilter($member_course) {
       switch ($member_course) {
-        case self::COURSE_PREMIUM:
-          return ContentModel::TARGET_COURSE_ADVANCE;  // プレミアム → アドバンス
-        case self::COURSE_BASIC:
-          return ContentModel::TARGET_COURSE_BASIC;    // ベーシック → ベーシック
-        case self::COURSE_OTHER:
-          return ContentModel::TARGET_COURSE_STANDARD; // その他 → スタンダード
+        case self::COURSE_PREMIUM:  // 1: プレミアム → アドバンス
+        case self::COURSE_OTHER:    // 3: その他 → アドバンス
+          return ContentModel::TARGET_COURSE_ADVANCE;  // アドバンス（全コンテンツ表示）
+        case self::COURSE_BASIC:    // 2: ベーシック
+          return ContentModel::TARGET_COURSE_BASIC;    // ベーシック（ベーシックコンテンツのみ）
         default:
           return ContentModel::TARGET_COURSE_ALL;      // 不明 → 全コース
       }

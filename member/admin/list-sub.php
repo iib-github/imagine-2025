@@ -52,17 +52,35 @@
     </a>
     <table class="member">
       <tr>
-        <th>資料ID</th>
+        <th style="width: 30px;">ID</th>
         <th>カテゴリー</th>
         <th>タイトル</th>
+        <th>対象コース</th>
         <th>公開日</th>
-        <th>詳細</th>
+        <th style="width: 30px;">詳細</th>
       </tr>
       <?php foreach ($sub_list as $sub) : ?>
       <tr>
         <td><?php echo $sub['sub_id']; ?></td>
         <td>Lesson<?php echo $number_list[$sub['category_id']]; ?></td>
         <td><?php echo htmlspecialchars($sub['content_title'], ENT_QUOTES, 'UTF-8'); ?></td>
+        <td>
+          <?php
+            $target_course = !empty($sub['target_course']) ? $sub['target_course'] : 'all';
+            switch($target_course) {
+              case 'basic':
+                echo 'ベーシック';
+                break;
+              case 'advance':
+                echo 'アドバンス';
+                break;
+              case 'all':
+              default:
+                echo '全コース';
+                break;
+            }
+          ?>
+        </td>
         <td><?php echo htmlspecialchars($sub["pub_date"], ENT_QUOTES, 'UTF-8'); ?></td>
         <td style="text-align:center"><input type="button" value="詳細" onclick="location.href='edit-sub.php?sub_id=<?php echo $sub['sub_id']; ?>'"></td>
       </tr>

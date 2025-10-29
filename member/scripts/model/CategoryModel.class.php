@@ -61,5 +61,59 @@
       return $category_list;
     }
 
+    /**
+     * カテゴリIDからカテゴリナンバーを取得
+     *
+     * @param int $category_id カテゴリID
+     * @return string カテゴリナンバー、またはnull
+     */
+    public function getCategoryNumber($category_id) {
+      $category = $this->select(array('category_id' => $category_id));
+      return !empty($category) ? $category[0]['category_number'] : null;
+    }
+
+    /**
+     * 会員のコースに基づいてカテゴリー一覧を取得
+     *
+     * @param string $course_filter コースフィルタ
+     * @param array $order_data ソート条件
+     * @return array カテゴリー一覧
+     */
+    public function getCategoriesByCourse($course_filter, $order_data = array('category_number' => BaseModel::ORDER_ASC)) {
+      $where_conditions = array('indicate_flag' => self::ACTIVE);
+      
+      // コースフィルタを適用
+      if ($course_filter !== 'all') {
+        $where_conditions['target_course'] = $course_filter;
+      }
+      
+      return $this->select($where_conditions, $order_data);
+    }
+
+    /**
+     * コース別フィルタリング（PHP側）
+     *
+     * @param array $categories カテゴリー一覧
+     * @param string $course_filter コースフィルタ
+     * @return array フィルタリング後のカテゴリー一覧
+     */
+    public function filterCategoriesByCourse($categories, $course_filter) {
+      $filtered_categories = array();
+      
+      foreach ($categories as $category) {
+        // target_courseが'all'またはNULLの場合は常に表示（旧来のコンテンツ）
+        if (empty($category['target_course']) || $category['target_course'] === 'all') {
+          $filtered_categories[] = $category;
+        } elseif ($course_filter === 'advance') {
+          // アドバンス会員は全コンテンツ表示
+          $filtered_categories[] = $category;
+        } elseif ($category['target_course'] === $course_filter) {
+          // ベーシック会員はベーシックコンテンツのみ表示
+          $filtered_categories[] = $category;
+        }
+      }
+      
+      return $filtered_categories;
+    }
 
   }

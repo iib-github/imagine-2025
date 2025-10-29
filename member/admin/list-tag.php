@@ -48,7 +48,9 @@ $tag_list = $tag_model->getTagList(null, array('tag_name' => BaseModel::ORDER_AS
   include_once 'menu.php';
 ?>
 
-    <a href="register-tag.php" class="regster">＋ 新しいタグを追加</a>
+    <a href="register-tag.php" class="regster">
+      <div class="submenu Tab">＋ 新しいタグを追加</div>
+    </a>
 
 <?php
   if(isset($_GET['message']) && $_GET['message'] === 'deleted') {
@@ -65,11 +67,11 @@ $tag_list = $tag_model->getTagList(null, array('tag_name' => BaseModel::ORDER_AS
     <table class="member">
       <thead>
         <tr>
-          <th>ID</th>
+          <th style="width: 30px;">ID</th>
           <th>タグ名</th>
           <th>説明</th>
-          <th>使用数</th>
-          <th>操作</th>
+          <th style="width: 40px;">使用数</th>
+          <th style="width: 30px;">操作</th>
         </tr>
       </thead>
       <tbody>

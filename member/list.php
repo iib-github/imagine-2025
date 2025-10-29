@@ -1,8 +1,14 @@
 <?php
+  require_once dirname(__FILE__) . '/scripts/env.php';
   require_once dirname(__FILE__) . '/scripts/Session.class.php';
   require_once dirname(__FILE__) . '/scripts/model/MemberModel.class.php';
   require_once dirname(__FILE__) . '/scripts/model/CategoryModel.class.php';
   require_once dirname(__FILE__) . '/scripts/model/ContentModel.class.php';
+  
+  // .envファイルを読み込み、エラーハンドリングを初期化
+  loadEnv();
+  initializeErrorHandling();
+  
   $session = Session::getInstance();
 
   // セッションがなければログイン画面に遷移させる。
@@ -10,6 +16,16 @@
     header("Location: login.php");
     exit;
   }
+
+  $member_id = $session->get('member');
+  $member_model = new MemberModel();
+  $member_info = $member_model->select(array('member_id' => $member_id));
+  if (empty($member_info)) {
+      header("Location: login.php");
+      exit;
+  }
+  $member_info = $member_info[0];
+  $course_filter = $member_model->getCourseFilter($member_info['select_course']);
 
   // カテゴリー取得
   $category_model = new CategoryModel();
@@ -25,14 +41,36 @@
   }
 
   // サイドバー（レッスン一覧）表示用
-  $category_list = $category_model->select(array('indicate_flag'=>1), array('category_number'=>$category_model::ORDER_ASC));
+  $all_categories = $category_model->select(array('indicate_flag'=>1), array('category_number'=>$category_model::ORDER_ASC));
+  $category_list = $category_model->filterCategoriesByCourse($all_categories, $course_filter);
 
   // コンテンツ取得
   $content_model = new ContentModel();
-  $contents = $content_model->select(array(
+  
+  $where_conditions = array(
     'category_id'=>$category['category_id'],
     'indicate_flag'=>$content_model::ACTIVE,
-  ), array('display_order'=>$content_model::ORDER_ASC));
+  );
+  
+  // コースフィルタを適用
+  // NOTE: target_courseが'all'の場合、またはNULLの場合は全コースに表示
+  $contents = $content_model->select($where_conditions, array('display_order'=>$content_model::ORDER_ASC));
+  
+  // 会員のコースに基づいてフィルタリング
+  $filtered_contents = array();
+  foreach ($contents as $content) {
+    // target_courseが'all'またはNULLの場合は常に表示（旧来のコンテンツ）
+    if (empty($content['target_course']) || $content['target_course'] === ContentModel::TARGET_COURSE_ALL) {
+      $filtered_contents[] = $content;
+    } elseif ($course_filter === ContentModel::TARGET_COURSE_ADVANCE) {
+      // アドバンス会員は全コンテンツ表示
+      $filtered_contents[] = $content;
+    } elseif ($content['target_course'] === $course_filter) {
+      // ベーシック会員はベーシックコンテンツのみ表示
+      $filtered_contents[] = $content;
+    }
+  }
+  $contents = $filtered_contents;
 
 ?><!DOCTYPE html>
 <html>

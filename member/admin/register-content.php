@@ -1,9 +1,14 @@
 <?php
+  require_once dirname(__FILE__) . '/../scripts/env.php';
   require_once dirname(__FILE__) . '/../scripts/Session.class.php';
   require_once dirname(__FILE__) . '/../scripts/model/ContentModel.class.php';
   require_once dirname(__FILE__) . '/../scripts/model/CategoryModel.class.php';
   require_once dirname(__FILE__) . '/../scripts/model/TagModel.class.php';
   require_once dirname(__FILE__) . '/../scripts/model/ContentVideoModel.class.php';
+  
+  // .envファイルを読み込み、エラーハンドリングを初期化
+  loadEnv();
+  initializeErrorHandling();
   
   $session = Session::getInstance();
 
@@ -31,7 +36,6 @@
       'category_id' => $_POST['category'],
       'content_week' => $_POST['week'],
       'content_title' => $_POST['title'],
-      'content_movie_url' => $_POST['movie_url'],
       'content_text' => $_POST['discription'],
       'display_order' => $_POST['order'],
       'indicate_flag' => $_POST['active'],
@@ -44,15 +48,15 @@
       $content_data['is_faq'] = $content_model::IS_NOT_FAQ;
     }
 
-    $success = $content_model->registerContent($content_data);
-    if($success) {
-      // コンテンツIDを取得
-      $content_id = $content_model->lastInsertId();
-      
+    $content_id = $content_model->registerContent($content_data);
+    if($content_id) {
       // タグを関連付け
       if(!empty($_POST['tags'])) {
         $tag_ids = array_map('intval', $_POST['tags']);
-        $content_model->setContentTags($content_id, $tag_ids);
+        $tag_result = $content_model->setContentTags($content_id, $tag_ids);
+        if(!$tag_result) {
+          error_log("Failed to set content tags for content_id: " . $content_id);
+        }
       }
       
       // 複数動画を登録
@@ -68,7 +72,10 @@
               'thumbnail_url' => isset($_POST['thumbnail_urls'][$index]) ? $_POST['thumbnail_urls'][$index] : '',
               'display_order' => $display_order
             );
-            $video_model->registerVideo($video_data);
+            $video_result = $video_model->registerVideo($video_data);
+            if(!$video_result) {
+              error_log("Failed to register video for content_id: " . $content_id . ", video_url: " . $video_url);
+            }
             $display_order++;
           }
         }
@@ -76,6 +83,8 @@
       
       header("Location: list-content.php");
       exit;
+    } else {
+      error_log("Failed to register content");
     }
 
   }

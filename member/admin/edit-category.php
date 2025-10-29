@@ -42,6 +42,7 @@
       'number_of_contents' => $_POST['number_of_contents'],
       'indicate_flag' => $_POST['indicate_flag'],
       'pub_date' => $_POST['pub_date'],
+      'target_course' => isset($_POST['target_course']) ? $_POST['target_course'] : 'all',
     );
     $category_model = new CategoryModel();
     $category_model->registerCategory($data);
@@ -151,6 +152,16 @@
             <select name="indicate_flag">
               <option value="1"<?php if($category['indicate_flag'] == 1) echo ' selected="selected"';?>>表示</option>
               <option value="2"<?php if($category['indicate_flag'] == 2) echo ' selected="selected"';?>>非表示</option>
+            </select>
+          </td>
+        </tr>
+        <tr>
+          <th>対象コース</th>
+          <td>
+            <select name="target_course">
+              <option value="all"<?php if(empty($category['target_course']) || $category['target_course'] === 'all') echo ' selected="selected"';?>>全コース</option>
+              <option value="basic"<?php if($category['target_course'] === 'basic') echo ' selected="selected"';?>>ベーシック</option>
+              <option value="advance"<?php if($category['target_course'] === 'advance') echo ' selected="selected"';?>>アドバンス</option>
             </select>
           </td>
         </tr>

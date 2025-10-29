@@ -15,10 +15,9 @@
     const IS_NOT_FAQ = 2;
 
     // コース設定
-    const TARGET_COURSE_STANDARD = 'standard';
-    const TARGET_COURSE_BASIC = 'basic';
-    const TARGET_COURSE_ADVANCE = 'advance';
-    const TARGET_COURSE_ALL = 'all';
+    const TARGET_COURSE_BASIC = 'basic';     // ベーシック（ベーシックコンテンツのみ）
+    const TARGET_COURSE_ADVANCE = 'advance'; // アドバンス（全コンテンツ）
+    const TARGET_COURSE_ALL = 'all';         // 全コース（旧来のコンテンツ用）
 
     public function __construct()
     {
@@ -42,30 +41,56 @@
         // insertしたレコードのIDを取得
         parent::insert($data);
         $content_id = $this->lastInsertId();
+        
+        // サムネイル画像のアップロード
+        $fname_thumbnail = 'cont_' . $content_id . '-' .'thumbnail';
+        if(($fname = UploadLib::getInstance()->_upload('thumbnail', 'content', $fname_thumbnail)) !== false) {
+          $update_data['thumbnail_url'] = 'contents/content/' . $fname;
+        }
+
+        // 資料のアップロード
+        $fname_work = 'cont_' . $content_id . '-' .'work';
+        if(($fnames = UploadLib::getInstance()->_upload('txt_url', 'works', $fname_work)) !== false) {
+          $update_data['text_dl_url'] = 'contents/works/' . $fnames;
+        }
+
+        // 書き起こし資料のアップロード
+        $fname_document = 'cont_' . $content_id . '-' .'document';
+        if(($fnames = UploadLib::getInstance()->_upload('document', 'document', $fname_document)) !== false) {
+          $update_data['message_dl_url'] = 'contents/document/' . $fnames;
+        }
+
+        // アップロードされたファイルがある場合は更新
+        if(!empty($update_data)) {
+          parent::update($update_data, array('content_id' => $content_id));
+        }
+        
+        return $content_id;
       } else {
         // update時
         $content_id = $data['content_id'];
-      }
+        
+        // サムネイル画像のアップロード
+        $fname_thumbnail = 'cont_' . $content_id . '-' .'thumbnail';
+        if(($fname = UploadLib::getInstance()->_upload('thumbnail', 'content', $fname_thumbnail)) !== false) {
+          $data['thumbnail_url'] = 'contents/content/' . $fname;
+        }
 
-      // サムネイル画像のアップロード
-      $fname_thumbnail = 'cont_' . $content_id . '-' .'thumbnail';
-      if(($fname = UploadLib::getInstance()->_upload('thumbnail', 'content', $fname_thumbnail)) !== false) {
-        $data['thumbnail_url'] = 'contents/content/' . $fname;
-      }
+        // 資料のアップロード
+        $fname_work = 'cont_' . $content_id . '-' .'work';
+        if(($fnames = UploadLib::getInstance()->_upload('txt_url', 'works', $fname_work)) !== false) {
+          $data['text_dl_url'] = 'contents/works/' . $fnames;
+        }
 
-      // 資料のアップロード
-      $fname_work = 'cont_' . $content_id . '-' .'work';
-      if(($fnames = UploadLib::getInstance()->_upload('txt_url', 'works', $fname_work)) !== false) {
-        $data['text_dl_url'] = 'contents/works/' . $fnames;
-      }
+        // 書き起こし資料のアップロード
+        $fname_document = 'cont_' . $content_id . '-' .'document';
+        if(($fnames = UploadLib::getInstance()->_upload('document', 'document', $fname_document)) !== false) {
+          $data['message_dl_url'] = 'contents/document/' . $fnames;
+        }
 
-      // 書き起こし資料のアップロード
-      $fname_document = 'cont_' . $content_id . '-' .'document';
-      if(($fnames = UploadLib::getInstance()->_upload('document', 'document', $fname_document)) !== false) {
-        $data['message_dl_url'] = 'contents/document/' . $fnames;
+        parent::update($data, array('content_id' => $content_id));
+        return $content_id;
       }
-
-      return parent::update($data, array('content_id' => $content_id));
     }
 
 
@@ -352,12 +377,11 @@
      * @return array コース一覧
      */
     public function getAvailableCourses() {
-      return array(
-        self::TARGET_COURSE_STANDARD => 'スタンダード',
+        return array(
         self::TARGET_COURSE_BASIC => 'ベーシック',
         self::TARGET_COURSE_ADVANCE => 'アドバンス',
         self::TARGET_COURSE_ALL => '全コース'
-      );
+        );
     }
 
     /**

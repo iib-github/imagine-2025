@@ -1,6 +1,7 @@
 <ul class="Selection">
   <li><a href="list-category.php"><div class="Tab<?php if($menu_active=='ctgr'){ ?>-Active<?php } ?>">カテゴリー一覧</div></a></li>
   <li><a href="list-content.php"><div class="Tab<?php if($menu_active=='cnts'){ ?>-Active<?php } ?>">コンテンツ一覧</div></a></li>
+  <li><a href="list-tag.php"><div class="Tab<?php if($menu_active=='tags'){ ?>-Active<?php } ?>">タグ一覧</div></a></li>
   <li><a href="list-sub.php"><div class="Tab<?php if($menu_active=='sub'){ ?>-Active<?php } ?>">資料一覧</div></a></li>
   <li><a href="list-member.php"><div class="Tab<?php if($menu_active=='cstm'){ ?>-Active<?php } ?>">会員一覧</div></a></li>
   <li><a href="list-news.php"><div class="Tab<?php if($menu_active=='news'){ ?>-Active<?php } ?>">更新情報一覧</div></a></li>

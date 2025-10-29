@@ -41,11 +41,12 @@
     </a>
     <table class="member">
       <tr>
-        <th>カテゴリーID</th>
+        <th style="width: 30px;">ID</th>
         <th>ナンバー</th>
         <th>タイトル</th>
+        <th>対象コース</th>
         <th>公開日</th>
-        <th>詳細</th>
+        <th style="width: 30px;">詳細</th>
       </tr>
 
 <?php foreach ($category_list as $category) : ?>
@@ -59,6 +60,23 @@
         <td>Lesson<?php echo $category['category_number']; ?></td>
 <?php endif; ?>
         <td><?php echo htmlspecialchars($category['category_title'], ENT_QUOTES, 'UTF-8'); ?></td>
+        <td>
+          <?php
+            $target_course = !empty($category['target_course']) ? $category['target_course'] : 'all';
+            switch($target_course) {
+              case 'basic':
+                echo 'ベーシック';
+                break;
+              case 'advance':
+                echo 'アドバンス';
+                break;
+              case 'all':
+              default:
+                echo '全コース';
+                break;
+            }
+          ?>
+        </td>
         <td><?php echo htmlspecialchars($category["pub_date"], ENT_QUOTES, 'UTF-8'); ?></td>
         <td style="text-align:center"><input type="button" value="詳細" onclick="location.href='edit-category.php?ctg_id=<?php echo $category['category_id']; ?>'"></td>
       </tr>
