@@ -93,15 +93,38 @@
         $video_model = new ContentVideoModel();
         // 既存の動画を削除
         $video_model->deleteVideosByContentId($content_id);
-        
+
         $display_order = 1;
         foreach($_POST['video_urls'] as $index => $video_url) {
           if(!empty($video_url)) {
+            // サムネイルのアップロード（あれば優先）
+            $thumb_url = '';
+            if(isset($_FILES['video_thumbnails']) && isset($_FILES['video_thumbnails']['name'][$index]) && $_FILES['video_thumbnails']['name'][$index] !== '') {
+              // 一時キーに詰め替えてUploadLibを使う
+              $tmpKey = '__video_thumb';
+              $_FILES[$tmpKey] = array(
+                'name' => $_FILES['video_thumbnails']['name'][$index],
+                'type' => $_FILES['video_thumbnails']['type'][$index],
+                'tmp_name' => $_FILES['video_thumbnails']['tmp_name'][$index],
+                'error' => $_FILES['video_thumbnails']['error'][$index],
+                'size' => $_FILES['video_thumbnails']['size'][$index],
+              );
+              $prefix = 'cont_' . $content_id . '-video_' . $display_order . '-thumb';
+              if(($fname = UploadLib::getInstance()->_upload($tmpKey, 'content', $prefix)) !== false) {
+                $thumb_url = 'contents/content/' . $fname;
+              }
+              unset($_FILES[$tmpKey]);
+            }
+            // アップロードが無ければ既存値（hidden）を利用
+            if(empty($thumb_url) && isset($_POST['thumbnail_urls'][$index])) {
+              $thumb_url = $_POST['thumbnail_urls'][$index];
+            }
+
             $video_data = array(
               'content_id' => $content_id,
               'video_url' => $video_url,
               'video_title' => isset($_POST['video_titles'][$index]) ? $_POST['video_titles'][$index] : '動画' . $display_order,
-              'thumbnail_url' => isset($_POST['thumbnail_urls'][$index]) ? $_POST['thumbnail_urls'][$index] : '',
+              'thumbnail_url' => $thumb_url,
               'display_order' => $display_order
             );
             $video_model->registerVideo($video_data);
@@ -187,7 +210,11 @@
     newEntry.innerHTML = `
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
         <strong>動画 ${videoCount + 1}</strong>
-        <button type="button" class="remove-video-btn" onclick="removeVideoField(this)">削除</button>
+        <div>
+          <button type="button" class="remove-video-btn" onclick="moveVideoUp(this)" style="margin-right:8px;background-color:#9e9e9e;">上へ</button>
+          <button type="button" class="remove-video-btn" onclick="moveVideoDown(this)" style="margin-right:8px;background-color:#9e9e9e;">下へ</button>
+          <button type="button" class="remove-video-btn" onclick="removeVideoField(this)">削除</button>
+        </div>
       </div>
       <input type="text" name="video_titles[]" placeholder="動画タイトル" style="width: 100%;">
       <textarea name="video_urls[]" placeholder="動画埋め込みコード（iframe等）" style="width: 100%; height: 80px;"></textarea>
@@ -201,6 +228,26 @@
     btn.closest('.video-entry').remove();
     // 番号を更新
     updateVideoNumbers();
+  }
+
+  function moveVideoUp(btn) {
+    const entry = btn.closest('.video-entry');
+    if (!entry) return;
+    const prev = entry.previousElementSibling;
+    if (prev && prev.classList.contains('video-entry')) {
+      prev.parentNode.insertBefore(entry, prev);
+      updateVideoNumbers();
+    }
+  }
+  
+  function moveVideoDown(btn) {
+    const entry = btn.closest('.video-entry');
+    if (!entry) return;
+    const next = entry.nextElementSibling;
+    if (next && next.classList.contains('video-entry')) {
+      next.parentNode.insertBefore(next, entry);
+      updateVideoNumbers();
+    }
   }
   
   function updateVideoNumbers() {
@@ -290,7 +337,7 @@
           <th>サムネイル画像</th>
           <td>
             <?php if(!empty($content["thumbnail_url"])){ ?>
-            https://<?php echo env('SITE_DOMAIN', 'the-imagine.com'); ?>/membership/member/<?php echo $content["thumbnail_url"]; ?><br>
+            https://<?php echo env('SITE_DOMAIN', 'the-imagine.com'); ?>/<?php echo $content["thumbnail_url"]; ?><br>
             <img src="<?php echo '../'.$content["thumbnail_url"].'?='.time(); ?>"><br>
             <?php } ?>
             <input type="file" name="thumbnail" id="thumbnail">
@@ -306,11 +353,21 @@
                 <div class="video-entry">
                   <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
                     <strong>動画 <?php echo $index + 1; ?></strong>
-                    <button type="button" class="remove-video-btn" onclick="removeVideoField(this)">削除</button>
+                    <div>
+                      <button type="button" class="remove-video-btn" onclick="moveVideoUp(this)" style="margin-right:8px;background-color:#9e9e9e;">上へ</button>
+                      <button type="button" class="remove-video-btn" onclick="moveVideoDown(this)" style="margin-right:8px;background-color:#9e9e9e;">下へ</button>
+                      <button type="button" class="remove-video-btn" onclick="removeVideoField(this)">削除</button>
+                    </div>
                   </div>
-                  <input type="text" name="video_titles[]" placeholder="動画タイトル" style="width: 100%;" value="<?php echo htmlspecialchars($video['video_title'], ENT_QUOTES, 'UTF-8'); ?>">
-                  <textarea name="video_urls[]" placeholder="動画埋め込みコード（iframe等）" style="width: 100%; height: 80px;"><?php echo htmlspecialchars($video['video_url'], ENT_QUOTES, 'UTF-8'); ?></textarea>
-                  <input type="text" name="thumbnail_urls[]" placeholder="サムネイル画像URL" style="width: 100%;" value="<?php echo htmlspecialchars($video['thumbnail_url'], ENT_QUOTES, 'UTF-8'); ?>">
+                  <input type="text" name="video_titles[]" placeholder="動画タイトル" style="width: 100%;" value="<?php echo htmlspecialchars(isset($video['video_title']) ? $video['video_title'] : '', ENT_QUOTES, 'UTF-8'); ?>">
+                  <textarea name="video_urls[]" placeholder="動画埋め込みコード（iframe等）" style="width: 100%; height: 80px;"><?php echo htmlspecialchars(isset($video['video_url']) ? $video['video_url'] : '', ENT_QUOTES, 'UTF-8'); ?></textarea>
+                  <?php if(!empty($video['thumbnail_url'])): ?>
+                  <div style="margin:6px 0;">
+                    <img src="<?php echo htmlspecialchars($video['thumbnail_url'], ENT_QUOTES, 'UTF-8'); ?>" alt="thumb" style="max-width:180px;height:auto;border:1px solid #ddd;">
+                  </div>
+                  <?php endif; ?>
+                  <input type="file" name="video_thumbnails[]" accept="image/*">
+                  <input type="hidden" name="thumbnail_urls[]" value="<?php echo htmlspecialchars(isset($video['thumbnail_url']) ? $video['thumbnail_url'] : '', ENT_QUOTES, 'UTF-8'); ?>">
                 </div>
                 <?php endforeach; ?>
               <?php endif; ?>
@@ -325,7 +382,7 @@
           <th>講座資料ダウンロード</th>
           <td>
             <?php if(!empty($content["text_dl_url"])){ ?>
-            <a href="/membership/member/<?php echo $content["text_dl_url"]; ?>" target="_blank">https://<?php echo env('SITE_DOMAIN', 'the-imagine.com'); ?>/membership/member/<?php echo $content["text_dl_url"]; ?></a>
+            <a href="/<?php echo $content["text_dl_url"]; ?>" target="_blank">https://<?php echo env('SITE_DOMAIN', 'the-imagine.com'); ?>/<?php echo $content["text_dl_url"]; ?></a>
             <?php } ?>
             <br><input type="file" name="txt_url" id="txt_url">
           </td>
@@ -334,7 +391,7 @@
           <th>文字起こし資料の<br>ダウンロード</th>
           <td>
             <?php if(!empty($content["message_dl_url"])){ ?>
-            <a href="/membership/member/<?php echo $content["message_dl_url"]; ?>" target="_blank">https://<?php echo env('SITE_DOMAIN', 'the-imagine.com'); ?>/membership/member/<?php echo $content["message_dl_url"]; ?></a>
+            <a href="/<?php echo $content["message_dl_url"]; ?>" target="_blank">https://<?php echo env('SITE_DOMAIN', 'the-imagine.com'); ?>/<?php echo $content["message_dl_url"]; ?></a>
             <?php } ?>
             <br><input type="file" name="document" id="document">
           </td>

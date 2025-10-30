@@ -33,8 +33,14 @@
   $filtered_content_list = array();
   foreach ($content_list as $content) {
     // コース別フィルタ
-    if (!empty($filter_course) && $content['target_course'] !== $filter_course) {
-      continue;
+    if (!empty($filter_course)) {
+      $target_course = isset($content['target_course']) ? $content['target_course'] : '';
+      // フィルタが指定されている場合：
+      // - コンテンツが指定コースと一致 → 表示
+      // - コンテンツが'all'または空(NULL) → どちらのフィルタでも表示
+      if ($target_course !== $filter_course && $target_course !== ContentModel::TARGET_COURSE_ALL && !empty($target_course)) {
+        continue;
+      }
     }
     
     // タグ別フィルタ

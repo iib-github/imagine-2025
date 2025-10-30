@@ -79,7 +79,7 @@
 <title>コンテンツ一覧 - THE Imagine Members SITE</title>
 <meta name="robots" content="noindex,nofollow" />
 <meta name="viewport" content="width=device-width">
-<link rel="apple-touch-icon" href="/membership/member/common/img/apple-touch-icon.png">
+<link rel="apple-touch-icon" href="/common/img/apple-touch-icon.png">
 <link href="common/css/main.css?date=20170614220000" rel="stylesheet">
 <link href="common/css/jquery.circliful.css" rel="stylesheet" type="text/css" />
 <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>

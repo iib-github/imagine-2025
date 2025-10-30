@@ -143,7 +143,7 @@
 <title>コンテンツ詳細 - THE Imagine Members SITE</title>
 <meta name="robots" content="noindex,nofollow" />
 <meta name="viewport" content="width=device-width">
-<link rel="apple-touch-icon" href="/membership/member/common/img/apple-touch-icon.png">
+<link rel="apple-touch-icon" href="/common/img/apple-touch-icon.png">
 <link href="common/css/main.css?date=20170614220000" rel="stylesheet">
 <link href="common/css/jquery.circliful.css" rel="stylesheet" type="text/css" />
 <link href="https://fonts.googleapis.com/css?family=Questrial" rel="stylesheet">
@@ -200,6 +200,10 @@
     height: 0;
     transition: opacity 0.5s ease-in-out; /* フェードアニメーション */
   }
+  /* 複数動画用のパネル（同一DOM内で表示切替） */
+  #main-video-player { position: relative; }
+  .video-pane { display: none; position: absolute; inset: 0; }
+  .video-pane.active { display: block; }
   .youtube.fade-out {
     opacity: 0;
   }
@@ -213,19 +217,47 @@
 <!-- 動画切り替えスクリプト -->
 <script>
   $(document).ready(function() {
+    const player = $('#main-video-player');
+    const panes = {}; // index -> pane div (.video-pane)
+    let currentIndex = 0;
+
+    // 初期のiframeを包んでパネル化（再ロードなし）
+    const initialChild = player.children().first();
+    if (initialChild.length) {
+      const pane0 = $('<div class="video-pane active"></div>');
+      pane0.append(initialChild); // 既存ノードをラップ（再読み込みしない）
+      player.empty().append(pane0);
+      panes[0] = pane0;
+    }
+
+    function getOrCreatePane(index) {
+      if (panes[index]) return panes[index];
+      const html = $('.video-thumbnail-item[data-index="' + index + '"]').data('video-url');
+      const temp = $('<div></div>').html(html);
+      const node = temp.contents(); // iframe等
+      const pane = $('<div class="video-pane"></div>').append(node);
+      player.append(pane); // 同一DOM下に保持（表示切替のみ）
+      panes[index] = pane;
+      return pane;
+    }
+
     $('.video-thumbnail-item').on('click', function() {
-      const newVideoUrl = $(this).data('video-url');
-      const mainPlayer = $('#main-video-player');
-      
-      mainPlayer.addClass('fade-out');
+      const index = parseInt($(this).data('index'), 10);
+      if (isNaN(index) || index === currentIndex) return;
+
+      const nextPane = getOrCreatePane(index);
+      const currPane = panes[currentIndex];
+
+      // フェード切替（DOMは保持、表示だけ切替）
+      player.addClass('fade-out');
       setTimeout(() => {
-        mainPlayer.html(newVideoUrl);
-        mainPlayer.removeClass('fade-out').addClass('fade-in');
-        setTimeout(() => {
-          mainPlayer.removeClass('fade-in');
-        }, 500); // フェードインの時間
-      }, 500); // フェードアウトの時間
-      
+        if (currPane) currPane.removeClass('active');
+        nextPane.addClass('active');
+        player.removeClass('fade-out').addClass('fade-in');
+        setTimeout(() => player.removeClass('fade-in'), 500);
+      }, 500);
+
+      currentIndex = index;
       $('.video-thumbnail-item').removeClass('active');
       $(this).addClass('active');
     });
@@ -262,11 +294,22 @@
               <div id="main-video-player" class="youtube">
                 <?php echo $content_videos[0]['video_url']; // 最初の動画を初期表示 ?>
               </div>
+              <div id="video-cache" style="display:none;"></div>
               <?php if(count($content_videos) > 1) : // 動画が複数ある場合のみ切り替えUIを表示 ?>
               <div class="video-thumbnail-list">
                 <?php foreach($content_videos as $index => $video) : ?>
-                <div class="video-thumbnail-item<?php echo ($index === 0) ? ' active' : ''; ?>" data-video-url="<?php echo htmlspecialchars($video['video_url'], ENT_QUOTES, 'UTF-8'); ?>">
-                  <img src="<?php echo !empty($video['thumbnail_url']) ? htmlspecialchars($video['thumbnail_url'], ENT_QUOTES, 'UTF-8') : 'common/img/no_image.png'; ?>" alt="<?php echo htmlspecialchars($video['video_title'], ENT_QUOTES, 'UTF-8'); ?>">
+                <div class="video-thumbnail-item<?php echo ($index === 0) ? ' active' : ''; ?>" data-index="<?php echo $index; ?>" data-video-url="<?php echo htmlspecialchars($video['video_url'], ENT_QUOTES, 'UTF-8'); ?>">
+                  <?php
+                    $thumb = '';
+                    if (!empty($video['thumbnail_url'])) {
+                      $thumb = $video['thumbnail_url'];
+                    } elseif (!empty($content['thumbnail_url'])) {
+                      $thumb = $content['thumbnail_url'];
+                    } else {
+                      $thumb = 'common/img/no_image.png';
+                    }
+                  ?>
+                  <img src="<?php echo htmlspecialchars($thumb, ENT_QUOTES, 'UTF-8'); ?>" alt="<?php echo htmlspecialchars($video['video_title'], ENT_QUOTES, 'UTF-8'); ?>">
                   <span><?php echo htmlspecialchars($video['video_title'], ENT_QUOTES, 'UTF-8'); ?></span>
                 </div>
                 <?php endforeach; ?>

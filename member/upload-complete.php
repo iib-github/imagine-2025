@@ -1,6 +1,6 @@
 <?php
   //一旦非表示
-  header("Location: /membership/member/");
+  header("Location: /");
   exit;
 
   require_once dirname(__FILE__) . '/scripts/Session.class.php';
@@ -19,7 +19,7 @@
 <title>提出完了 - THE Imagine Membersサイト</title>
 <meta name="robots" content="noindex,nofollow" />
 <meta name="viewport" content="width=device-width">
-<link rel="apple-touch-icon" href="/membership/member/common/img/apple-touch-icon.png">
+<link rel="apple-touch-icon" href="/common/img/apple-touch-icon.png">
 <link href="common/css/main.css" rel="stylesheet">
 <!--[if lt IE 9]>
 <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>

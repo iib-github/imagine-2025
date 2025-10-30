@@ -108,7 +108,7 @@
           <th>サムネイル画像</th>
           <td>
             <?php if(!empty($sub["thumbnail_url"])){ ?>
-            https://<?php echo env('SITE_DOMAIN', 'the-imagine.com'); ?>/membership/member/<?php echo $sub["thumbnail_url"]; ?><br>
+            https://<?php echo env('SITE_DOMAIN', 'the-imagine.com'); ?>/<?php echo $sub["thumbnail_url"]; ?><br>
             <img src="<?php echo '../'.$sub["thumbnail_url"].'?='.time(); ?>"><br>
             <?php } ?>
             <input type="file" name="thumbnail" id="thumbnail">
@@ -118,7 +118,7 @@
           <th>資料アップロード</th>
           <td>
             <?php if(!empty($sub["content_url"])){ ?>
-            <a href="/membership/member/<?php echo $sub["content_url"]; ?>" target="_blank">https://<?php echo env('SITE_DOMAIN', 'the-imagine.com'); ?>/membership/member/<?php echo $sub["content_url"]; ?></a><br>
+            <a href="/<?php echo $sub["content_url"]; ?>" target="_blank">https://<?php echo env('SITE_DOMAIN', 'the-imagine.com'); ?>/<?php echo $sub["content_url"]; ?></a><br>
             <?php } ?>
             <input type="file" name="content" id="content">
           </td>

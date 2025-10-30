@@ -61,7 +61,7 @@
       <tr>
         <td style="width:5%;"><?php echo $n['id']; ?></td>
         <td style="width:10%;"><?php echo htmlspecialchars(mb_substr($n['created_date'], 0, 10), ENT_QUOTES, 'UTF-8'); ?></td>
-        <td style="width:10%;"><a href="/membership/member/admin/edit-member.php?mid=<?php echo $n['member_id']; ?>"><?php echo $number_list[$n['member_id']]; ?></a></td>
+        <td style="width:10%;"><a href="/admin/edit-member.php?mid=<?php echo $n['member_id']; ?>"><?php echo $number_list[$n['member_id']]; ?></a></td>
         <td style="width:10%;"><?php echo htmlspecialchars($n['category'], ENT_QUOTES, 'UTF-8'); ?></td>
         <td style="width:65%;"><?php echo htmlspecialchars($n['text'], ENT_QUOTES, 'UTF-8'); ?></td>
       </tr>

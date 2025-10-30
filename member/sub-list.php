@@ -36,7 +36,7 @@
 <title>ダウンロード資料一覧 - THE Imagine Members SITE</title>
 <meta name="robots" content="noindex,nofollow" />
 <meta name="viewport" content="width=device-width">
-<link rel="apple-touch-icon" href="/membership/member/common/img/apple-touch-icon.png">
+<link rel="apple-touch-icon" href="/common/img/apple-touch-icon.png">
 <link href="common/css/main.css?date=20170614220000" rel="stylesheet">
 <link href="common/css/jquery.circliful.css" rel="stylesheet" type="text/css" />
 <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
@@ -61,7 +61,7 @@
         <h2>ダウンロード資料一覧</h2>
         <div class="Block">
           <p class="Photo">
-            <img src="/membership/member/common/img/catBnr-special.png" width="712" height="251" alt=""/>
+            <img src="/common/img/catBnr-special.png" width="712" height="251" alt=""/>
           </p>
           <div class="txt">
             <p>本講座でお届けした資料やその他特典コンテンツをダウンロードすることができます</p>

@@ -15,7 +15,7 @@
 <title>ご質問BOX送信完了 - THE Imagine Membersサイト</title>
 <meta name="robots" content="noindex,nofollow" />
 <meta name="viewport" content="width=device-width">
-<link rel="apple-touch-icon" href="/membership/member/common/img/apple-touch-icon.png">
+<link rel="apple-touch-icon" href="/common/img/apple-touch-icon.png">
 <link href="../common/css/main.css" rel="stylesheet">
 <link href="../common/css/main.css" rel="stylesheet">
 <!--[if lt IE 9]>
@@ -44,7 +44,7 @@
             <p>ご質問ありがとうございました！<br>ご質問内容を確認し、必要に応じてQ&Aライブやメールにてお答えさせていただきます。</p>
             <p>引き続き THE Imagineをお楽しみください。</p>
             <p>アストロクリエイター　星野ワタル</p>
-            <a href="/membership/member/" class="btn">トップページに戻る</a>
+            <a href="/" class="btn">トップページに戻る</a>
           </div>
         </div>
       </section>

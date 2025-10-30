@@ -65,11 +65,32 @@
         $display_order = 1;
         foreach($_POST['video_urls'] as $index => $video_url) {
           if(!empty($video_url)) {
+            // サムネイルのアップロード（あれば優先）
+            $thumb_url = '';
+            if(isset($_FILES['video_thumbnails']) && isset($_FILES['video_thumbnails']['name'][$index]) && $_FILES['video_thumbnails']['name'][$index] !== '') {
+              $tmpKey = '__video_thumb';
+              $_FILES[$tmpKey] = array(
+                'name' => $_FILES['video_thumbnails']['name'][$index],
+                'type' => $_FILES['video_thumbnails']['type'][$index],
+                'tmp_name' => $_FILES['video_thumbnails']['tmp_name'][$index],
+                'error' => $_FILES['video_thumbnails']['error'][$index],
+                'size' => $_FILES['video_thumbnails']['size'][$index],
+              );
+              $prefix = 'cont_' . $content_id . '-video_' . $display_order . '-thumb';
+              if(($fname = UploadLib::getInstance()->_upload($tmpKey, 'content', $prefix)) !== false) {
+                $thumb_url = 'contents/content/' . $fname;
+              }
+              unset($_FILES[$tmpKey]);
+            }
+            if(empty($thumb_url) && isset($_POST['thumbnail_urls'][$index])) {
+              $thumb_url = $_POST['thumbnail_urls'][$index];
+            }
+
             $video_data = array(
               'content_id' => $content_id,
               'video_url' => $video_url,
               'video_title' => isset($_POST['video_titles'][$index]) ? $_POST['video_titles'][$index] : '動画' . $display_order,
-              'thumbnail_url' => isset($_POST['thumbnail_urls'][$index]) ? $_POST['thumbnail_urls'][$index] : '',
+              'thumbnail_url' => $thumb_url,
               'display_order' => $display_order
             );
             $video_result = $video_model->registerVideo($video_data);
@@ -165,7 +186,8 @@
       </div>
       <input type="text" name="video_titles[]" placeholder="動画タイトル" style="width: 100%;">
       <textarea name="video_urls[]" placeholder="動画埋め込みコード（iframe等）" style="width: 100%; height: 80px;"></textarea>
-      <input type="text" name="thumbnail_urls[]" placeholder="サムネイル画像URL" style="width: 100%;">
+      <input type="file" name="video_thumbnails[]" accept="image/*">
+      <input type="hidden" name="thumbnail_urls[]" value="">
     `;
     
     videoContainer.appendChild(newEntry);

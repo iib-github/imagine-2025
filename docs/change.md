@@ -134,7 +134,7 @@ mail@cosmamic-space.com
 
 ### 5. URLパス・ドメイン設定
 
-以下のファイルで `/membership/member/` というパスがハードコードされています。プロジェクトの配置に応じて変更してください。
+以下のファイルで `/` というパスがハードコードされています。プロジェクトの配置に応じて変更してください。
 
 **対象ファイル一覧**:
 - `member/tmp/header.php` (複数箇所)
@@ -148,8 +148,8 @@ mail@cosmamic-space.com
 **変更例**:
 ```php
 // 変更前
-<a href="/membership/member/">TOP</a>
-<link rel="apple-touch-icon" href="/membership/member/common/img/apple-touch-icon.png">
+<a href="/">TOP</a>
+<link rel="apple-touch-icon" href="/common/img/apple-touch-icon.png">
 
 // 変更後（例：サブディレクトリに配置する場合）
 <a href="/new-project/member/">TOP</a>
@@ -184,11 +184,11 @@ mail@cosmamic-space.com
 **ファイル**: `member/admin/edit-category.php`, `member/admin/edit-content.php`, `member/admin/edit-sub.php`
 
 ```106:106:member/admin/edit-category.php
-            https://the-imagine.com/membership/member/<?php echo $category["category_top_img"]; ?><br>
+            https://the-imagine.com/<?php echo $category["category_top_img"]; ?><br>
 ```
 
 **変更内容**:
-- 表示用のベースURL（`https://the-imagine.com/membership/member/`）を新しいドメインとパスに変更
+- 表示用のベースURL（`https://the-imagine.com/`）を新しいドメインとパスに変更
 
 ---
 
@@ -318,7 +318,7 @@ require_once dirname(__FILE__) . '/../scripts/model/ContentModel.class.php';
 - [ ] 2. 新しいデータベースを作成・インポート
 - [ ] 3. 管理画面ログイン情報を変更（`admin/login.php`）
 - [ ] 4. メール送信設定を全て変更（送信先、送信元、本文内のURL・アドレス）
-- [ ] 5. URLパスを全て新しいパスに変更（`/membership/member/` → 新しいパス）
+- [ ] 5. URLパスを全て新しいパスに変更（`/` → 新しいパス）
 - [ ] 6. ドメイン関連の設定を変更
 - [ ] 7. バッチ処理のパスを変更・確認
 - [ ] 8. Google Analytics IDを変更または削除

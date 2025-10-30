@@ -109,7 +109,7 @@
           <th>TOPバナー画像</th>
           <td>
             <?php if(!empty($category["category_top_img"])){ ?>
-            https://<?php echo env('SITE_DOMAIN', 'the-imagine.com'); ?>/membership/member/<?php echo $category["category_top_img"]; ?><br>
+            https://<?php echo env('SITE_DOMAIN', 'the-imagine.com'); ?>/<?php echo $category["category_top_img"]; ?><br>
             <img src="<?php echo '../'.$category["category_top_img"].'?='.time(); ?>"><br>
             <?php } ?>
             <input type="file" name="bnr-img" id="bnr-img">
@@ -119,7 +119,7 @@
           <th>詳細ページ画像</th>
           <td>
             <?php if(!empty($category["category_list_img"])){ ?>
-            https://<?php echo env('SITE_DOMAIN', 'the-imagine.com'); ?>/membership/member/<?php echo $category["category_list_img"]; ?><br>
+            https://<?php echo env('SITE_DOMAIN', 'the-imagine.com'); ?>/<?php echo $category["category_list_img"]; ?><br>
             <img src="<?php echo '../'.$category["category_list_img"].'?='.time(); ?>"><br>
             <?php } ?>
             <input type="file" name="main-img" id="main-img">
