@@ -110,7 +110,29 @@
       <?php endif; ?>
         <div class="Block">
           <p class="Photo">
-            <img src="<?php echo $category['category_list_img'];?>" width="712" height="251" alt=""/>
+            <?php
+              $hdr = $category['category_list_img'];
+              $piH = pathinfo($hdr);
+              $baseH = $piH['dirname'] . '/' . (isset($piH['filename']) ? $piH['filename'] : '');
+              $jpg640H = $baseH . '_640.jpg';
+              $jpg1280H = $baseH . '_1280.jpg';
+              $webp640H = $baseH . '_640.webp';
+              $webp1280H = $baseH . '_1280.webp';
+              $rootDir = dirname(__FILE__);
+              $exists_webp640H = file_exists($rootDir . '/' . ltrim($webp640H, '/'));
+              $exists_webp1280H = file_exists($rootDir . '/' . ltrim($webp1280H, '/'));
+              $exists_jpg640H = file_exists($rootDir . '/' . ltrim($jpg640H, '/'));
+              $exists_jpg1280H = file_exists($rootDir . '/' . ltrim($jpg1280H, '/'));
+            ?>
+            <picture>
+              <?php if ($exists_webp640H || $exists_webp1280H): ?>
+              <source type="image/webp" srcset="<?php echo $exists_webp640H ? htmlspecialchars($webp640H, ENT_QUOTES, 'UTF-8').' 640w' : ''; ?><?php echo ($exists_webp640H && $exists_webp1280H) ? ', ' : ''; ?><?php echo $exists_webp1280H ? htmlspecialchars($webp1280H, ENT_QUOTES, 'UTF-8').' 1280w' : ''; ?>" sizes="(max-width: 768px) 640px, 1280px">
+              <?php endif; ?>
+              <?php if ($exists_jpg640H || $exists_jpg1280H): ?>
+              <source type="image/jpeg" srcset="<?php echo $exists_jpg640H ? htmlspecialchars($jpg640H, ENT_QUOTES, 'UTF-8').' 640w' : ''; ?><?php echo ($exists_jpg640H && $exists_jpg1280H) ? ', ' : ''; ?><?php echo $exists_jpg1280H ? htmlspecialchars($jpg1280H, ENT_QUOTES, 'UTF-8').' 1280w' : ''; ?>" sizes="(max-width: 768px) 640px, 1280px">
+              <?php endif; ?>
+              <img src="<?php echo htmlspecialchars($hdr, ENT_QUOTES, 'UTF-8'); ?>" width="712" height="251" loading="lazy" decoding="async" alt=""/>
+            </picture>
           </p>
           <div class="txt">
             <p><?php echo nl2br($category['content_text']);?></p>
@@ -123,7 +145,29 @@
           <li class="Hv">
             <a href="detail.php?cont_id=<?php echo $c['content_id'];?>">
               <div class="thumb">
-                <img src="<?php echo $c['thumbnail_url']; ?>" width="217" height="150" alt=""/>
+                <?php
+                  $tn = $c['thumbnail_url'];
+                  $piT = pathinfo($tn);
+                  $baseT = $piT['dirname'] . '/' . (isset($piT['filename']) ? $piT['filename'] : '');
+                  $jpg640T = $baseT . '_640.jpg';
+                  $jpg1280T = $baseT . '_1280.jpg';
+                  $webp640T = $baseT . '_640.webp';
+                  $webp1280T = $baseT . '_1280.webp';
+                  $rootDir = dirname(__FILE__);
+                  $exists_webp640T = file_exists($rootDir . '/' . ltrim($webp640T, '/'));
+                  $exists_webp1280T = file_exists($rootDir . '/' . ltrim($webp1280T, '/'));
+                  $exists_jpg640T = file_exists($rootDir . '/' . ltrim($jpg640T, '/'));
+                  $exists_jpg1280T = file_exists($rootDir . '/' . ltrim($jpg1280T, '/'));
+                ?>
+                <picture>
+                  <?php if ($exists_webp640T || $exists_webp1280T): ?>
+                  <source type="image/webp" srcset="<?php echo $exists_webp640T ? htmlspecialchars($webp640T, ENT_QUOTES, 'UTF-8').' 640w' : ''; ?><?php echo ($exists_webp640T && $exists_webp1280T) ? ', ' : ''; ?><?php echo $exists_webp1280T ? htmlspecialchars($webp1280T, ENT_QUOTES, 'UTF-8').' 1280w' : ''; ?>" sizes="(max-width: 768px) 320px, 640px">
+                  <?php endif; ?>
+                  <?php if ($exists_jpg640T || $exists_jpg1280T): ?>
+                  <source type="image/jpeg" srcset="<?php echo $exists_jpg640T ? htmlspecialchars($jpg640T, ENT_QUOTES, 'UTF-8').' 640w' : ''; ?><?php echo ($exists_jpg640T && $exists_jpg1280T) ? ', ' : ''; ?><?php echo $exists_jpg1280T ? htmlspecialchars($jpg1280T, ENT_QUOTES, 'UTF-8').' 1280w' : ''; ?>" sizes="(max-width: 768px) 320px, 640px">
+                  <?php endif; ?>
+                  <img src="<?php echo htmlspecialchars($tn, ENT_QUOTES, 'UTF-8'); ?>" width="217" height="150" loading="lazy" decoding="async" alt=""/>
+                </picture>
               </div>
               <div class="txt">
                 <div class="number">Week <?php echo $c['content_week']; ?></div>

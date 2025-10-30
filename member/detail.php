@@ -308,8 +308,44 @@
                     } else {
                       $thumb = 'common/img/no_image.png';
                     }
+                    $pi = pathinfo($thumb);
+                    $base = $pi['dirname'] . '/' . $pi['filename'];
+                    $ext = isset($pi['extension']) ? $pi['extension'] : 'jpg';
+                    $jpg320 = $base . '_320.jpg';
+                    $jpg640 = $base . '_640.jpg';
+                    $jpg1280 = $base . '_1280.jpg';
+                    $webp320 = $base . '_320.webp';
+                    $webp640 = $base . '_640.webp';
+                    $webp1280 = $base . '_1280.webp';
+                    $rootDir = dirname(__FILE__);
+                    $exists_webp320 = file_exists($rootDir . '/' . ltrim($webp320, '/'));
+                    $exists_webp640 = file_exists($rootDir . '/' . ltrim($webp640, '/'));
+                    $exists_webp1280 = file_exists($rootDir . '/' . ltrim($webp1280, '/'));
+                    $exists_jpg320 = file_exists($rootDir . '/' . ltrim($jpg320, '/'));
+                    $exists_jpg640 = file_exists($rootDir . '/' . ltrim($jpg640, '/'));
+                    $exists_jpg1280 = file_exists($rootDir . '/' . ltrim($jpg1280, '/'));
                   ?>
-                  <img src="<?php echo htmlspecialchars($thumb, ENT_QUOTES, 'UTF-8'); ?>" alt="<?php echo htmlspecialchars($video['video_title'], ENT_QUOTES, 'UTF-8'); ?>">
+                  <picture>
+                    <?php if ($exists_webp320 || $exists_webp640 || $exists_webp1280): ?>
+                    <source type="image/webp" srcset="<?php
+                      $ss = array();
+                      if ($exists_webp320) $ss[] = htmlspecialchars($webp320, ENT_QUOTES, 'UTF-8')." 320w";
+                      if ($exists_webp640) $ss[] = htmlspecialchars($webp640, ENT_QUOTES, 'UTF-8')." 640w";
+                      if ($exists_webp1280) $ss[] = htmlspecialchars($webp1280, ENT_QUOTES, 'UTF-8')." 1280w";
+                      echo implode(', ', $ss);
+                    ?>" sizes="(max-width: 768px) 320px, 120px">
+                    <?php endif; ?>
+                    <?php if ($exists_jpg320 || $exists_jpg640 || $exists_jpg1280): ?>
+                    <source type="image/jpeg" srcset="<?php
+                      $ss = array();
+                      if ($exists_jpg320) $ss[] = htmlspecialchars($jpg320, ENT_QUOTES, 'UTF-8')." 320w";
+                      if ($exists_jpg640) $ss[] = htmlspecialchars($jpg640, ENT_QUOTES, 'UTF-8')." 640w";
+                      if ($exists_jpg1280) $ss[] = htmlspecialchars($jpg1280, ENT_QUOTES, 'UTF-8')." 1280w";
+                      echo implode(', ', $ss);
+                    ?>" sizes="(max-width: 768px) 320px, 120px">
+                    <?php endif; ?>
+                    <img src="<?php echo htmlspecialchars($thumb, ENT_QUOTES, 'UTF-8'); ?>" alt="<?php echo htmlspecialchars($video['video_title'], ENT_QUOTES, 'UTF-8'); ?>" loading="lazy" decoding="async" width="120" height="70" style="width:120px;height:70px;object-fit:cover;">
+                  </picture>
                   <span><?php echo htmlspecialchars($video['video_title'], ENT_QUOTES, 'UTF-8'); ?></span>
                 </div>
                 <?php endforeach; ?>
@@ -412,7 +448,29 @@
                 <li class="Hv">
                   <a href="detail.php?cont_id=<?php echo $cont['content_id']; ?>" style="display: inline;">
                     <div class="thumb">
-                      <img src="<?php echo $cont['thumbnail_url']; ?>" width="217" height="150" alt=""/></div>
+                      <?php
+                        $oth = $cont['thumbnail_url'];
+                        $pi2 = pathinfo($oth);
+                        $base2 = $pi2['dirname'] . '/' . $pi2['filename'];
+                        $jpg640_2 = $base2 . '_640.jpg';
+                        $jpg1280_2 = $base2 . '_1280.jpg';
+                        $webp640_2 = $base2 . '_640.webp';
+                        $webp1280_2 = $base2 . '_1280.webp';
+                        $rootDir = dirname(__FILE__);
+                        $ex_w640 = file_exists($rootDir . '/' . ltrim($webp640_2, '/'));
+                        $ex_w1280 = file_exists($rootDir . '/' . ltrim($webp1280_2, '/'));
+                        $ex_j640 = file_exists($rootDir . '/' . ltrim($jpg640_2, '/'));
+                        $ex_j1280 = file_exists($rootDir . '/' . ltrim($jpg1280_2, '/'));
+                      ?>
+                      <picture>
+                        <?php if ($ex_w640 || $ex_w1280): ?>
+                        <source type="image/webp" srcset="<?php echo $ex_w640 ? htmlspecialchars($webp640_2, ENT_QUOTES, 'UTF-8').' 640w' : ''; ?><?php echo ($ex_w640 && $ex_w1280) ? ', ' : ''; ?><?php echo $ex_w1280 ? htmlspecialchars($webp1280_2, ENT_QUOTES, 'UTF-8').' 1280w' : ''; ?>" sizes="(max-width: 768px) 320px, 640px">
+                        <?php endif; ?>
+                        <?php if ($ex_j640 || $ex_j1280): ?>
+                        <source type="image/jpeg" srcset="<?php echo $ex_j640 ? htmlspecialchars($jpg640_2, ENT_QUOTES, 'UTF-8').' 640w' : ''; ?><?php echo ($ex_j640 && $ex_j1280) ? ', ' : ''; ?><?php echo $ex_j1280 ? htmlspecialchars($jpg1280_2, ENT_QUOTES, 'UTF-8').' 1280w' : ''; ?>" sizes="(max-width: 768px) 320px, 640px">
+                        <?php endif; ?>
+                        <img src="<?php echo htmlspecialchars($oth, ENT_QUOTES, 'UTF-8'); ?>" width="217" height="150" loading="lazy" decoding="async" alt=""/>
+                      </picture>
                     <div class="txt">
                       <div class="number">Week <?php echo $cont['content_week']; ?></div>
                       <div class="title"><?php echo $cont['content_title']; ?></div>

@@ -120,7 +120,7 @@
           <td>
             <?php if(!empty($category["category_list_img"])){ ?>
             https://<?php echo env('SITE_DOMAIN', 'the-imagine.com'); ?>/<?php echo $category["category_list_img"]; ?><br>
-            <img src="<?php echo '../'.$category["category_list_img"].'?='.time(); ?>"><br>
+            <img src="<?php echo '../'.$category["category_list_img"].'?='.time(); ?>" loading="lazy" decoding="async"><br>
             <?php } ?>
             <input type="file" name="main-img" id="main-img">
           </td>

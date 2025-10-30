@@ -84,7 +84,7 @@ elm.style.backgroundImage = 'url(common/img/' + url[n] + ')';
 <body>
 <section id="MV">
   <div class="Cnt">
-    <h1><img src="common/img/login_logo.png" width="320" alt="THE Imagine"/></h1>
+    <h1><img src="common/img/login_logo.png" width="320" alt="THE Imagine" loading="lazy" decoding="async"/></h1>
   </div>
 </section>
 <div id="wrapper"><!-- Wrapper -->
@@ -125,7 +125,30 @@ elm.style.backgroundImage = 'url(common/img/' + url[n] + ')';
           <?php foreach($category_list as $category) : ?>
           <li class="Hv">
             <a href="list.php?ctg_id=<?php echo $category['category_id']; ?>">
-              <img src="<?php echo $category['category_top_img'] ;?>?=<?php echo date('His');?>" width="749" height="172" alt=""/>
+              <?php
+                $top = $category['category_top_img'];
+                $pi = pathinfo($top);
+                $base = $pi['dirname'] . '/' . (isset($pi['filename']) ? $pi['filename'] : '');
+                $jpg640 = $base . '_640.jpg';
+                $jpg1280 = $base . '_1280.jpg';
+                $webp640 = $base . '_640.webp';
+                $webp1280 = $base . '_1280.webp';
+                // 実在チェック用にファイルシステムパスへ変換
+                $rootDir = dirname(__FILE__);
+                $exists_webp640 = file_exists($rootDir . '/' . ltrim($webp640, '/'));
+                $exists_webp1280 = file_exists($rootDir . '/' . ltrim($webp1280, '/'));
+                $exists_jpg640 = file_exists($rootDir . '/' . ltrim($jpg640, '/'));
+                $exists_jpg1280 = file_exists($rootDir . '/' . ltrim($jpg1280, '/'));
+              ?>
+              <picture>
+                <?php if ($exists_webp640 || $exists_webp1280): ?>
+                <source type="image/webp" srcset="<?php echo $exists_webp640 ? htmlspecialchars($webp640, ENT_QUOTES, 'UTF-8').' 640w' : ''; ?><?php echo ($exists_webp640 && $exists_webp1280) ? ', ' : ''; ?><?php echo $exists_webp1280 ? htmlspecialchars($webp1280, ENT_QUOTES, 'UTF-8').' 1280w' : ''; ?>" sizes="(max-width: 768px) 640px, 1280px">
+                <?php endif; ?>
+                <?php if ($exists_jpg640 || $exists_jpg1280): ?>
+                <source type="image/jpeg" srcset="<?php echo $exists_jpg640 ? htmlspecialchars($jpg640, ENT_QUOTES, 'UTF-8').' 640w' : ''; ?><?php echo ($exists_jpg640 && $exists_jpg1280) ? ', ' : ''; ?><?php echo $exists_jpg1280 ? htmlspecialchars($jpg1280, ENT_QUOTES, 'UTF-8').' 1280w' : ''; ?>" sizes="(max-width: 768px) 640px, 1280px">
+                <?php endif; ?>
+                <img src="<?php echo htmlspecialchars($top, ENT_QUOTES, 'UTF-8'); ?>?=<?php echo date('His'); ?>" width="749" height="172" loading="lazy" decoding="async" alt=""/>
+              </picture>
             </a>
           </li>
           <?php endforeach;?>

@@ -336,10 +336,10 @@
         <tr>
           <th>サムネイル画像</th>
           <td>
-            <?php if(!empty($content["thumbnail_url"])){ ?>
+            <?php if(!empty($content["thumbnail_url"])): ?>
             https://<?php echo env('SITE_DOMAIN', 'the-imagine.com'); ?>/<?php echo $content["thumbnail_url"]; ?><br>
-            <img src="<?php echo '../'.$content["thumbnail_url"].'?='.time(); ?>"><br>
-            <?php } ?>
+            <img src="<?php echo '../'.$content["thumbnail_url"].'?='.time(); ?>" loading="lazy" decoding="async"><br>
+            <?php endif; ?>
             <input type="file" name="thumbnail" id="thumbnail">
           </td>
         </tr>
@@ -363,7 +363,7 @@
                   <textarea name="video_urls[]" placeholder="動画埋め込みコード（iframe等）" style="width: 100%; height: 80px;"><?php echo htmlspecialchars(isset($video['video_url']) ? $video['video_url'] : '', ENT_QUOTES, 'UTF-8'); ?></textarea>
                   <?php if(!empty($video['thumbnail_url'])): ?>
                   <div style="margin:6px 0;">
-                    <img src="<?php echo htmlspecialchars($video['thumbnail_url'], ENT_QUOTES, 'UTF-8'); ?>" alt="thumb" style="max-width:180px;height:auto;border:1px solid #ddd;">
+                    <img src="<?php echo htmlspecialchars($video['thumbnail_url'], ENT_QUOTES, 'UTF-8'); ?>" alt="thumb" loading="lazy" decoding="async" style="max-width:180px;height:auto;border:1px solid #ddd;">
                   </div>
                   <?php endif; ?>
                   <input type="file" name="video_thumbnails[]" accept="image/*">
