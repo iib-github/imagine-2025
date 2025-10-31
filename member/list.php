@@ -147,17 +147,19 @@
               <div class="thumb">
                 <?php
                   $tn = $c['thumbnail_url'];
-                  $piT = pathinfo($tn);
-                  $baseT = $piT['dirname'] . '/' . (isset($piT['filename']) ? $piT['filename'] : '');
-                  $jpg640T = $baseT . '_640.jpg';
-                  $jpg1280T = $baseT . '_1280.jpg';
-                  $webp640T = $baseT . '_640.webp';
-                  $webp1280T = $baseT . '_1280.webp';
+                  $piT = is_string($tn) ? pathinfo($tn) : array();
+                  $dirT = (isset($piT['dirname']) && $piT['dirname'] !== '.' && $piT['dirname'] !== '') ? $piT['dirname'].'/' : '';
+                  $nameT = isset($piT['filename']) ? $piT['filename'] : (isset($piT['basename']) ? preg_replace('/\.[^.]*$/','',$piT['basename']) : '');
+                  $baseT = $dirT . $nameT;
+                  $jpg640T = $baseT !== '' ? $baseT . '_640.jpg' : '';
+                  $jpg1280T = $baseT !== '' ? $baseT . '_1280.jpg' : '';
+                  $webp640T = $baseT !== '' ? $baseT . '_640.webp' : '';
+                  $webp1280T = $baseT !== '' ? $baseT . '_1280.webp' : '';
                   $rootDir = dirname(__FILE__);
-                  $exists_webp640T = file_exists($rootDir . '/' . ltrim($webp640T, '/'));
-                  $exists_webp1280T = file_exists($rootDir . '/' . ltrim($webp1280T, '/'));
-                  $exists_jpg640T = file_exists($rootDir . '/' . ltrim($jpg640T, '/'));
-                  $exists_jpg1280T = file_exists($rootDir . '/' . ltrim($jpg1280T, '/'));
+                  $exists_webp640T = ($webp640T !== '') && file_exists($rootDir . '/' . ltrim($webp640T, '/'));
+                  $exists_webp1280T = ($webp1280T !== '') && file_exists($rootDir . '/' . ltrim($webp1280T, '/'));
+                  $exists_jpg640T = ($jpg640T !== '') && file_exists($rootDir . '/' . ltrim($jpg640T, '/'));
+                  $exists_jpg1280T = ($jpg1280T !== '') && file_exists($rootDir . '/' . ltrim($jpg1280T, '/'));
                 ?>
                 <picture>
                   <?php if ($exists_webp640T || $exists_webp1280T): ?>
