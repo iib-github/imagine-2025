@@ -37,7 +37,7 @@
       );
       
       // コースフィルタを適用
-      if ($course_filter !== ContentModel::TARGET_COURSE_ALL) {
+      if ($course_filter !== null) {
         $where_conditions['target_course'] = $course_filter;
       }
 

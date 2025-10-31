@@ -121,9 +121,8 @@
           <th>対象コース</th>
           <td>
             <select name="target_course">
-              <option value="all">全コース</option>
               <option value="basic">ベーシック</option>
-              <option value="advance">アドバンス</option>
+              <option value="advance" selected="selected">アドバンス</option>
             </select>
           </td>
         </tr>

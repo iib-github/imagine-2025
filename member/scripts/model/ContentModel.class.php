@@ -17,7 +17,7 @@
     // コース設定
     const TARGET_COURSE_BASIC = 'basic';     // ベーシック（ベーシックコンテンツのみ）
     const TARGET_COURSE_ADVANCE = 'advance'; // アドバンス（全コンテンツ）
-    const TARGET_COURSE_ALL = 'all';         // 全コース（旧来のコンテンツ用）
+    // const TARGET_COURSE_ALL = 'all';         // 全コース（旧来のコンテンツ用）
 
     public function __construct()
     {
@@ -213,7 +213,7 @@
       $where_conditions = array();
       
       // コース条件の追加
-      if ($course !== self::TARGET_COURSE_ALL) {
+      if ($course !== null) {
         $where_conditions['target_course'] = $course;
       }
       
@@ -380,7 +380,7 @@
         return array(
         self::TARGET_COURSE_BASIC => 'ベーシック',
         self::TARGET_COURSE_ADVANCE => 'アドバンス',
-        self::TARGET_COURSE_ALL => '全コース'
+        // self::TARGET_COURSE_ALL => '全コース'
         );
     }
 

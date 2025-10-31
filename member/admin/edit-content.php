@@ -69,7 +69,7 @@
       'display_order' => $_POST['order'],
       'indicate_flag' => $_POST['active'],
       'pub_date' => $_POST['pub_date'],
-      'target_course' => isset($_POST['target_course']) ? $_POST['target_course'] : ContentModel::TARGET_COURSE_ALL,
+      'target_course' => isset($_POST['target_course']) ? $_POST['target_course'] : ContentModel::TARGET_COURSE_ADVANCE,
     );
     if(isset($_POST['is_faq'])) {
       $data['is_faq'] = $_POST['is_faq'];

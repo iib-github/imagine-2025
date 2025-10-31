@@ -45,12 +45,12 @@
   $advance_categories = array();
   $basic_categories = array();
   foreach ($category_list as $category) {
-    $target = isset($category['target_course']) ? $category['target_course'] : ContentModel::TARGET_COURSE_ALL;
+    $target = isset($category['target_course']) ? $category['target_course'] : ContentModel::TARGET_COURSE_ADVANCE;
     if ($target === ContentModel::TARGET_COURSE_ADVANCE) {
       $advance_categories[] = $category;
     } elseif ($target === ContentModel::TARGET_COURSE_BASIC) {
       $basic_categories[] = $category;
-    } else { // 'all' or undefined -> 双方に表示
+    } else { // undefined -> 双方に表示
       $advance_categories[] = $category;
       $basic_categories[] = $category;
     }

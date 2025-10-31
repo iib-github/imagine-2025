@@ -41,7 +41,7 @@
   }
 
   // アクセス制限: ベーシックユーザーがアドバンス専用カテゴリを閲覧できないようにする
-  $category_target_course = isset($category['target_course']) ? $category['target_course'] : ContentModel::TARGET_COURSE_ALL;
+  $category_target_course = isset($category['target_course']) ? $category['target_course'] : ContentModel::TARGET_COURSE_ADVANCE;
   if ($course_filter === ContentModel::TARGET_COURSE_BASIC && $category_target_course === ContentModel::TARGET_COURSE_ADVANCE) {
     header("Location: index.php");
     exit;
@@ -60,14 +60,13 @@
   );
   
   // コースフィルタを適用
-  // NOTE: target_courseが'all'の場合、またはNULLの場合は全コースに表示
   $contents = $content_model->select($where_conditions, array('display_order'=>$content_model::ORDER_ASC));
   
   // 会員のコースに基づいてフィルタリング
   $filtered_contents = array();
   foreach ($contents as $content) {
-    // target_courseが'all'またはNULLの場合は常に表示（旧来のコンテンツ）
-    if (empty($content['target_course']) || $content['target_course'] === ContentModel::TARGET_COURSE_ALL) {
+    // target_courseがNULLの場合は常に表示
+    if (empty($content['target_course']) || $content['target_course'] === ContentModel::TARGET_COURSE_ADVANCE) {
       $filtered_contents[] = $content;
     } elseif ($course_filter === ContentModel::TARGET_COURSE_ADVANCE) {
       // アドバンス会員は全コンテンツ表示

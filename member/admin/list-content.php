@@ -37,8 +37,8 @@
       $target_course = isset($content['target_course']) ? $content['target_course'] : '';
       // フィルタが指定されている場合：
       // - コンテンツが指定コースと一致 → 表示
-      // - コンテンツが'all'または空(NULL) → どちらのフィルタでも表示
-      if ($target_course !== $filter_course && $target_course !== ContentModel::TARGET_COURSE_ALL && !empty($target_course)) {
+      // - コンテンツが空(NULL) → どちらのフィルタでも表示
+      if ($target_course !== $filter_course && $target_course !== ContentModel::TARGET_COURSE_ADVANCE && !empty($target_course)) {
         continue;
       }
     }

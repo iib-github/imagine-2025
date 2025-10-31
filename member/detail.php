@@ -49,7 +49,7 @@
   // 閲覧権限チェック
   $has_permission = false;
   // target_courseが'all'またはNULLの場合は常に表示（旧来のコンテンツ）
-  if (empty($content['target_course']) || $content['target_course'] === ContentModel::TARGET_COURSE_ALL) {
+  if (empty($content['target_course']) || $content['target_course'] === ContentModel::TARGET_COURSE_ADVANCE) {
       $has_permission = true;
   } elseif ($course_filter === ContentModel::TARGET_COURSE_ADVANCE) {
       // アドバンス会員は全コンテンツ表示
@@ -78,7 +78,7 @@
     'category_id' => $category['category_id'],
     'indicate_flag' => ContentModel::ACTIVE,
   );
-  if ($course_filter !== ContentModel::TARGET_COURSE_ALL) {
+  if ($course_filter !== null) {
     $where_other_contents['target_course'] = $course_filter;
   }
   $content_list = $content_model->select($where_other_contents, array('content_week'=>ContentModel::ORDER_ASC));

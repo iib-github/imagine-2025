@@ -159,9 +159,8 @@
           <th>対象コース</th>
           <td>
             <select name="target_course">
-              <option value="all"<?php if(empty($category['target_course']) || $category['target_course'] === 'all') echo ' selected="selected"';?>>全コース</option>
               <option value="basic"<?php if($category['target_course'] === 'basic') echo ' selected="selected"';?>>ベーシック</option>
-              <option value="advance"<?php if($category['target_course'] === 'advance') echo ' selected="selected"';?>>アドバンス</option>
+              <option value="advance"<?php if(empty($category['target_course']) || $category['target_course'] === 'advance') echo ' selected="selected"';?>>アドバンス</option>
             </select>
           </td>
         </tr>

@@ -140,7 +140,7 @@
         case self::COURSE_BASIC:    // 2: ベーシック
           return ContentModel::TARGET_COURSE_BASIC;    // ベーシック（ベーシックコンテンツのみ）
         default:
-          return ContentModel::TARGET_COURSE_ALL;      // 不明 → 全コース
+          return ContentModel::TARGET_COURSE_ADVANCE;      // 不明 → 全コース
       }
     }
 
@@ -213,7 +213,7 @@
       $params = array($member_id);
       
       // コースフィルタの適用
-      if ($course_filter !== ContentModel::TARGET_COURSE_ALL) {
+      if ($course_filter !== null) {
         $sql .= " WHERE cm.target_course = ?";
         $params[] = $course_filter;
       } else {
@@ -285,7 +285,7 @@
       $content_model = new ContentModel();
       $where_conditions = array('indicate_flag' => ContentModel::ACTIVE);
       
-      if ($course_filter !== ContentModel::TARGET_COURSE_ALL) {
+      if ($course_filter !== null) {
         $where_conditions['target_course'] = $course_filter;
       }
       
