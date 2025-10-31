@@ -40,6 +40,23 @@
   $category_model = new CategoryModel();
   $all_categories = $category_model->select(array('indicate_flag'=>1), array('category_number'=>$category_model::ORDER_ASC));
   $category_list = $category_model->filterCategoriesByCourse($all_categories, $course_filter);
+
+  // カテゴリーをコース別に分類
+  $advance_categories = array();
+  $basic_categories = array();
+  foreach ($category_list as $category) {
+    $target = isset($category['target_course']) ? $category['target_course'] : ContentModel::TARGET_COURSE_ALL;
+    if ($target === ContentModel::TARGET_COURSE_ADVANCE) {
+      $advance_categories[] = $category;
+    } elseif ($target === ContentModel::TARGET_COURSE_BASIC) {
+      $basic_categories[] = $category;
+    } else { // 'all' or undefined -> 双方に表示
+      $advance_categories[] = $category;
+      $basic_categories[] = $category;
+    }
+  }
+
+  $is_basic_user = ($course_filter === ContentModel::TARGET_COURSE_BASIC);
   
   // 会員のコース別進捗情報を取得
   $member_progress = $member_model->getMemberCourseProgress($member_id);
@@ -90,7 +107,7 @@ elm.style.backgroundImage = 'url(common/img/' + url[n] + ')';
 <div id="wrapper"><!-- Wrapper -->
   <div id="Contents"><!-- Contents -->
     <div id="Main"><!-- Main -->
-      <section id="Progress">
+      <!-- <section id="Progress">
         <h2>学習進捗</h2>
         <div class="Block">
           <p>現在のコース: <strong><?php echo htmlspecialchars($member_model->getMemberCourseName($member_info['select_course'])); ?></strong></p>
@@ -102,7 +119,7 @@ elm.style.backgroundImage = 'url(common/img/' + url[n] + ')';
           </div>
           <p class="progress-detail-link"><a href="progress.php">進捗詳細を見る</a></p>
         </div>
-      </section>
+      </section> -->
       <section id="News">
         <h2>更新情報</h2>
         <div class="Block">
@@ -120,9 +137,12 @@ elm.style.backgroundImage = 'url(common/img/' + url[n] + ')';
           </ul>
         </div>
       </section>
-      <section id="Bnr" style="margin-bottom: 8%;">
+
+      <?php if(!$is_basic_user && !empty($advance_categories)): ?>
+      <section id="Bnr" style="margin-bottom: 0;">
+        <h2>Advance</h2>
         <ul>
-          <?php foreach($category_list as $category) : ?>
+          <?php foreach($advance_categories as $category) : ?>
           <li class="Hv">
             <a href="list.php?ctg_id=<?php echo $category['category_id']; ?>">
               <?php
@@ -154,6 +174,45 @@ elm.style.backgroundImage = 'url(common/img/' + url[n] + ')';
           <?php endforeach;?>
         </ul>
       </section>
+      <?php endif; ?>
+
+      <?php if(!empty($basic_categories)): ?>
+      <section id="Bnr" style="margin-bottom: 8%;">
+        <h2>Basic</h2>
+        <ul>
+          <?php foreach($basic_categories as $category) : ?>
+          <li class="Hv">
+            <a href="list.php?ctg_id=<?php echo $category['category_id']; ?>">
+              <?php
+                $top = $category['category_top_img'];
+                $pi = pathinfo($top);
+                $base = $pi['dirname'] . '/' . (isset($pi['filename']) ? $pi['filename'] : '');
+                $jpg640 = $base . '_640.jpg';
+                $jpg1280 = $base . '_1280.jpg';
+                $webp640 = $base . '_640.webp';
+                $webp1280 = $base . '_1280.webp';
+                // 実在チェック用にファイルシステムパスへ変換
+                $rootDir = dirname(__FILE__);
+                $exists_webp640 = file_exists($rootDir . '/' . ltrim($webp640, '/'));
+                $exists_webp1280 = file_exists($rootDir . '/' . ltrim($webp1280, '/'));
+                $exists_jpg640 = file_exists($rootDir . '/' . ltrim($jpg640, '/'));
+                $exists_jpg1280 = file_exists($rootDir . '/' . ltrim($jpg1280, '/'));
+              ?>
+              <picture>
+                <?php if ($exists_webp640 || $exists_webp1280): ?>
+                <source type="image/webp" srcset="<?php echo $exists_webp640 ? htmlspecialchars($webp640, ENT_QUOTES, 'UTF-8').' 640w' : ''; ?><?php echo ($exists_webp640 && $exists_webp1280) ? ', ' : ''; ?><?php echo $exists_webp1280 ? htmlspecialchars($webp1280, ENT_QUOTES, 'UTF-8').' 1280w' : ''; ?>" sizes="(max-width: 768px) 640px, 1280px">
+                <?php endif; ?>
+                <?php if ($exists_jpg640 || $exists_jpg1280): ?>
+                <source type="image/jpeg" srcset="<?php echo $exists_jpg640 ? htmlspecialchars($jpg640, ENT_QUOTES, 'UTF-8').' 640w' : ''; ?><?php echo ($exists_jpg640 && $exists_jpg1280) ? ', ' : ''; ?><?php echo $exists_jpg1280 ? htmlspecialchars($jpg1280, ENT_QUOTES, 'UTF-8').' 1280w' : ''; ?>" sizes="(max-width: 768px) 640px, 1280px">
+                <?php endif; ?>
+                <img src="<?php echo htmlspecialchars($top, ENT_QUOTES, 'UTF-8'); ?>?=<?php echo date('His'); ?>" width="749" height="172" loading="lazy" decoding="async" alt=""/>
+              </picture>
+            </a>
+          </li>
+          <?php endforeach;?>
+        </ul>
+      </section>
+      <?php endif; ?>
     </div><!-- /Main -->
 
     <div id="Side"><!-- Side -->

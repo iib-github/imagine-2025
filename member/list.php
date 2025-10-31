@@ -40,6 +40,13 @@
     $category = $category[0];
   }
 
+  // アクセス制限: ベーシックユーザーがアドバンス専用カテゴリを閲覧できないようにする
+  $category_target_course = isset($category['target_course']) ? $category['target_course'] : ContentModel::TARGET_COURSE_ALL;
+  if ($course_filter === ContentModel::TARGET_COURSE_BASIC && $category_target_course === ContentModel::TARGET_COURSE_ADVANCE) {
+    header("Location: index.php");
+    exit;
+  }
+
   // サイドバー（レッスン一覧）表示用
   $all_categories = $category_model->select(array('indicate_flag'=>1), array('category_number'=>$category_model::ORDER_ASC));
   $category_list = $category_model->filterCategoriesByCourse($all_categories, $course_filter);

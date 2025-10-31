@@ -59,6 +59,11 @@
       $has_permission = true;
   }
 
+  if (!$has_permission) {
+    header("Location: index.php");
+    exit;
+  }
+
   // コンテンツ動画取得
   $content_video_model = new ContentVideoModel();
   $content_videos = $content_video_model->getVideosByContentId($content['content_id']);
@@ -359,9 +364,12 @@
             </div>
             <?php endif; ?>
             <?php endif; ?>
+            <?php if(!empty($content['content_text'])): ?>
             <div class="txtBlock">
               <?php echo $content['content_text']; ?>
             </div>
+            <?php endif; ?>
+            <?php if(!empty($content['text_dl_url']) || !empty($content['message_dl_url'])): ?>
             <div class="BtnBlock">
 <?php if(!empty($content['text_dl_url'])):?>
               <a href="<?php echo $content['text_dl_url']; ?>" download="<?php echo $content['content_title']; ?>_ワーク.pdf" target="_blank">
@@ -374,6 +382,7 @@
               </a>
 <?php endif; ?>
             </div>
+            <?php endif; ?>
             <?php if(!$is_finished): ?>
             <div class="BtnBlockSingle" id="complete">
               <a href="javascript:void(0);" onclick="complete(<?php echo $session->get('member').', '.$category['category_id'].', '.$content['content_id']; ?>);">
