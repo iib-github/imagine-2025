@@ -133,6 +133,8 @@
     margin-right: 8px;
   }
   .video-entry {
+    display: flex;
+    flex-direction: column;
     border: 1px solid #ddd;
     padding: 15px;
     margin-bottom: 15px;
@@ -141,7 +143,7 @@
   }
   .video-entry input,
   .video-entry textarea {
-    width: 100%;
+    /* width: 100%; */
     margin-bottom: 10px;
     padding: 8px;
     border: 1px solid #ccc;
@@ -184,10 +186,14 @@
         <strong>動画 ${videoCount + 1}</strong>
         <button type="button" class="remove-video-btn" onclick="removeVideoField(this)">削除</button>
       </div>
-      <input type="text" name="video_titles[]" placeholder="動画タイトル" style="width: 100%;">
-      <textarea name="video_urls[]" placeholder="動画埋め込みコード（iframe等）" style="width: 100%; height: 80px;"></textarea>
-      <input type="file" name="video_thumbnails[]" accept="image/*">
-      <input type="hidden" name="thumbnail_urls[]" value="">
+      <input type="text" name="video_titles[]" placeholder="動画タイトル">
+      <textarea name="video_urls[]" placeholder="動画埋め込みコード（iframe等）" style="height: 40px;"></textarea>
+      <div style="display: flex; align-items: end;">
+        <div>
+          <input type="file" name="video_thumbnails[]" accept="image/*" style="margin-bottom:0;">
+          <input type="hidden" name="thumbnail_urls[]" value="">
+        </div>
+      </div>
     `;
     
     videoContainer.appendChild(newEntry);

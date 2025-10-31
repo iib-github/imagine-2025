@@ -161,6 +161,8 @@
     margin-right: 8px;
   }
   .video-entry {
+    display: flex;
+    flex-direction: column;
     border: 1px solid #ddd;
     padding: 15px;
     margin-bottom: 15px;
@@ -169,7 +171,7 @@
   }
   .video-entry input,
   .video-entry textarea {
-    width: 100%;
+    /* width: 100%; */
     margin-bottom: 10px;
     padding: 8px;
     border: 1px solid #ccc;
@@ -216,9 +218,9 @@
           <button type="button" class="remove-video-btn" onclick="removeVideoField(this)">削除</button>
         </div>
       </div>
-      <input type="text" name="video_titles[]" placeholder="動画タイトル" style="width: 100%;">
-      <textarea name="video_urls[]" placeholder="動画埋め込みコード（iframe等）" style="width: 100%; height: 80px;"></textarea>
-      <input type="text" name="thumbnail_urls[]" placeholder="サムネイル画像URL" style="width: 100%;">
+      <input type="text" name="video_titles[]" placeholder="動画タイトル">
+      <textarea name="video_urls[]" placeholder="動画埋め込みコード（iframe等）" style="height: 40px;"></textarea>
+      <input type="text" name="thumbnail_urls[]" placeholder="サムネイル画像URL">
     `;
     
     videoContainer.appendChild(newEntry);
@@ -359,15 +361,17 @@
                       <button type="button" class="remove-video-btn" onclick="removeVideoField(this)">削除</button>
                     </div>
                   </div>
-                  <input type="text" name="video_titles[]" placeholder="動画タイトル" style="width: 100%;" value="<?php echo htmlspecialchars(isset($video['video_title']) ? $video['video_title'] : '', ENT_QUOTES, 'UTF-8'); ?>">
-                  <textarea name="video_urls[]" placeholder="動画埋め込みコード（iframe等）" style="width: 100%; height: 80px;"><?php echo htmlspecialchars(isset($video['video_url']) ? $video['video_url'] : '', ENT_QUOTES, 'UTF-8'); ?></textarea>
-                  <?php if(!empty($video['thumbnail_url'])): ?>
-                  <div style="margin:6px 0;">
-                    <img src="<?php echo htmlspecialchars($video['thumbnail_url'], ENT_QUOTES, 'UTF-8'); ?>" alt="thumb" loading="lazy" decoding="async" style="max-width:180px;height:auto;border:1px solid #ddd;">
+                  <input type="text" name="video_titles[]" placeholder="動画タイトル" value="<?php echo htmlspecialchars(isset($video['video_title']) ? $video['video_title'] : '', ENT_QUOTES, 'UTF-8'); ?>">
+                  <textarea name="video_urls[]" placeholder="動画埋め込みコード（iframe等）" style="height: 40px;"><?php echo htmlspecialchars(isset($video['video_url']) ? $video['video_url'] : '', ENT_QUOTES, 'UTF-8'); ?></textarea>
+                  <div style="display: flex; align-items: end;">
+                    <div style="margin-right: 10px;">
+                      <input type="file" name="video_thumbnails[]" accept="image/*" style="margin-bottom:0;">
+                      <input type="hidden" name="thumbnail_urls[]" value="<?php echo htmlspecialchars(isset($video['thumbnail_url']) ? $video['thumbnail_url'] : '', ENT_QUOTES, 'UTF-8'); ?>">
+                    </div>
+                    <?php if(!empty($video['thumbnail_url'])): ?>
+                    <img src="/<?php echo htmlspecialchars($video['thumbnail_url'], ENT_QUOTES, 'UTF-8'); ?>" alt="thumb" loading="lazy" decoding="async" style="min-height:50px;width:auto;max-width:180px;height:auto;border:1px solid #ddd;">
+                    <?php endif; ?>
                   </div>
-                  <?php endif; ?>
-                  <input type="file" name="video_thumbnails[]" accept="image/*">
-                  <input type="hidden" name="thumbnail_urls[]" value="<?php echo htmlspecialchars(isset($video['thumbnail_url']) ? $video['thumbnail_url'] : '', ENT_QUOTES, 'UTF-8'); ?>">
                 </div>
                 <?php endforeach; ?>
               <?php endif; ?>
