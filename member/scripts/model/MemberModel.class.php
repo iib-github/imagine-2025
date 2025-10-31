@@ -140,7 +140,7 @@
         case self::COURSE_BASIC:    // 2: ベーシック
           return ContentModel::TARGET_COURSE_BASIC;    // ベーシック（ベーシックコンテンツのみ）
         default:
-          return ContentModel::TARGET_COURSE_ADVANCE;      // 不明 → 全コース
+          return ContentModel::TARGET_COURSE_ADVANCE;      // 不明 → アドバンス
       }
     }
 

@@ -181,13 +181,12 @@
 |-------------|----------|------|------|
 | target_course | VARCHAR(20) | NULL | 表示対象コース（'standard','basic','advance','all'） |
 
-**デフォルト値:** `'all'`（全コース対象）
+**デフォルト値:** `'advance'`（アドバンス対象）
 
 **コース設定値:**
 - `'standard'` - スタンダード（プレミアム）コースのみ
 - `'basic'` - ベーシックコースのみ  
 - `'advance'` - アドバンスコースのみ
-- `'all'` - 全コース対象
 
 ---
 
@@ -216,7 +215,7 @@ AND content_movie_url != '';
 既存の`content_master`レコードに`target_course`フィールドを設定：
 
 ```sql
--- デフォルトで全コース対象に設定
+-- デフォルトでアドバンス対象に設定
 UPDATE content_master SET target_course = 'all' WHERE target_course IS NULL;
 ```
 

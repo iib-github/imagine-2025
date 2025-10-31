@@ -107,13 +107,12 @@ function updateVideoNumbers() { /* ... */ }
   - スタンダード（standard）
   - ベーシック（basic）
   - アドバンス（advance）
-  - 全コース（all）
 
 **処理:**
 ```php
 $content_data['target_course'] = isset($_POST['target_course']) 
   ? $_POST['target_course'] 
-  : ContentModel::TARGET_COURSE_ALL;
+  : ContentModel::TARGET_COURSE_ADVANCE;
 ```
 
 ---

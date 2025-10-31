@@ -76,7 +76,7 @@
                 break;
               case 'all':
               default:
-                echo '全コース';
+                echo 'アドバンス';
                 break;
             }
           ?>

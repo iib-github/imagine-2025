@@ -17,7 +17,6 @@
     // コース設定
     const TARGET_COURSE_BASIC = 'basic';     // ベーシック（ベーシックコンテンツのみ）
     const TARGET_COURSE_ADVANCE = 'advance'; // アドバンス（全コンテンツ）
-    // const TARGET_COURSE_ALL = 'all';         // 全コース（旧来のコンテンツ用）
 
     public function __construct()
     {
@@ -379,8 +378,7 @@
     public function getAvailableCourses() {
         return array(
         self::TARGET_COURSE_BASIC => 'ベーシック',
-        self::TARGET_COURSE_ADVANCE => 'アドバンス',
-        // self::TARGET_COURSE_ALL => '全コース'
+        self::TARGET_COURSE_ADVANCE => 'アドバンス'
         );
     }
 
