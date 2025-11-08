@@ -1,5 +1,6 @@
 <?php
   require_once dirname(__FILE__) . '/../BaseModel.class.php';
+  require_once dirname(__FILE__) . '/../PdoInterface.class.php';
   require_once dirname(__FILE__) . '/../model/CategoryModel.class.php';
   require_once dirname(__FILE__) . '/../model/ContentModel.class.php';
   require_once dirname(__FILE__) . '/../model/UploadModel.class.php';
@@ -15,6 +16,59 @@
 
     public function __construct($member_id = NULL) {
       parent::set_table_name('member_master');
+    }
+
+    /**
+     * カテゴリーごとの総コンテンツ数と完了数を取得
+     *
+     * @param int $member_id 会員ID
+     * @param int $category_id カテゴリーID
+     * @return array{total:int, completed:int}
+     */
+    private function getCategoryContentStats($member_id, $category_id) {
+      $member = parent::select(array('member_id' => $member_id));
+      if (empty($member)) {
+        return array('total' => 0, 'completed' => 0);
+      }
+
+      $member_data = $member[0];
+      $course_filter = $this->getCourseFilter($member_data['select_course']);
+      $pdo = PdoInterface::getInstance();
+
+      $total_sql = "SELECT COUNT(*) AS total
+                    FROM content_master cm
+                    WHERE cm.indicate_flag = ? AND cm.category_id = ?";
+      $total_params = array(ContentModel::ACTIVE, $category_id);
+
+      if ($course_filter === ContentModel::TARGET_COURSE_BASIC) {
+        $total_sql .= " AND (cm.target_course = ? OR cm.target_course IS NULL OR cm.target_course = '' OR cm.target_course = 'all')";
+        $total_params[] = $course_filter;
+      }
+
+      $pdo->query($total_sql, $total_params);
+      $total_row = $pdo->fetch_assoc();
+      $total = isset($total_row['total']) ? (int)$total_row['total'] : 0;
+
+      if ($total === 0) {
+        return array('total' => 0, 'completed' => 0);
+      }
+
+      $completed_sql = "SELECT COUNT(*) AS completed
+                        FROM member_content_relation mcr
+                        INNER JOIN content_master cm ON cm.content_id = mcr.content_id
+                        WHERE mcr.member_id = ? AND cm.indicate_flag = ? AND cm.category_id = ?";
+      $completed_params = array($member_id, ContentModel::ACTIVE, $category_id);
+
+      if ($course_filter === ContentModel::TARGET_COURSE_BASIC) {
+        $completed_sql .= " AND (cm.target_course = ? OR cm.target_course IS NULL OR cm.target_course = '' OR cm.target_course = 'all')";
+        $completed_params[] = $course_filter;
+      }
+
+      $pdo->query($completed_sql, $completed_params);
+      $completed_row = $pdo->fetch_assoc();
+      $completed = isset($completed_row['completed']) ? (int)$completed_row['completed'] : 0;
+
+      return array('total' => $total, 'completed' => $completed);
     }
 
 
@@ -68,28 +122,11 @@
      * @return 達成率：整数
      */
     public function getScore($member_id, $category_id) {
-
-      // 指定の課題（カテゴリー）のコンテンツ数を取得
-      $category_model = new CategoryModel();
-      $category = $category_model->select(array('category_id'=>$category_id));
-      $category = $category[0];
-      $number_of_contents = $category['number_of_contents'];
-
-      // 指定の課題（カテゴリー）に紐づく達成済みコンテンツの数を取得
-      $member_content_relation = new MemberContentRelation();
-      $complete_list = $member_content_relation->getCompList($member_id, $category_id);
-      $complete_number = count($complete_list);
-
-      // 達成率を計算する。
-      if($number_of_contents == 0) {
-        // コンテンツの設定値が0だった場合100を返す
-        return 100;
-      } else {
-        // 達成率（％）は小数点を四捨五入し整数とする。
-        $score = (int)round($complete_number / $number_of_contents * 100);
-        return $score;
+      $stats = $this->getCategoryContentStats($member_id, $category_id);
+      if ($stats['total'] === 0) {
+        return 0;
       }
-
+      return (int)round($stats['completed'] / $stats['total'] * 100);
     }
 
     /**
@@ -208,16 +245,18 @@
                     ELSE NULL 
                   END as completed_date
               FROM content_master cm
-              LEFT JOIN member_content_relation mcr ON cm.content_id = mcr.content_id AND mcr.member_id = ?";
+              LEFT JOIN member_content_relation mcr ON cm.content_id = mcr.content_id AND mcr.member_id = ?
+              WHERE cm.indicate_flag = ?";
       
-      $params = array($member_id);
+      $params = array($member_id, ContentModel::ACTIVE);
       
       // コースフィルタの適用
-      if ($course_filter !== null) {
-        $sql .= " WHERE cm.target_course = ?";
+      if ($course_filter === ContentModel::TARGET_COURSE_BASIC) {
+        $sql .= " AND (cm.target_course = ? OR cm.target_course IS NULL OR cm.target_course = '' OR cm.target_course = 'all')";
         $params[] = $course_filter;
-      } else {
-        $sql .= " WHERE 1=1";
+      } elseif ($course_filter !== null && $course_filter !== ContentModel::TARGET_COURSE_ADVANCE) {
+        $sql .= " AND cm.target_course = ?";
+        $params[] = $course_filter;
       }
       
       // カテゴリーフィルタの適用
@@ -248,12 +287,18 @@
     public function getMemberCourseProgress($member_id, $category_id = null) {
       $progress_data = $this->getMemberProgressByCourse($member_id, $category_id);
       
-      $total_contents = count($progress_data);
-      $completed_contents = 0;
+      if ($category_id !== null) {
+        $stats = $this->getCategoryContentStats($member_id, $category_id);
+        $total_contents = $stats['total'];
+        $completed_contents = $stats['completed'];
+      } else {
+        $total_contents = count($progress_data);
+        $completed_contents = 0;
       
-      foreach ($progress_data as $content) {
-        if ($content['is_completed']) {
-          $completed_contents++;
+        foreach ($progress_data as $content) {
+          if ($content['is_completed']) {
+            $completed_contents++;
+          }
         }
       }
       

@@ -18,7 +18,6 @@
       'category_number' => $_POST['number'],
       'category_title' => $_POST['title'],
       'content_text' => $_POST['content'],
-      'number_of_contents' => $_POST['number_of_contents'],
       'indicate_flag' => $_POST['indicate_flag'],
       'pub_date' => $_POST['pub_date'],
       'target_course' => isset($_POST['target_course']) ? $_POST['target_course'] : 'all',
@@ -98,15 +97,7 @@
         </tr>
         <tr>
           <th>コンテンツ数</th>
-          <td>
-            <select name="number_of_contents">
-            <?php
-            for ($i = 1; $i <= 20; $i++) {
-              echo '<option value="'.$i.'"'.'>'.$i.'</option>';
-            }
-            ;?>
-            </select>
-          </td>
+          <td>コンテンツ登録後に自動集計されます。</td>
         </tr>
         <tr>
           <th>表示 / 非表示</th>

@@ -2,6 +2,7 @@
   require_once dirname(__FILE__) . '/../scripts/env.php';
   require_once dirname(__FILE__) . '/../scripts/Session.class.php';
   require_once dirname(__FILE__) . '/../scripts/model/CategoryModel.class.php';
+  require_once dirname(__FILE__) . '/../scripts/model/ContentModel.class.php';
   
   // .envファイルを読み込む
   loadEnv();
@@ -24,8 +25,13 @@
     if($_GET['ctg_id']) {
       // 編集対象の課題（カテゴリー）情報取得
       $category_model = new CategoryModel();
+      $content_model = new ContentModel();
       $category = $category_model->select(array('category_id'=>$_GET['ctg_id']));
       $category = $category[0];
+      $category_content_count = $content_model->count(array(
+        'category_id' => $category['category_id'],
+        'indicate_flag' => ContentModel::ACTIVE
+      ));
 
       // DBからカテゴリーが取れなければ一覧画面に飛ばす。
       if(empty($category)) {
@@ -38,18 +44,18 @@
       exit;
     }
   } else { // POST時
-    // 入力情報でカテゴリーを更新
+      // 入力情報でカテゴリーを更新
     $data = array(
       'category_id' => $_POST['category_id'],
       'category_number' => $_POST['number'],
       'category_title' => $_POST['title'],
       'content_text' => $_POST['discription'],
-      'number_of_contents' => $_POST['number_of_contents'],
       'indicate_flag' => $_POST['indicate_flag'],
       'pub_date' => $_POST['pub_date'],
       'target_course' => isset($_POST['target_course']) ? $_POST['target_course'] : 'all',
     );
     $category_model = new CategoryModel();
+      $content_model = new ContentModel();
     $result = $category_model->registerCategory($data);
     if ($result) {
       $category_id = $_POST['category_id'];
@@ -59,6 +65,10 @@
       $toast_message = '更新に失敗しました。';
       $category = $category_model->select(array('category_id'=>$_POST['category_id']));
       $category = !empty($category) ? $category[0] : array();
+      $category_content_count = $content_model->count(array(
+        'category_id' => $_POST['category_id'],
+        'indicate_flag' => ContentModel::ACTIVE
+      ));
     }
   }
 
@@ -143,20 +153,7 @@
         </tr>
         <tr>
           <th>コンテンツ数</th>
-          <td>
-            <select name="number_of_contents">
-            <?php
-            for ($i = 1; $i <= 20; $i++) {
-              if($i == $category['number_of_contents']) {
-                $selected = ' selected="selected"';
-              } else {
-                $selected = '';
-              }
-              echo '<option value="'.$i.'"'.$selected.'>'.$i.'</option>';
-            }
-            ;?>
-            </select>
-          </td>
+          <td><?php echo isset($category_content_count) ? (int)$category_content_count : 0; ?>（公開中コンテンツを自動集計）</td>
         </tr>
         <tr>
           <th>表示 / 非表示</th>

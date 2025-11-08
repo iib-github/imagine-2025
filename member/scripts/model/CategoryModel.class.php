@@ -1,6 +1,7 @@
 <?php
   require_once dirname(__FILE__) . '/../BaseModel.class.php';
   require_once dirname(__FILE__) . '/../UploadLib.class.php';
+  require_once dirname(__FILE__) . '/ContentModel.class.php';
 
   class CategoryModel extends BaseModel {
 
@@ -47,7 +48,17 @@
         $data['category_list_img'] = 'contents/category/' . $fname;
       }
 
-      return parent::update($data, array('category_id' => $category_id));
+      $result = parent::update($data, array('category_id' => $category_id));
+
+      // 公開中コンテンツ数を自動集計し反映
+      $content_model = new ContentModel();
+      $content_count = $content_model->count(array(
+        'category_id' => $category_id,
+        'indicate_flag' => ContentModel::ACTIVE
+      ));
+      parent::update(array('number_of_contents' => $content_count), array('category_id' => $category_id));
+
+      return $result;
     }
 
 
