@@ -61,9 +61,6 @@
 <![endif]-->
 <!--[if IE 6]><script src="common/js/minmax.js"></script><![endif]-->
 <?php include 'tmp/analytics.php';?>
-<style>
-  
-</style>
 </head>
 
 <body>
@@ -74,9 +71,9 @@
     <!-- Contents -->
     <div id="Main">
       <!-- Main -->
-      <section id="TagSearch">
-        <h2>タグで動画を探す</h2>
-        <form method="GET" action="tag-search.php">
+      <form method="GET" action="tag-search.php">
+        <section id="ContentsDetail">
+          <h2>タグで動画を探す</h2>
           <div class="Block">
             <div class="tag-checkbox-group">
               <?php if(!empty($all_tags)): ?>
@@ -92,15 +89,19 @@
               <?php endif; ?>
             </div>
             <div class="tag-actions">
-              <button type="button" id="selectAllTags">全て選択</button>
-              <button type="button" id="deselectAllTags">全て解除</button>
+              <div class="tag-actions__left">
+                <input type="submit" value="タグで検索" class="tag-actions__submit">
+              </div>
+              <div class="tag-actions__right">
+                <button type="button" id="selectAllTags">全て選択</button>
+                <button type="button" id="deselectAllTags">全て解除</button>
+              </div>
             </div>
           </div>
-          <div class="search-button-area">
-            <input type="submit" value="タグで検索">
-          </div>
-        </form>
+        </section>
+      </form>
 
+      <section id="TagSearch">
         <?php if(!empty($selected_tag_ids) && empty($search_results)): ?>
           <p style="text-align: center; color: #f44336; font-weight: bold;">選択されたタグに一致するコンテンツは見つかりませんでした。</p>
         <?php endif; ?>

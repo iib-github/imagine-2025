@@ -291,19 +291,25 @@ Contents
 }
 .tag-checkbox-item input[type="checkbox"] {
   cursor: pointer;
+  accent-color: #0899ae;
 }
 .tag-checkbox-item label {
   padding: 3px 8px;
   cursor: pointer;
 }
 .tag-checkbox-item input[type="checkbox"]:checked + label {
-  background-color: #007bff;
+  background-color: #0899ae;
   color: white;
   padding: 3px 8px;
   border-radius: 3px;
 }
 .tag-actions {
-  text-align: right;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
 }
 .tag-actions button {
   background-color: #6c757d;
@@ -317,6 +323,21 @@ Contents
 }
 .tag-actions button:hover {
   background-color: #5a6268;
+}
+#Main input[type=submit].tag-actions__submit {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 0.9em;
+  height: 32px;
+  width: auto;
+  margin: 0;
+}
+#Main input[type=submit].tag-actions__submit:hover {
+  background-color: #0056b3;
 }
 .search-button-area {
   text-align: center;
