@@ -39,7 +39,7 @@ if (isset($_GET['status'])) {
 }
 
 // タグ一覧を取得
-$tag_list = $tag_model->getTagList(null, array('tag_name' => BaseModel::ORDER_ASC));
+$tag_list = $tag_model->getTagList(null, array('tag_id' => BaseModel::ORDER_ASC));
 
 ?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">

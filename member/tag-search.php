@@ -22,7 +22,7 @@
   $course_filter = $member_model->getCourseFilter($member_info['select_course']);
 
   $tag_model = new TagModel();
-  $all_tags = $tag_model->getTagList(null, array('tag_name' => BaseModel::ORDER_ASC));
+$all_tags = $tag_model->getTagList(null, array('tag_id' => BaseModel::ORDER_ASC));
 
   $content_model = new ContentModel();
   $category_model = new CategoryModel();
