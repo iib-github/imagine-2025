@@ -14,6 +14,12 @@
     const COURSE_BASIC = 2;      // ベーシック
     const COURSE_OTHER = 3;      // その他
 
+    // ログイン結果ステータス
+    const LOGIN_STATUS_SUCCESS = 'success';
+    const LOGIN_STATUS_INVALID_CREDENTIALS = 'invalid_credentials';
+    const LOGIN_STATUS_EXPIRED = 'expired';
+    const LOGIN_STATUS_ERROR = 'error';
+
     public function __construct($member_id = NULL) {
       parent::set_table_name('member_master');
     }
@@ -90,27 +96,42 @@
 
 
     /**
-     * ログインの成否を返す。
+     * ログイン処理
      *
      * @param string $login_mail メールアドレス
      * @param string $password パスワード
-     * @return boolean
+     * @return array{status:string, member?:array}
      */
     public function login($input_mail, $input_pass) {
       $member = $this->getMemberByMail($input_mail);
+      if (empty($member)) {
+        return array(
+          'status' => self::LOGIN_STATUS_INVALID_CREDENTIALS
+        );
+      }
+
       $pass = $member["login_password"];
       $now = time();//現在の時間
-      $stop_date = strtotime($member["stop_date"]);//退会時間
-      if($stop_date) {
-        if ($stop_date < $now) {
-          return false;
-        }
+      $stop_date_raw = isset($member["stop_date"]) ? $member["stop_date"] : null;//退会時間
+      $stop_timestamp = $stop_date_raw ? strtotime($stop_date_raw) : false;
+      if($stop_timestamp && $stop_timestamp < $now) {
+        return array(
+          'status' => self::LOGIN_STATUS_EXPIRED,
+          'member' => $member
+        );
       }
+
       if($input_pass == $pass) {
-        return true;
-      } else {
-        return false;
+        return array(
+          'status' => self::LOGIN_STATUS_SUCCESS,
+          'member' => $member
+        );
       }
+
+      return array(
+        'status' => self::LOGIN_STATUS_INVALID_CREDENTIALS,
+        'member' => $member
+      );
     }
 
 
@@ -310,6 +331,93 @@
         'completion_rate' => $completion_rate,
         'progress_data' => $progress_data
       );
+    }
+
+    /**
+     * カテゴリーID一覧に対して進捗情報をまとめて取得
+     *
+     * @param int $member_id 会員ID
+     * @param array $category_ids カテゴリーID配列
+     * @return array カテゴリーIDをキーにした進捗情報
+     */
+    public function getMemberCourseProgressByCategories($member_id, array $category_ids) {
+      $category_ids = array_values(array_unique(array_filter(array_map('intval', $category_ids))));
+      if (empty($category_ids)) {
+        return array();
+      }
+
+      $member = parent::select(array('member_id' => $member_id));
+      if (empty($member)) {
+        return array();
+      }
+
+      $member_data = $member[0];
+      $course_filter = $this->getCourseFilter($member_data['select_course']);
+
+      $placeholders = implode(',', array_fill(0, count($category_ids), '?'));
+      $pdo = PdoInterface::getInstance();
+
+      $totals_sql = "SELECT cm.category_id, COUNT(*) AS total
+                     FROM content_master cm
+                     WHERE cm.indicate_flag = ?
+                       AND cm.category_id IN ($placeholders)";
+      $totals_params = array_merge(array(ContentModel::ACTIVE), $category_ids);
+
+      if ($course_filter === ContentModel::TARGET_COURSE_BASIC) {
+        $totals_sql .= " AND (cm.target_course = ? OR cm.target_course IS NULL OR cm.target_course = '' OR cm.target_course = 'all')";
+        $totals_params[] = $course_filter;
+      } elseif ($course_filter !== null && $course_filter !== ContentModel::TARGET_COURSE_ADVANCE) {
+        $totals_sql .= " AND cm.target_course = ?";
+        $totals_params[] = $course_filter;
+      }
+
+      $totals_sql .= " GROUP BY cm.category_id";
+
+      $pdo->query($totals_sql, $totals_params);
+      $totals = array();
+      while($row = $pdo->fetch_assoc()) {
+        $category_id = (int)$row['category_id'];
+        $totals[$category_id] = (int)$row['total'];
+      }
+
+      $completes_sql = "SELECT cm.category_id, COUNT(*) AS completed
+                        FROM member_content_relation mcr
+                        INNER JOIN content_master cm ON cm.content_id = mcr.content_id
+                        WHERE mcr.member_id = ?
+                          AND cm.indicate_flag = ?
+                          AND cm.category_id IN ($placeholders)";
+      $completes_params = array_merge(array($member_id, ContentModel::ACTIVE), $category_ids);
+
+      if ($course_filter === ContentModel::TARGET_COURSE_BASIC) {
+        $completes_sql .= " AND (cm.target_course = ? OR cm.target_course IS NULL OR cm.target_course = '' OR cm.target_course = 'all')";
+        $completes_params[] = $course_filter;
+      } elseif ($course_filter !== null && $course_filter !== ContentModel::TARGET_COURSE_ADVANCE) {
+        $completes_sql .= " AND cm.target_course = ?";
+        $completes_params[] = $course_filter;
+      }
+
+      $completes_sql .= " GROUP BY cm.category_id";
+
+      $pdo->query($completes_sql, $completes_params);
+      $completes = array();
+      while($row = $pdo->fetch_assoc()) {
+        $category_id = (int)$row['category_id'];
+        $completes[$category_id] = (int)$row['completed'];
+      }
+
+      $results = array();
+      foreach ($category_ids as $category_id) {
+        $total = isset($totals[$category_id]) ? $totals[$category_id] : 0;
+        $completed = isset($completes[$category_id]) ? $completes[$category_id] : 0;
+        $completion_rate = $total > 0 ? (int)round($completed / $total * 100) : 0;
+        $results[$category_id] = array(
+          'total_contents' => $total,
+          'completed_contents' => $completed,
+          'completion_rate' => $completion_rate
+        );
+      }
+
+      return $results;
     }
 
     /**

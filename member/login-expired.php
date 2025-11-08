@@ -8,10 +8,26 @@
   $session = Session::getInstance();
 
   // ログイン済みであれば自動で遷移させる。
-  if($session->get('member') === true) {
+  if($session->get('member') !== false) {
     header("Location: index.php");
     exit;
   }
+
+  $reason = $session->get('login_error_reason');
+  if($reason !== false) {
+    $session->clear('login_error_reason');
+  }
+  if($reason === false) {
+    $reason = 'other';
+  }
+
+  $messages = array(
+    'invalid' => 'メールアドレスまたはパスワードが異なります。',
+    'expired' => '視聴期限が切れました。',
+    'other'   => 'ログインできませんでした。お手数ですが再度お試しください。'
+  );
+  $message_key = array_key_exists($reason, $messages) ? $reason : 'other';
+  $main_message = $messages[$message_key];
 
 ?><!DOCTYPE html>
 <html>
@@ -34,7 +50,8 @@
   <section id="LoginBox">
     <div class="Cnt">
       <h1><img src="common/img/login_logo.png" width="316" alt="THE Imagine Members"/></h1>
-      <p>視聴期限が切れました。<br>THE Imagineに関するお問い合わせは<br><a href="mailto:<?php echo env('MAIL_SUPPORT_ADDRESS', 'info@hoshino-wataru.com'); ?>">THE Imagine事務局</a>までお願いします。</p>
+      <p><?php echo htmlspecialchars($main_message, ENT_QUOTES, 'UTF-8'); ?><br>
+      THE Imagineに関するお問い合わせは<br><a href="mailto:<?php echo env('MAIL_SUPPORT_ADDRESS', 'info@hoshino-wataru.com'); ?>">THE Imagine事務局</a>までお願いします。</p>
       <a href="login.php"><p class="Btn-Back">ログイン画面へ</p></a>
     </div>
   </section>

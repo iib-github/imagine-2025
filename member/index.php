@@ -50,6 +50,17 @@ if ($theme === 'blue') {
   $member_info = $member_info[0];
   $course_filter = $member_model->getCourseFilter($member_info['select_course']);
 
+  if (!function_exists('cached_file_exists')) {
+    function cached_file_exists($path) {
+      static $cache = array();
+      if (array_key_exists($path, $cache)) {
+        return $cache[$path];
+      }
+      $cache[$path] = file_exists($path);
+      return $cache[$path];
+    }
+  }
+
   // 有効なカテゴリーを全て取得
   $category_model = new CategoryModel();
   $all_categories = $category_model->select(array('indicate_flag'=>1), array('category_number'=>$category_model::ORDER_ASC));
@@ -77,6 +88,19 @@ if ($theme === 'blue') {
   $total_contents = $member_progress['total_contents'];
   $completed_contents = $member_progress['completed_contents'];
   $completion_rate = $member_progress['completion_rate'];
+
+  $category_ids = array();
+  foreach ($advance_categories as $category) {
+    $category_ids[] = (int)$category['category_id'];
+  }
+  foreach ($basic_categories as $category) {
+    $category_ids[] = (int)$category['category_id'];
+  }
+  $category_ids = array_values(array_unique(array_filter($category_ids)));
+  $category_progress_map = array();
+  if (!empty($category_ids)) {
+    $category_progress_map = $member_model->getMemberCourseProgressByCategories($member_id, $category_ids);
+  }
 
   // お知らせ取得
   $news_model = new NewsModel();
@@ -150,7 +174,7 @@ elm.style.backgroundImage = 'url(common/img/' + url[n] + ')';
               <a href="news-detail.php?id=<?php echo $n['id']?>">
               <dl>
                 <dt><?php echo mb_substr($n['note_date'], 0, 10); ?></dt>
-                <dd><?php echo $n['description']; ?></dd>
+                <dd><?php echo htmlspecialchars($n['description'], ENT_QUOTES, 'UTF-8'); ?></dd>
               </dl>
               </a>
             </li>
@@ -165,7 +189,8 @@ elm.style.backgroundImage = 'url(common/img/' + url[n] + ')';
         <ul>
           <?php foreach($advance_categories as $category) : ?>
           <?php
-            $category_progress = $member_model->getMemberCourseProgress($member_id, $category['category_id']);
+            $category_id = $category['category_id'];
+            $category_progress = isset($category_progress_map[$category_id]) ? $category_progress_map[$category_id] : array();
             $category_completion_rate = isset($category_progress['completion_rate']) ? (int)$category_progress['completion_rate'] : 0;
             $category_completed = isset($category_progress['completed_contents']) ? (int)$category_progress['completed_contents'] : 0;
             $category_total = isset($category_progress['total_contents']) ? (int)$category_progress['total_contents'] : 0;
@@ -183,10 +208,10 @@ elm.style.backgroundImage = 'url(common/img/' + url[n] + ')';
                 $webp1280 = $base . '_1280.webp';
                 // 実在チェック用にファイルシステムパスへ変換
                 $rootDir = dirname(__FILE__);
-                $exists_webp640 = file_exists($rootDir . '/' . ltrim($webp640, '/'));
-                $exists_webp1280 = file_exists($rootDir . '/' . ltrim($webp1280, '/'));
-                $exists_jpg640 = file_exists($rootDir . '/' . ltrim($jpg640, '/'));
-                $exists_jpg1280 = file_exists($rootDir . '/' . ltrim($jpg1280, '/'));
+                $exists_webp640 = cached_file_exists($rootDir . '/' . ltrim($webp640, '/'));
+                $exists_webp1280 = cached_file_exists($rootDir . '/' . ltrim($webp1280, '/'));
+                $exists_jpg640 = cached_file_exists($rootDir . '/' . ltrim($jpg640, '/'));
+                $exists_jpg1280 = cached_file_exists($rootDir . '/' . ltrim($jpg1280, '/'));
               ?>
               <picture>
                 <?php if ($exists_webp640 || $exists_webp1280): ?>
@@ -195,7 +220,7 @@ elm.style.backgroundImage = 'url(common/img/' + url[n] + ')';
                 <?php if ($exists_jpg640 || $exists_jpg1280): ?>
                 <source type="image/jpeg" srcset="<?php echo $exists_jpg640 ? htmlspecialchars($jpg640, ENT_QUOTES, 'UTF-8').' 640w' : ''; ?><?php echo ($exists_jpg640 && $exists_jpg1280) ? ', ' : ''; ?><?php echo $exists_jpg1280 ? htmlspecialchars($jpg1280, ENT_QUOTES, 'UTF-8').' 1280w' : ''; ?>" sizes="(max-width: 768px) 640px, 1280px">
                 <?php endif; ?>
-                <img src="<?php echo htmlspecialchars($top, ENT_QUOTES, 'UTF-8'); ?>?=<?php echo date('His'); ?>" width="749" height="172" loading="lazy" decoding="async" alt=""/>
+                <img src="<?php echo htmlspecialchars($top, ENT_QUOTES, 'UTF-8'); ?>?v=<?php echo date('His'); ?>" width="749" height="172" loading="lazy" decoding="async" alt=""/>
               </picture>
               <div style="position: absolute; left: 0; bottom: 0; width: 100%; padding: 12px 20px 14px; background: linear-gradient(0deg, rgba(0, 0, 0, 0.65), rgba(0, 0, 0, 0)); box-sizing: border-box;">
                 <div style="width: 100%; margin: 0 auto;">
@@ -224,7 +249,8 @@ elm.style.backgroundImage = 'url(common/img/' + url[n] + ')';
         <ul>
           <?php foreach($basic_categories as $category) : ?>
           <?php
-            $category_progress = $member_model->getMemberCourseProgress($member_id, $category['category_id']);
+            $category_id = $category['category_id'];
+            $category_progress = isset($category_progress_map[$category_id]) ? $category_progress_map[$category_id] : array();
             $category_completion_rate = isset($category_progress['completion_rate']) ? (int)$category_progress['completion_rate'] : 0;
             $category_completed = isset($category_progress['completed_contents']) ? (int)$category_progress['completed_contents'] : 0;
             $category_total = isset($category_progress['total_contents']) ? (int)$category_progress['total_contents'] : 0;
@@ -242,10 +268,10 @@ elm.style.backgroundImage = 'url(common/img/' + url[n] + ')';
                 $webp1280 = $base . '_1280.webp';
                 // 実在チェック用にファイルシステムパスへ変換
                 $rootDir = dirname(__FILE__);
-                $exists_webp640 = file_exists($rootDir . '/' . ltrim($webp640, '/'));
-                $exists_webp1280 = file_exists($rootDir . '/' . ltrim($webp1280, '/'));
-                $exists_jpg640 = file_exists($rootDir . '/' . ltrim($jpg640, '/'));
-                $exists_jpg1280 = file_exists($rootDir . '/' . ltrim($jpg1280, '/'));
+                $exists_webp640 = cached_file_exists($rootDir . '/' . ltrim($webp640, '/'));
+                $exists_webp1280 = cached_file_exists($rootDir . '/' . ltrim($webp1280, '/'));
+                $exists_jpg640 = cached_file_exists($rootDir . '/' . ltrim($jpg640, '/'));
+                $exists_jpg1280 = cached_file_exists($rootDir . '/' . ltrim($jpg1280, '/'));
               ?>
               <picture>
                 <?php if ($exists_webp640 || $exists_webp1280): ?>
@@ -254,7 +280,7 @@ elm.style.backgroundImage = 'url(common/img/' + url[n] + ')';
                 <?php if ($exists_jpg640 || $exists_jpg1280): ?>
                 <source type="image/jpeg" srcset="<?php echo $exists_jpg640 ? htmlspecialchars($jpg640, ENT_QUOTES, 'UTF-8').' 640w' : ''; ?><?php echo ($exists_jpg640 && $exists_jpg1280) ? ', ' : ''; ?><?php echo $exists_jpg1280 ? htmlspecialchars($jpg1280, ENT_QUOTES, 'UTF-8').' 1280w' : ''; ?>" sizes="(max-width: 768px) 640px, 1280px">
                 <?php endif; ?>
-                <img src="<?php echo htmlspecialchars($top, ENT_QUOTES, 'UTF-8'); ?>?=<?php echo date('His'); ?>" width="749" height="172" loading="lazy" decoding="async" alt=""/>
+                <img src="<?php echo htmlspecialchars($top, ENT_QUOTES, 'UTF-8'); ?>?v=<?php echo date('His'); ?>" width="749" height="172" loading="lazy" decoding="async" alt=""/>
               </picture>
               <div style="position: absolute; left: 0; bottom: 0; width: 100%; padding: 12px 20px 14px; background: linear-gradient(0deg, rgba(0, 0, 0, 0.65), rgba(0, 0, 0, 0)); box-sizing: border-box;">
                 <div style="width: 100%; margin: 0 auto;">

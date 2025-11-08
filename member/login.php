@@ -22,17 +22,30 @@
     $pass = @$_POST["password"];
 
     $member_model = new MemberModel($member_id = NULL);
-    $login_success = $member_model->login($mail, $pass);
+    $login_result = $member_model->login($mail, $pass);
+    $status = is_array($login_result) && isset($login_result['status']) ? $login_result['status'] : MemberModel::LOGIN_STATUS_ERROR;
 
-    if($login_success) { // ログイン成功
-      $member = $member_model->getMemberByMail($mail);
-      $session->set('member', $member['member_id']);
+    if($status === MemberModel::LOGIN_STATUS_SUCCESS) { // ログイン成功
+      $member = isset($login_result['member']) ? $login_result['member'] : $member_model->getMemberByMail($mail);
+      if($member && isset($member['member_id'])) {
+        $session->set('member', $member['member_id']);
+      } else {
+        $session->clear('member');
+      }
+      $session->clear('login_error_reason');
       $session->set('show_login_splash', true);
       header("location: index.php");
       exit;
     } else { // ログイン失敗
-      $session->destroy();
-      // header("location: login-fail.php");
+      $session->clear('member');
+      $session->clear('show_login_splash');
+      $reason = 'other';
+      if($status === MemberModel::LOGIN_STATUS_INVALID_CREDENTIALS) {
+        $reason = 'invalid';
+      } elseif($status === MemberModel::LOGIN_STATUS_EXPIRED) {
+        $reason = 'expired';
+      }
+      $session->set('login_error_reason', $reason);
       header("location: login-expired.php");
       exit;
     }
