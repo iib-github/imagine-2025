@@ -63,6 +63,109 @@ LoginBox
 #LoginBox .Cnt input[type=button]:hover {-moz-transition-property:background;-moz-transition-duration: 0.3s;-moz-transition-timing-function: ease;-moz-transition-delay: 0.3s;-webkit-transition-property:all;-webkit-transition-duration: 0.3s;-webkit-transition-timing-function: ease;-webkit-transition-delay: 0.3s;-o-transition-property:all;-o-transition-duration: 0.3s;-o-transition-timing-function: ease;-o-transition-delay: 0.3s;opacity:0.8;}
 #LoginBox .Cnt a .Btn-Back { border-radius:3px; text-align:center; background:#666e82; color:#ffffff;width: 314px; font-size:16px; padding:15px 0 16px; letter-spacing:0.5px; height:50px;height: 20px; margin: 0 auto;}
 #LoginBox .Cnt a:hover .Btn-Back {-moz-transition-property:background;-moz-transition-duration: 0.3s;-moz-transition-timing-function: ease;-moz-transition-delay: 0.3s;-webkit-transition-property:all;-webkit-transition-duration: 0.3s;-webkit-transition-timing-function: ease;-webkit-transition-delay: 0.3s;-o-transition-property:all;-o-transition-duration: 0.3s;-o-transition-timing-function: ease;-o-transition-delay: 0.3s;opacity:0.5;}
+.ForgotPwTrigger {
+  margin-top: 15px;
+  text-align: center;
+}
+.ForgotPwTrigger__btn {
+  background: none;
+  border: none;
+  color: #313131;
+  cursor: pointer;
+  font-size: 14px;
+  text-decoration: underline;
+}
+.ForgotPwTrigger__btn:hover {
+  opacity: 0.7;
+}
+.ForgotPwModal {
+  position: fixed;
+  inset: 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+.ForgotPwModal.is-active {
+  display: flex;
+}
+.ForgotPwModal__overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.45);
+}
+.ForgotPwModal__content {
+  position: relative;
+  z-index: 1;
+  width: min(90%, 360px);
+  background: #fff;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.25);
+}
+.ForgotPwModal__close {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  color: #888;
+}
+.ForgotPwModal__close:hover {
+  color: #333;
+}
+.ForgotPwModal__lead {
+  font-size: 14px;
+  line-height: 1.6;
+  margin-bottom: 16px;
+}
+.ForgotPwModal__label {
+  display: block;
+  margin-bottom: 16px;
+  font-size: 14px;
+  color: #555;
+}
+.ForgotPwModal__label span {
+  display: block;
+  margin-bottom: 6px;
+  font-weight: bold;
+}
+.ForgotPwModal__label input {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+  box-sizing: border-box;
+}
+.ForgotPwModal__actions {
+  text-align: right;
+}
+.ForgotPwModal__submit {
+  background: #5fbdff;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 10px 16px;
+  font-size: 14px;
+  cursor: pointer;
+}
+.ForgotPwModal__submit:hover {
+  opacity: 0.85;
+}
+.ForgotPwModal__message {
+  min-height: 1.4em;
+  font-size: 13px;
+  margin-bottom: 12px;
+}
+.ForgotPwModal__message.is-success {
+  color: #2e7d32;
+}
+.ForgotPwModal__message.is-error {
+  color: #d32f2f;
+}
 
 /*========================================
 Index
