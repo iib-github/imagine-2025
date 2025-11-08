@@ -69,7 +69,6 @@
             <select name="course">
               <option value="1" >アドバンス</option>
               <option value="2" >ベーシック</option>
-              <option value="3" >その他</option>
             </select>
           </td>
         </tr>

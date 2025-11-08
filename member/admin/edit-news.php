@@ -15,6 +15,41 @@
 
   $toast_message = '';
 
+if (!function_exists('formatDateForInput')) {
+  function formatDateForInput($value) {
+    if (empty($value)) {
+      return '';
+    }
+    $normalized = str_replace('.', '-', trim($value));
+    if (preg_match('/^(\d{4})-(\d{2})-(\d{2})$/', $normalized, $m)) {
+      return sprintf('%s-%s-%s', $m[1], $m[2], $m[3]);
+    }
+    if (preg_match('/^(\d{4})-(\d{2})-(\d{2})/', $normalized, $m)) {
+      return sprintf('%s-%s-%s', $m[1], $m[2], $m[3]);
+    }
+    return '';
+  }
+}
+
+if (!function_exists('formatDatetimeForInput')) {
+  function formatDatetimeForInput($value) {
+    if (empty($value)) {
+      return '';
+    }
+    $normalized = str_replace('.', '-', trim($value));
+    $normalized = preg_replace('/\s+/', 'T', $normalized);
+    if (preg_match('/^(\d{4}-\d{2}-\d{2})-(\d{2}):(\d{2})(?::(\d{2}))?$/', $normalized, $m)) {
+      $seconds = isset($m[4]) ? ':' . $m[4] : '';
+      return sprintf('%sT%s:%s%s', $m[1], $m[2], $m[3], $seconds);
+    }
+    if (preg_match('/^(\d{4}-\d{2}-\d{2})T(\d{2}):(\d{2})(?::(\d{2}))?$/', $normalized, $m)) {
+      $seconds = isset($m[4]) ? ':' . $m[4] : '';
+      return sprintf('%sT%s:%s%s', $m[1], $m[2], $m[3], $seconds);
+    }
+    return '';
+  }
+}
+
   if($_SERVER["REQUEST_METHOD"] == "POST") {
     $news_id_post = isset($_POST['news_id']) ? (int)$_POST['news_id'] : 0;
     $toast_message = '';
@@ -80,7 +115,7 @@
       <table class="member">
         <tr>
           <th>お知らせ日時</th>
-          <td><input type="text" name="note_date" style="width:200px;" value="<?php echo htmlspecialchars($news["note_date"], ENT_QUOTES, 'UTF-8'); ?>">　例)「2017.06.05-15:00」という形式で入力してください。</td>
+          <td><input type="datetime-local" name="note_date" style="width:200px;" value="<?php echo htmlspecialchars(formatDatetimeForInput($news["note_date"]), ENT_QUOTES, 'UTF-8'); ?>">　※カレンダーから日時を選択してください。</td>
         </tr>
         <tr>
           <th>お知らせタイトル</th>

@@ -87,9 +87,12 @@
   // カテゴリ表示名とidの紐付け表を作成
   $category_model = new CategoryModel();
   $category_list = $category_model->select();
-  $number_list = array();
+  $category_map = array();
   foreach ($category_list as $ctg) {
-    $number_list[$ctg['category_id']] = $ctg['category_number'];
+    $label = !empty($ctg['category_title'])
+      ? $ctg['category_title']
+      : 'Lesson' . $ctg['category_number'];
+    $category_map[$ctg['category_id']] = $label;
   }
 
 ?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -335,13 +338,7 @@
       <?php foreach ($content_list as $content) : ?>
       <tr>
         <td><?php echo $content['content_id']; ?></td>
-<?php if ($content['category_id'] == '5'): ?>
-        <td>イマジンラジオ</td>
-<?php elseif ($content['category_id'] == '6'): ?>
-        <td>QAライブ動画</td>
-<?php else: ?>
-        <td>Lesson<?php echo $number_list[$content['category_id']]; ?></td>
-<?php endif; ?>
+        <td><?php echo htmlspecialchars(isset($category_map[$content['category_id']]) ? $category_map[$content['category_id']] : '未設定', ENT_QUOTES, 'UTF-8'); ?></td>
         <td><?php echo $content['content_week']; ?></td>
         <td><?php echo htmlspecialchars($content['content_title'], ENT_QUOTES, 'UTF-8'); ?></td>
         <td><?php echo htmlspecialchars($content_model->getCourseName($content['target_course']), ENT_QUOTES, 'UTF-8'); ?></td>

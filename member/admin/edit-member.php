@@ -99,11 +99,16 @@
         <tr>
           <th>コース</th>
           <td>
+            <?php
+              $current_course = (int)$member['select_course'];
+            ?>
             <select name="course">
-              <option value="1"<?php if($member['select_course'] == 1) echo ' selected="selected"';?>>アドバンス</option>
-              <option value="2"<?php if($member['select_course'] == 2) echo ' selected="selected"';?>>ベーシック</option>
-              <option value="3"<?php if($member['select_course'] == 3) echo ' selected="selected"';?>>その他</option>
+              <option value="1"<?php if($current_course === 1 || ($current_course !== 1 && $current_course !== 2)) echo ' selected="selected"';?>>アドバンス</option>
+              <option value="2"<?php if($current_course === 2) echo ' selected="selected"';?>>ベーシック</option>
             </select>
+            <?php if($current_course !== 1 && $current_course !== 2): ?>
+            <p style="margin:8px 0 0;font-size:12px;color:#555;">現在「その他」が設定されています。保存時に新しいコースを選択してください。</p>
+            <?php endif; ?>
             </td>
         </tr>
         <tr>

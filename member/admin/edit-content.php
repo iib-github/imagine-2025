@@ -35,6 +35,22 @@
   $content_videos = array();
   $content_tags = array();
 
+  if (!function_exists('formatDateForInput')) {
+    function formatDateForInput($value) {
+      if (empty($value)) {
+        return '';
+      }
+      $normalized = str_replace('.', '-', trim($value));
+      if (preg_match('/^(\d{4})-(\d{2})-(\d{2})$/', $normalized, $m)) {
+        return sprintf('%s-%s-%s', $m[1], $m[2], $m[3]);
+      }
+      if (preg_match('/^(\d{4})-(\d{2})-(\d{2})/', $normalized, $m)) {
+        return sprintf('%s-%s-%s', $m[1], $m[2], $m[3]);
+      }
+      return '';
+    }
+  }
+
   if($_SERVER["REQUEST_METHOD"] == "GET") {
     if($_GET['cont_id']) {
       // 編集対象のコンテンツ情報取得
@@ -228,18 +244,14 @@
   }
   .form-action-buttons {
     display: flex;
-    gap: 12px;
     align-items: center;
+    justify-content: space-between;
+    gap: 12px;
     margin-bottom: 15px;
   }
   .btn-delete {
-    background-color: #f44336;
+    background-color: #f44336!important;
     color: #fff;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 3px;
-    cursor: pointer;
-    font-size: 14px;
   }
   .btn-delete:hover {
     background-color: #d32f2f;
@@ -340,7 +352,7 @@
     <form method="POST" action="edit-content.php" enctype="multipart/form-data">
       <div class="form-action-buttons">
         <input type="submit" id="btnUpdate" class="Btn" value="更新" name="update">
-        <button type="submit" id="btnDelete" class="btn-delete" name="delete" value="1">削除</button>
+        <button type="submit" id="btnDelete" class="Btn btn-delete" name="delete" value="1">削除</button>
       </div>
       <input type="hidden" name="content_id" value="<?php echo $content["content_id"]; ?>">
       <table class="member">
@@ -354,18 +366,11 @@
             <select name="category">
             <?php
               foreach ($category_list as $category) {
-                if($category['category_id'] == $content['category_id']) {
-                  $selected = ' selected="selected"';
-                } else {
-                  $selected = '';
-                }
-                if ($category['category_number'] == '12') {
-                  echo '<option value="' . $category['category_id'] . '"'.$selected.'>イマジンラジオ</option>';
-                } elseif ($category['category_number'] == '11') {
-                  echo '<option value="' . $category['category_id'] . '"'.$selected.'>QAライブ動画</option>';
-                } else {
-                  echo '<option value="'.$category['category_id'].'"'.$selected.'>Lesson'.$category['category_number'] . '</option>';
-                }
+                $selected = ($category['category_id'] == $content['category_id']) ? ' selected="selected"' : '';
+                $label = !empty($category['category_title'])
+                  ? htmlspecialchars($category['category_title'], ENT_QUOTES, 'UTF-8')
+                  : 'Lesson' . htmlspecialchars($category['category_number'], ENT_QUOTES, 'UTF-8');
+                echo '<option value="' . $category['category_id'] . '"' . $selected . '>' . $label . '</option>';
               }
             ?>
             </select>
@@ -421,6 +426,7 @@
                   <textarea name="video_urls[]" placeholder="動画埋め込みコード（iframe等）" style="height: 40px;"><?php echo htmlspecialchars(isset($video['video_url']) ? $video['video_url'] : '', ENT_QUOTES, 'UTF-8'); ?></textarea>
                   <div style="display: flex; align-items: end;">
                     <div style="margin-right: 10px;">
+                      <label style="display:block;font-size:12px;color:#555;margin-bottom:4px;">サムネイル画像アップロード</label>
                       <input type="file" name="video_thumbnails[]" accept="image/*" style="margin-bottom:0;">
                       <input type="hidden" name="thumbnail_urls[]" value="<?php echo htmlspecialchars(isset($video['thumbnail_url']) ? $video['thumbnail_url'] : '', ENT_QUOTES, 'UTF-8'); ?>">
                     </div>
@@ -484,7 +490,7 @@
         </tr>
         <tr>
           <th>公開日時</th>
-          <td><input type="text" name="pub_date" value="<?php echo htmlspecialchars($content["pub_date"], ENT_QUOTES, 'UTF-8'); ?>">　※「2017.06.15」という形式で入力してください。</td>
+          <td><input type="date" name="pub_date" value="<?php echo htmlspecialchars(formatDateForInput($content["pub_date"]), ENT_QUOTES, 'UTF-8'); ?>">　※カレンダーから日付を選択してください。</td>
         </tr>
         <tr>
           <th>対象コース</th>

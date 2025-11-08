@@ -21,6 +21,9 @@
       case 'deleted':
         $toast_message = '更新情報を削除しました。';
         break;
+      case 'toggled':
+        $toast_message = '表示状態を更新しました。';
+        break;
     }
   }
 
@@ -38,6 +41,68 @@
 <link href="common/css/reset.css" rel="stylesheet" type="text/css" media="all" />
 <link href="common/css/style.css" rel="stylesheet" type="text/css" media="all" />
 <style>
+  .status-toggle-form {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+  }
+  .status-toggle-label {
+    position: relative;
+    display: inline-block;
+    width: 44px;
+    height: 22px;
+    margin-right: 8px;
+  }
+  .status-toggle-label input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+  .status-toggle-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: .3s;
+    border-radius: 22px;
+  }
+  .status-toggle-slider:before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 2px;
+    bottom: 2px;
+    background-color: white;
+    transition: .3s;
+    border-radius: 50%;
+  }
+  .status-toggle-input:checked + .status-toggle-slider {
+    background-color: #4CAF50;
+  }
+  .status-toggle-input:checked + .status-toggle-slider:before {
+    transform: translateX(22px);
+  }
+  .status-toggle-text {
+    font-size: 12px;
+    font-weight: bold;
+    color: #555;
+  }
+  .status-toggle-text.active {
+    color: #2e7d32;
+  }
+  .status-toggle-text.inactive {
+    color: #757575;
+  }
+  .status-toggle-header,
+  .status-toggle-cell {
+    text-align: center;
+    width: 80px;
+  }
   .btn-detail {
     display: inline-block;
     padding: 6px 12px;
@@ -78,7 +143,8 @@
         <th>お知らせ日時(公開日時)</th>
         <th>タイトル</th>
         <th>対象コース</th>
-        <th>表示 / 非表示</th>
+        <th>公開日</th>
+        <th class="status-toggle-header">表示 / 非表示</th>
         <th style="width: 50px;">詳細</th>
       </tr>
 
@@ -104,14 +170,27 @@
             }
           ?>
         </td>
-        <td>
-          <?php
-            if($n['is_active']) {
-              echo '表示';
-            } else {
-              echo '非表示';
-            }
-          ?>
+        <td><?php echo htmlspecialchars(mb_substr($n['note_date'], 0, 10), ENT_QUOTES, 'UTF-8'); ?></td>
+        <td class="status-toggle-cell">
+          <form class="status-toggle-form" method="POST" action="toggle-news-status.php">
+            <input type="hidden" name="news_id" value="<?php echo (int)$n['id']; ?>">
+            <input type="hidden" name="redirect" value="list-news.php<?php echo !empty($_SERVER['QUERY_STRING']) ? '?' . htmlspecialchars($_SERVER['QUERY_STRING'], ENT_QUOTES, 'UTF-8') : ''; ?>">
+            <input type="hidden" name="target_status" value="<?php echo ((int)$n['is_active'] === 1) ? 0 : 1; ?>">
+            <label class="status-toggle-label">
+              <input
+                type="checkbox"
+                class="status-toggle-input"
+                name="is_active"
+                value="<?php echo ((int)$n['is_active'] === 1) ? 0 : 1; ?>"
+                <?php if((int)$n['is_active'] === 1) echo ' checked="checked"'; ?>
+                onchange="this.form.submit();"
+              >
+              <span class="status-toggle-slider"></span>
+            </label>
+            <span class="status-toggle-text <?php echo ((int)$n['is_active'] === 1) ? 'active' : 'inactive'; ?>">
+              <?php echo ((int)$n['is_active'] === 1) ? '表示' : '非表示'; ?>
+            </span>
+          </form>
         </td>
         <td style="text-align:center"><button type="button" class="btn-detail" onclick="location.href='edit-news.php?n_id=<?php echo $n['id']; ?>'">詳細</button></td>
       </tr>

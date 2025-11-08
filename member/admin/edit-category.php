@@ -7,6 +7,22 @@
   // .envファイルを読み込む
   loadEnv();
   
+  if (!function_exists('formatDateForInput')) {
+    function formatDateForInput($value) {
+      if (empty($value)) {
+        return '';
+      }
+      $normalized = str_replace('.', '-', trim($value));
+      if (preg_match('/^(\d{4})-(\d{2})-(\d{2})$/', $normalized, $m)) {
+        return sprintf('%s-%s-%s', $m[1], $m[2], $m[3]);
+      }
+      if (preg_match('/^(\d{4})-(\d{2})-(\d{2})/', $normalized, $m)) {
+        return sprintf('%s-%s-%s', $m[1], $m[2], $m[3]);
+      }
+      return '';
+    }
+  }
+
   $session = Session::getInstance();
 
   $toast_message = '';
@@ -172,7 +188,7 @@
         </tr>
         <tr>
           <th>公開日時</th>
-          <td><input type="text" name="pub_date" value="<?php echo htmlspecialchars($category["pub_date"], ENT_QUOTES, 'UTF-8'); ?>">　※「2017.06.15」という形式で入力してください。</td>
+          <td><input type="date" name="pub_date" value="<?php echo htmlspecialchars(formatDateForInput($category["pub_date"]), ENT_QUOTES, 'UTF-8'); ?>">　※カレンダーから日付を選択してください。</td>
         </tr>
       </table>
     </form>

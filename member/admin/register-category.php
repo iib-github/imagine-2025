@@ -119,7 +119,7 @@
         </tr>
         <tr>
           <th>公開日時</th>
-          <td><input type="text" name="pub_date">　※「2017.06.15」という形式で入力してください。</td>
+          <td><input type="date" name="pub_date">　※カレンダーから日付を選択してください。</td>
         </tr>
       </table>
     </form>

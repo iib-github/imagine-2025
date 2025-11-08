@@ -190,6 +190,7 @@
       <textarea name="video_urls[]" placeholder="動画埋め込みコード（iframe等）" style="height: 40px;"></textarea>
       <div style="display: flex; align-items: end;">
         <div>
+          <label style="display:block;font-size:12px;color:#555;margin-bottom:4px;">サムネイル画像アップロード</label>
           <input type="file" name="video_thumbnails[]" accept="image/*" style="margin-bottom:0;">
           <input type="hidden" name="thumbnail_urls[]" value="">
         </div>
@@ -247,13 +248,10 @@
             <select name="category">
             <?php
               foreach ($category_list as $category) {
-                if ($category['category_number'] == '12') {
-                  echo '<option value="' . $category['category_id'] . '" >イマジンラジオ</option>';
-                } elseif ($category['category_number'] == '11') {
-                  echo '<option value="' . $category['category_id'] . '" >QAライブ動画</option>';
-                } else {
-                  echo '<option value="' . $category['category_id'] . '" >Lesson' . $category['category_number'] . '</option>';
-                }
+                $label = !empty($category['category_title'])
+                  ? htmlspecialchars($category['category_title'], ENT_QUOTES, 'UTF-8')
+                  : 'Lesson' . htmlspecialchars($category['category_number'], ENT_QUOTES, 'UTF-8');
+                echo '<option value="' . $category['category_id'] . '" >' . $label . '</option>';
               }
             ?>
             </select>
@@ -326,7 +324,7 @@
         </tr>
         <tr>
           <th>公開日時</th>
-          <td><input type="text" name="pub_date">　※「2017.06.15」という形式で入力してください。</td>
+          <td><input type="date" name="pub_date">　※カレンダーから日付を選択してください。</td>
         </tr>
         <tr>
           <th>対象コース</th>

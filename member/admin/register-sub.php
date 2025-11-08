@@ -1,8 +1,7 @@
 <?php
   require_once dirname(__FILE__) . '/../scripts/Session.class.php';
-require_once dirname(__FILE__) . '/../scripts/model/SubModel.class.php';
-require_once dirname(__FILE__) . '/../scripts/model/CategoryModel.class.php';
-require_once dirname(__FILE__) . '/../scripts/model/ContentModel.class.php';
+  require_once dirname(__FILE__) . '/../scripts/model/SubModel.class.php';
+  require_once dirname(__FILE__) . '/../scripts/model/CategoryModel.class.php';
   $session = Session::getInstance();
 
   // セッションがなければログイン画面に遷移させる。
@@ -27,12 +26,11 @@ require_once dirname(__FILE__) . '/../scripts/model/ContentModel.class.php';
       'display_order' => $_POST['display_order'],
       'indicate_flag' => $_POST['indicate_flag'],
       'pub_date' => $_POST['pub_date'],
-      'target_course' => isset($_POST['target_course']) ? $_POST['target_course'] : ContentModel::TARGET_COURSE_ADVANCE,
     );
 
     $success = $sub_model->registerSub($sub_data);
     if($success) {
-      header("Location: list-sub.php?status=created");
+      header("Location: list-sub.php");
       exit;
     }
 
@@ -64,15 +62,6 @@ require_once dirname(__FILE__) . '/../scripts/model/ContentModel.class.php';
     <form method="POST" action="register-sub.php" enctype="multipart/form-data">
       <p><input type="submit" id="btnRegister" class="Btn" value="登録" name="register"></p>
       <table class="member">
-        <tr>
-          <th>対象コース</th>
-          <td>
-            <select name="target_course">
-              <option value="<?php echo ContentModel::TARGET_COURSE_ADVANCE; ?>">アドバンス（全体）</option>
-              <option value="<?php echo ContentModel::TARGET_COURSE_BASIC; ?>">ベーシック</option>
-            </select>
-          </td>
-        </tr>
         <tr>
           <th>紐づくカテゴリー</th>
           <td>
@@ -125,7 +114,7 @@ require_once dirname(__FILE__) . '/../scripts/model/ContentModel.class.php';
         </tr>
         <tr>
           <th>公開日時</th>
-          <td><input type="text" name="pub_date">　※「2017.06.15」という形式で入力してください。</td>
+          <td><input type="date" name="pub_date">　※カレンダーから日付を選択してください。</td>
         </tr>
       </table>
     </form>
