@@ -155,8 +155,15 @@ elm.style.backgroundImage = 'url(common/img/' + url[n] + ')';
         <h2 style="margin-bottom: 10px;">Advance</h2>
         <ul>
           <?php foreach($advance_categories as $category) : ?>
+          <?php
+            $category_progress = $member_model->getMemberCourseProgress($member_id, $category['category_id']);
+            $category_completion_rate = isset($category_progress['completion_rate']) ? (int)$category_progress['completion_rate'] : 0;
+            $category_completed = isset($category_progress['completed_contents']) ? (int)$category_progress['completed_contents'] : 0;
+            $category_total = isset($category_progress['total_contents']) ? (int)$category_progress['total_contents'] : 0;
+            $progress_width = max(0, min(100, $category_completion_rate));
+          ?>
           <li class="Hv">
-            <a href="list.php?ctg_id=<?php echo $category['category_id']; ?>">
+            <a href="list.php?ctg_id=<?php echo $category['category_id']; ?>" style="position: relative; display: block;">
               <?php
                 $top = $category['category_top_img'];
                 $pi = pathinfo($top);
@@ -181,6 +188,20 @@ elm.style.backgroundImage = 'url(common/img/' + url[n] + ')';
                 <?php endif; ?>
                 <img src="<?php echo htmlspecialchars($top, ENT_QUOTES, 'UTF-8'); ?>?=<?php echo date('His'); ?>" width="749" height="172" loading="lazy" decoding="async" alt=""/>
               </picture>
+              <div style="position: absolute; left: 0; bottom: 0; width: 100%; padding: 12px 20px 14px; background: linear-gradient(0deg, rgba(0, 0, 0, 0.65), rgba(0, 0, 0, 0)); box-sizing: border-box;">
+                <div style="width: 100%; margin: 0 auto;">
+                  <div style="display: flex; justify-content: space-between; color: #fff; font-size: 12px; margin-bottom: 6px;">
+                    <span><?php echo $category_completion_rate; ?>% 達成</span>
+                    <span><?php echo $category_completed; ?> / <?php echo $category_total; ?></span>
+                  </div>
+                  <div style="position: relative; height: 8px; border-radius: 4px; background: rgba(255,255,255,0.25); overflow: hidden;">
+                    <div style="position: absolute; left: 0; top: 0; bottom: 0; width: 100%; border-radius: 4px; background: rgba(0,0,0,0.18);"></div>
+                    <div style="position: absolute; left: 2px; right: 2px; top: 2px; bottom: 2px;">
+                      <div style="width: <?php echo $progress_width; ?>%; height: 100%; border-radius: 4px; background: linear-gradient(90deg, #0899ae, #12bfd4);"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </a>
           </li>
           <?php endforeach;?>
@@ -193,8 +214,15 @@ elm.style.backgroundImage = 'url(common/img/' + url[n] + ')';
         <h2 style="margin-bottom: 10px;">Basic</h2>
         <ul>
           <?php foreach($basic_categories as $category) : ?>
+          <?php
+            $category_progress = $member_model->getMemberCourseProgress($member_id, $category['category_id']);
+            $category_completion_rate = isset($category_progress['completion_rate']) ? (int)$category_progress['completion_rate'] : 0;
+            $category_completed = isset($category_progress['completed_contents']) ? (int)$category_progress['completed_contents'] : 0;
+            $category_total = isset($category_progress['total_contents']) ? (int)$category_progress['total_contents'] : 0;
+            $progress_width = max(0, min(100, $category_completion_rate));
+          ?>
           <li class="Hv">
-            <a href="list.php?ctg_id=<?php echo $category['category_id']; ?>">
+            <a href="list.php?ctg_id=<?php echo $category['category_id']; ?>" style="position: relative; display: block;">
               <?php
                 $top = $category['category_top_img'];
                 $pi = pathinfo($top);
@@ -219,6 +247,20 @@ elm.style.backgroundImage = 'url(common/img/' + url[n] + ')';
                 <?php endif; ?>
                 <img src="<?php echo htmlspecialchars($top, ENT_QUOTES, 'UTF-8'); ?>?=<?php echo date('His'); ?>" width="749" height="172" loading="lazy" decoding="async" alt=""/>
               </picture>
+              <div style="position: absolute; left: 0; bottom: 0; width: 100%; padding: 12px 20px 14px; background: linear-gradient(0deg, rgba(0, 0, 0, 0.65), rgba(0, 0, 0, 0)); box-sizing: border-box;">
+                <div style="width: 100%; margin: 0 auto;">
+                  <div style="display: flex; justify-content: space-between; color: #fff; font-size: 12px; margin-bottom: 6px;">
+                    <span><?php echo $category_completion_rate; ?>% 達成</span>
+                    <span><?php echo $category_completed; ?> / <?php echo $category_total; ?></span>
+                  </div>
+                  <div style="position: relative; height: 8px; border-radius: 4px; background: rgba(255,255,255,0.25); overflow: hidden;">
+                    <div style="position: absolute; left: 0; top: 0; bottom: 0; width: 100%; border-radius: 4px; background: rgba(0,0,0,0.18);"></div>
+                    <div style="position: absolute; left: 2px; right: 2px; top: 2px; bottom: 2px;">
+                      <div style="width: <?php echo $progress_width; ?>%; height: 100%; border-radius: 4px; background: linear-gradient(90deg, #ffeb3b, #ffc107);"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </a>
           </li>
           <?php endforeach;?>
