@@ -32,7 +32,7 @@ require_once dirname(__FILE__) . '/../scripts/model/ContentModel.class.php';
 
     $success = $sub_model->registerSub($sub_data);
     if($success) {
-      header("Location: list-sub.php");
+      header("Location: list-sub.php?status=created");
       exit;
     }
 

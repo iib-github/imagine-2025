@@ -220,7 +220,7 @@ Contents
 /* #Side */
 #Side { float: right; width: 224px;}
 #Side .Block { overflow: hidden; margin-bottom: 30px;webkit-box-shadow: 3px 3px 3px 0 rgba(132,132,132,.2);-moz-box-shadow: 3px 3px 3px 0 rgba(132,132,132,.2);box-shadow: 3px 3px 3px 0 rgba(132,132,132,.2);}
-#Side .Block h3 { background: #eee8e2; padding: 10px; color: #535353; letter-spacing: 0.5px;}
+#Side .Block h3 { background: #eee8e2; padding: 10px; color: #000; letter-spacing: 0.5px;}
 #Side .Block .cnt {border: 1px solid #e0e0e0; padding: 15px;background: #fff;}
 #Side .Block ul { overflow: hidden;}
 #Side .Block li { padding-bottom: 5px; border-bottom: 1px dotted #e0e0e0;background: url("../img/arrowBlack.png") 98% 40% no-repeat; background-size: 6px auto;margin-bottom: 10px;-moz-transition-property:all;-moz-transition-duration: 0.5s;-moz-transition-timing-function: ease;-moz-transition-delay: 0.1s;-webkit-transition-property:all;-webkit-transition-duration: 0.5s;-webkit-transition-timing-function: ease;-webkit-transition-delay: 0.1s;-o-transition-property:all;-o-transition-duration: 0.5s;-o-transition-timing-function: ease;-o-transition-delay: 0.1s;}
@@ -237,7 +237,7 @@ Contents
 
 /* #Main */
 #Main { float: left; width: 750px;}
-#Main h2 {background: #eee8e2; padding: 10px 10px 10px 2%; color: #535353; letter-spacing: 0.5px;}
+#Main h2 {background: #eee8e2; padding: 10px 10px 10px 2%; color: #000; letter-spacing: 0.5px;}
 #Main h2 span { background: #F32E31; color: #fff; border-radius: 3px; margin-right: 10px; padding: 0 5px;}
 #Main h3 {border-bottom: 1px solid #525252; margin-bottom:2%;}
 #Main .Block {border: 1px solid #e0e0e0; padding: 20px; background: #fff;}
@@ -518,7 +518,7 @@ Contents
 /* #Side */
 #Side { float: none; width: 96%;padding: 2%;}
 #Side .Block {margin-bottom: 30px;}
-#Side .Block h3 {padding: 10px; color: #535353;}
+#Side .Block h3 {padding: 10px; color: #000;}
 #Side .Block .cnt {padding: 15px;}
 
 /* #Main */

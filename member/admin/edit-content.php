@@ -10,9 +10,6 @@
   $toast_message = '';
   loadEnv();
   initializeErrorHandling();
-  if (isset($_GET['status']) && $_GET['status'] === 'updated') {
-    $toast_message = 'コンテンツを更新しました。';
-  }
   
   $session = Session::getInstance();
 
@@ -152,7 +149,7 @@
           }
         }
         
-        header("Location: edit-content.php?cont_id=" . urlencode((string)$content_id) . "&status=updated");
+        header("Location: list-content.php?status=updated");
         exit;
       }
       $toast_message = '更新に失敗しました。';

@@ -7,12 +7,9 @@
   // .envファイルを読み込む
   loadEnv();
   
-  $toast_message = '';
-  if (isset($_GET['status']) && $_GET['status'] === 'updated') {
-    $toast_message = 'カテゴリー情報を更新しました。';
-  }
-
   $session = Session::getInstance();
+
+  $toast_message = '';
 
   // セッションがなければログイン画面に遷移させる。
   if($session->get('admin') === false) {
@@ -59,7 +56,7 @@
     $result = $category_model->registerCategory($data);
     if ($result) {
       $category_id = $_POST['category_id'];
-      header("Location: edit-category.php?ctg_id=" . urlencode($category_id) . "&status=updated");
+      header("Location: list-category.php?status=updated");
       exit;
     } else {
       $toast_message = '更新に失敗しました。';

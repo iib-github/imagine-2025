@@ -26,7 +26,7 @@
 
     $success = $member_model->insert($member_data);
     if($success) {
-      header("Location: list-member.php");
+      header("Location: list-member.php?status=created");
       exit;
     }
 

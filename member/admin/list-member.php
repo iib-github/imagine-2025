@@ -9,6 +9,24 @@
     exit;
   }
 
+  $toast_message = '';
+  if (isset($_GET['status'])) {
+    switch ($_GET['status']) {
+      case 'created':
+        $toast_message = '会員を登録しました。';
+        break;
+      case 'updated':
+        $toast_message = '会員情報を更新しました。';
+        break;
+      case 'deleted':
+        $toast_message = '会員を削除しました。';
+        break;
+      case 'imported':
+        $toast_message = '会員情報をインポートしました。';
+        break;
+    }
+  }
+
   // 会員一覧取得
   $member_model = new MemberModel();
   $members = $member_model->select(null, array('member_id' => BaseModel::ORDER_DESC));
@@ -22,6 +40,24 @@
 <title>会員一覧 | ADMIN THE Imagine</title>
 <link href="common/css/reset.css" rel="stylesheet" type="text/css" media="all" />
 <link href="common/css/style.css" rel="stylesheet" type="text/css" media="all" />
+<style>
+  .btn-detail {
+    display: inline-block;
+    padding: 6px 12px;
+    background-color: #2196F3;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    line-height: 1.4;
+    transition: background-color .2s ease, transform .2s ease;
+  }
+  .btn-detail:hover {
+    background-color: #1976D2;
+    transform: translateY(-1px);
+  }
+</style>
 <script type="text/javascript">
   function sendAccInfo(id, name, mail, password) {
     var msg =
@@ -62,7 +98,7 @@
         <th>名前</th>
         <th>コース</th>
         <th>ログインメールアドレス</th>
-        <th style="width: 30px;">詳細</th>
+        <th style="width: 50px;">詳細</th>
         <!--th>アカウント連絡</th-->
       </tr>
 
@@ -80,7 +116,7 @@
         }
         ?></td>
         <td><?php echo htmlspecialchars($member['login_mail'], ENT_QUOTES, 'UTF-8'); ?></td>
-        <td style="text-align:center"><input type="button" value="詳細" onclick="location.href='edit-member.php?mid=<?php echo $member['member_id']; ?>'"></td>
+        <td style="text-align:center"><button type="button" class="btn-detail" onclick="location.href='edit-member.php?mid=<?php echo $member['member_id']; ?>'">詳細</button></td>
         <!--td>
 
           <?php //if($member['is_contacted'] == 1) : ?>
@@ -96,5 +132,21 @@
   </div><!-- /INBOX -->
 </div>
 <!-- Wrapper ends -->
+
+<?php if (!empty($toast_message)): ?>
+<div class="toast-notice" id="toastNotice"><?php echo htmlspecialchars($toast_message, ENT_QUOTES, 'UTF-8'); ?></div>
+<script>
+(function(){
+  var toast=document.getElementById('toastNotice');
+  if(!toast)return;
+  setTimeout(function(){toast.classList.add('show');},80);
+  setTimeout(function(){toast.classList.remove('show');},3080);
+})();
+</script>
+<style>
+.toast-notice{position:fixed;left:20px;bottom:20px;padding:12px 20px;background:#4CAF50;color:#fff;border-radius:4px;box-shadow:0 2px 12px rgba(0,0,0,0.2);font-size:14px;opacity:0;transform:translateY(20px);transition:opacity .3s ease,transform .3s ease;z-index:9999;}
+.toast-notice.show{opacity:1;transform:translateY(0);}
+</style>
+<?php endif; ?>
 </body>
 </html>

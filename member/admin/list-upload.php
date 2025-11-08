@@ -26,6 +26,24 @@
 <title>提出ファイル一覧 | ADMIN THE Imagine</title>
 <link href="common/css/reset.css" rel="stylesheet" type="text/css" media="all" />
 <link href="common/css/style.css" rel="stylesheet" type="text/css" media="all" />
+<style>
+  .btn-detail {
+    display: inline-block;
+    padding: 6px 12px;
+    background-color: #2196F3;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    line-height: 1.4;
+    transition: background-color .2s ease, transform .2s ease;
+  }
+  .btn-detail:hover {
+    background-color: #1976D2;
+    transform: translateY(-1px);
+  }
+</style>
 </head>
 
 <body>
@@ -50,7 +68,7 @@
         <th>会員名</th>
         <th>タイトル</th>
         <th>対象コース</th>
-        <th>詳細</th>
+        <th style="width: 50px;">詳細</th>
         <th>ファイルリンク</th>
       </tr>
 
@@ -78,7 +96,7 @@
           ?>
         </td>
         <td><?php echo htmlspecialchars($n['note'], ENT_QUOTES, 'UTF-8'); ?></td>
-        <td style="text-align:center"><input type="button" value="確認する" onclick="location.href='../<?php echo $n['path']; ?>'"></td>
+        <td style="text-align:center"><button type="button" class="btn-detail" onclick="location.href='../<?php echo $n['path']; ?>'">詳細</button></td>
       </tr>
       <?php endforeach; ?>
 

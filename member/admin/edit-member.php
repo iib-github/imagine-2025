@@ -10,6 +10,8 @@
     exit;
   }
 
+  $toast_message = '';
+
   if($_SERVER["REQUEST_METHOD"] == "GET") {
 
     if($_GET['mid']) {
@@ -51,7 +53,7 @@
     $member_model = new MemberModel();
     $result = $member_model->update($data, array('member_id'=>$_POST['member_id']));
     if ($result) {
-      header("Location: edit-member.php?mid=" . urlencode($_POST['member_id']) . "&status=updated");
+      header("Location: list-member.php?status=updated");
       exit;
     }
     $toast_message = '更新に失敗しました。';

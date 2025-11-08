@@ -102,7 +102,7 @@
         }
       }
       
-      header("Location: list-content.php");
+      header("Location: list-content.php?status=created");
       exit;
     } else {
       error_log("Failed to register content");

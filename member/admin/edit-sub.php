@@ -22,6 +22,8 @@ require_once dirname(__FILE__) . '/../scripts/model/ContentModel.class.php';
 
   $sub_model = new SubModel();
 
+  $toast_message = '';
+
   if($_SERVER["REQUEST_METHOD"] == "GET") {
     if($_GET['sub_id']) {
       // 編集対象のコンテンツ情報取得
@@ -55,7 +57,7 @@ require_once dirname(__FILE__) . '/../scripts/model/ContentModel.class.php';
     );
     $result = $sub_model->registerSub($data);
     if ($result) {
-      header("Location: edit-sub.php?sub_id=" . urlencode($_POST['sub_id']) . "&status=updated");
+      header("Location: list-sub.php?status=updated");
       exit;
     }
     $toast_message = '更新に失敗しました。';

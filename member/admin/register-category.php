@@ -25,7 +25,7 @@
 
     $success = $category_model->registerCategory($category_data);
     if($success) {
-      header("Location: list-category.php");
+      header("Location: list-category.php?status=created");
       exit;
     }
 

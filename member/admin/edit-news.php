@@ -14,12 +14,10 @@
   $news = $news_model->getNewsById($news_id);
 
   $toast_message = '';
-  if (isset($_GET['status']) && $_GET['status'] === 'updated') {
-    $toast_message = '更新情報を更新しました。';
-  }
 
   if($_SERVER["REQUEST_METHOD"] == "POST") {
     $news_id_post = isset($_POST['news_id']) ? (int)$_POST['news_id'] : 0;
+    $toast_message = '';
     if(empty($news_id_post)) {
       // 新規登録時
       $insert_data = array(
@@ -30,7 +28,8 @@
       );
       $result = $news_model->insert($insert_data);
       if ($result) {
-        $news_id_post = $news_model->lastInsertId();
+        header("Location: list-news.php?status=created");
+        exit;
       }
     } else {
       // 更新時
@@ -43,7 +42,7 @@
       $result = $news_model->update($update_data, array('id'=>$_POST['news_id']));
     }
     if (!empty($result)) {
-      header("Location: edit-news.php?n_id=" . urlencode($news_id_post) . "&status=updated");
+      header("Location: list-news.php?status=updated");
       exit;
     }
     $toast_message = '更新に失敗しました。';

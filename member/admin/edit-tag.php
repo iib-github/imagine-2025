@@ -12,9 +12,6 @@ if($session->get('admin') === false) {
 
 $tag_model = new TagModel();
 $toast_message = '';
-if (isset($_GET['status']) && $_GET['status'] === 'updated') {
-  $toast_message = 'タグを更新しました。';
-}
 $errors = array();
 $tag = null;
 
@@ -62,7 +59,7 @@ if($_SERVER["REQUEST_METHOD"] == "GET") {
     $success = $tag_model->updateTag($update_data, $where_data);
     
     if($success) {
-      header("Location: edit-tag.php?tag_id=" . urlencode($_POST['tag_id']) . "&status=updated");
+      header("Location: list-tag.php?status=updated");
       exit;
     } else {
       $errors[] = 'タグの更新に失敗しました。';
@@ -139,9 +136,7 @@ $use_count = $tag_model->getTagUseCount($tag['tag_id']);
         <td><?php echo $use_count; ?> 件</td>
       </tr>
       </table>
-      <p><input type="submit" id="btnUpdateBottom" class="Btn" value="更新" name="update"></p>
     </form>
-    <p><input type="button" class="Btn" value="一覧に戻る" onclick="location.href='list-tag.php'"></p>
   </div><!-- /INBOX -->
 </div>
 <!-- Wrapper ends -->
