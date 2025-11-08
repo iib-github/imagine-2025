@@ -93,12 +93,12 @@ Contents
 #Side { float: right; width: 224px;}
 #Side .Block { overflow: hidden; margin-bottom: 30px;webkit-box-shadow: 3px 3px 3px 0 rgba(132,132,132,.2);-moz-box-shadow: 3px 3px 3px 0 rgba(132,132,132,.2);box-shadow: 3px 3px 3px 0 rgba(132,132,132,.2);}
 #Side .Block h3 { background: #eee8e2; padding: 10px; color: #535353; letter-spacing: 0.5px;}
-#Side .Block .cnt {border: 1px solid #e0e0e0; padding: 15px;}
+#Side .Block .cnt {border: 1px solid #e0e0e0; padding: 15px;background: #fff;}
 #Side .Block ul { overflow: hidden;}
 #Side .Block li { padding-bottom: 5px; border-bottom: 1px dotted #e0e0e0;background: url("../img/arrowBlack.png") 98% 40% no-repeat; background-size: 6px auto;margin-bottom: 10px;-moz-transition-property:all;-moz-transition-duration: 0.5s;-moz-transition-timing-function: ease;-moz-transition-delay: 0.1s;-webkit-transition-property:all;-webkit-transition-duration: 0.5s;-webkit-transition-timing-function: ease;-webkit-transition-delay: 0.1s;-o-transition-property:all;-o-transition-duration: 0.5s;-o-transition-timing-function: ease;-o-transition-delay: 0.1s;}
 #Side .Block li:hover { color: #16B7FB;-moz-transition-property:all;-moz-transition-duration: 0.5s;-moz-transition-timing-function: ease;-moz-transition-delay: 0.1s;-webkit-transition-property:all;-webkit-transition-duration: 0.5s;-webkit-transition-timing-function: ease;-webkit-transition-delay: 0.1s;-o-transition-property:all;-o-transition-duration: 0.5s;-o-transition-timing-function: ease;-o-transition-delay: 0.1s;background: url("../img/arrowBlack.png") 100% 40% no-repeat;background-size: 6px auto}
 
-#Side .Block .cntQuest {border: 1px solid #e0e0e0; padding: 15px;}
+#Side .Block .cntQuest {border: 1px solid #e0e0e0; padding: 15px;background: #fff;}
 #Side .Block .cntQuest ul { overflow: hidden;}
 #Side .Block .cntQuest li { padding-bottom: 5px; border-bottom: 1px dotted #e0e0e0; margin-bottom: 10px;-moz-transition-property:all;-moz-transition-duration: 0.5s;-moz-transition-timing-function: ease;-moz-transition-delay: 0.1s;-webkit-transition-property:all;-webkit-transition-duration: 0.5s;-webkit-transition-timing-function: ease;-webkit-transition-delay: 0.1s;-o-transition-property:all;-o-transition-duration: 0.5s;-o-transition-timing-function: ease;-o-transition-delay: 0.1s; overflow: hidden;background: none;}
 #Side .Block .cntQuest li:hover { color: #16B7FB;-moz-transition-property:all;-moz-transition-duration: 0.5s;-moz-transition-timing-function: ease;-moz-transition-delay: 0.1s;-webkit-transition-property:all;-webkit-transition-duration: 0.5s;-webkit-transition-timing-function: ease;-webkit-transition-delay: 0.1s;-o-transition-property:all;-o-transition-duration: 0.5s;-o-transition-timing-function: ease;-o-transition-delay: 0.1s;}
@@ -112,7 +112,7 @@ Contents
 #Main h2 {background: #eee8e2; padding: 10px 10px 10px 2%; color: #535353; letter-spacing: 0.5px;}
 #Main h2 span { background: #F32E31; color: #fff; border-radius: 3px; margin-right: 10px; padding: 0 5px;}
 #Main h3 {border-bottom: 1px solid #525252; margin-bottom:2%;}
-#Main .Block {border: 1px solid #e0e0e0; padding: 20px;}
+#Main .Block {border: 1px solid #e0e0e0; padding: 20px; background: #fff;}
 #Main .Block .txtBlock { overflow: hidden; margin-bottom: 20px;}
 #Main .Block .txtBlock a {text-decoration: underline; color: #0000ff;}
 #Main input[type=text] {width: 96%;height: auto;text-align:left;font-family: "游ゴシック体","Yu Gothic",YuGothic,"ヒラギノ角ゴシック Pro","Hiragino Kaku Gothic Pro","メイリオ",Meiryo,Osaka,"ＭＳ Ｐゴシック","MS PGothic",sans-serif;font-size:18px;color:#313131;border: 1px solid #eee8e2;padding:10px 15px; margin:0 0 10px; background: #fff;}
