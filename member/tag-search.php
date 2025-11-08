@@ -25,6 +25,7 @@
   $all_tags = $tag_model->getTagList(null, array('tag_name' => BaseModel::ORDER_ASC));
 
   $content_model = new ContentModel();
+  $category_model = new CategoryModel();
   $search_results = array();
   $selected_tag_ids = array();
 
@@ -36,9 +37,9 @@
         'indicate_flag' => ContentModel::ACTIVE,
       );
       
-      // コースフィルタを適用
-      if ($course_filter !== null) {
-        $where_conditions['target_course'] = $course_filter;
+    // コースフィルタを適用（ベーシックは限定、アドバンスは全件）
+    if ($course_filter === ContentModel::TARGET_COURSE_BASIC) {
+      $where_conditions['target_course'] = ContentModel::TARGET_COURSE_BASIC;
       }
 
       $search_results = $content_model->getContentListByTags($selected_tag_ids, $where_conditions, array('content_week' => BaseModel::ORDER_ASC));
@@ -61,103 +62,7 @@
 <!--[if IE 6]><script src="common/js/minmax.js"></script><![endif]-->
 <?php include 'tmp/analytics.php';?>
 <style>
-  .tag-checkbox-group {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 15px;
-    background-color: #f9f9f9;
-    border: 1px solid #eee;
-    padding: 15px;
-    border-radius: 5px;
-    margin-bottom: 20px;
-  }
-  .tag-checkbox-item {
-    display: flex;
-    align-items: center;
-  }
-  .tag-checkbox-item input[type="checkbox"] {
-    margin-right: 8px;
-  }
-  .tag-checkbox-item input[type="checkbox"]:checked + label {
-    background-color: #007bff;
-    color: white;
-    padding: 3px 8px;
-    border-radius: 3px;
-  }
-  .tag-actions {
-    margin-bottom: 15px;
-    text-align: right;
-  }
-  .tag-actions button {
-    background-color: #6c757d;
-    color: white;
-    border: none;
-    padding: 5px 10px;
-    border-radius: 3px;
-    cursor: pointer;
-    font-size: 0.9em;
-    margin-left: 10px;
-  }
-  .tag-actions button:hover {
-    background-color: #5a6268;
-  }
-  .search-button-area {
-    text-align: center;
-    margin-bottom: 30px;
-    margin-top: 20px; /* タグアクションボタンとの間に余白 */
-  }
-  .search-button-area input[type="submit"] {
-    background-color: #007bff;
-    color: white;
-    padding: 10px 25px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 1.1em;
-  }
-  .search-button-area input[type="submit"]:hover {
-    background-color: #0056b3;
-  }
-  .search-results-list {
-    list-style: none;
-    padding: 0;
-  }
-  .search-results-list li {
-    background-color: #fff;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    margin-bottom: 15px;
-    padding: 15px;
-    display: flex;
-    align-items: center;
-  }
-  .search-results-list li .thumb {
-    flex-shrink: 0;
-    margin-right: 15px;
-  }
-  .search-results-list li .thumb img {
-    width: 100px;
-    height: 70px;
-    object-fit: cover;
-    border-radius: 3px;
-  }
-  .search-results-list li .txt {
-    flex-grow: 1;
-  }
-  .search-results-list li .title {
-    font-weight: bold;
-    font-size: 1.2em;
-    margin-bottom: 5px;
-  }
-  .search-results-list li .category-info {
-    font-size: 0.9em;
-    color: #666;
-    margin-bottom: 5px;
-  }
-  .search-results-list li .summery {
-    font-size: 0.9em;
-    color: #555;
-  }
+  
 </style>
 </head>
 
@@ -170,24 +75,26 @@
     <div id="Main">
       <!-- Main -->
       <section id="TagSearch">
-        <h2>タグでコンテンツを探す</h2>
+        <h2>タグで動画を探す</h2>
         <form method="GET" action="tag-search.php">
-          <div class="tag-actions">
-            <button type="button" id="selectAllTags">全て選択</button>
-            <button type="button" id="deselectAllTags">全て解除</button>
-          </div>
-          <div class="tag-checkbox-group">
-            <?php if(!empty($all_tags)): ?>
-              <?php foreach($all_tags as $tag): ?>
-                <div class="tag-checkbox-item">
-                  <input type="checkbox" name="tags[]" value="<?php echo htmlspecialchars($tag['tag_id']); ?>" id="tag_<?php echo htmlspecialchars($tag['tag_id']); ?>"
-                    <?php echo in_array($tag['tag_id'], $selected_tag_ids) ? 'checked' : ''; ?>>
-                  <label for="tag_<?php echo htmlspecialchars($tag['tag_id']); ?>"><?php echo htmlspecialchars($tag['tag_name']); ?></label>
-                </div>
-              <?php endforeach; ?>
-            <?php else: ?>
-              <p>登録されているタグがありません。</p>
-            <?php endif; ?>
+          <div class="Block">
+            <div class="tag-checkbox-group">
+              <?php if(!empty($all_tags)): ?>
+                <?php foreach($all_tags as $tag): ?>
+                  <div class="tag-checkbox-item">
+                    <input type="checkbox" name="tags[]" value="<?php echo htmlspecialchars($tag['tag_id']); ?>" id="tag_<?php echo htmlspecialchars($tag['tag_id']); ?>"
+                      <?php echo in_array($tag['tag_id'], $selected_tag_ids) ? 'checked' : ''; ?>>
+                    <label for="tag_<?php echo htmlspecialchars($tag['tag_id']); ?>"><?php echo htmlspecialchars($tag['tag_name']); ?></label>
+                  </div>
+                <?php endforeach; ?>
+              <?php else: ?>
+                <p>登録されているタグがありません。</p>
+              <?php endif; ?>
+            </div>
+            <div class="tag-actions">
+              <button type="button" id="selectAllTags">全て選択</button>
+              <button type="button" id="deselectAllTags">全て解除</button>
+            </div>
           </div>
           <div class="search-button-area">
             <input type="submit" value="タグで検索">
@@ -199,23 +106,63 @@
         <?php endif; ?>
 
         <?php if(!empty($search_results)): ?>
+          <?php $category_cache = array(); ?>
           <h3>検索結果 (<?php echo count($search_results); ?>件)</h3>
-          <ul class="search-results-list">
-            <?php foreach($search_results as $content): ?>
-              <li>
-                <a href="detail.php?cont_id=<?php echo htmlspecialchars($content['content_id']); ?>">
+          <section id="Quests" class="SearchResults">
+            <ul>
+              <?php foreach($search_results as $content): ?>
+              <li class="Hv">
+                <a href="detail.php?cont_id=<?php echo $content['content_id']; ?>">
                   <div class="thumb">
-                    <img src="<?php echo !empty($content['thumbnail_url']) ? htmlspecialchars($content['thumbnail_url']) : 'common/img/no_image.png'; ?>" alt="<?php echo htmlspecialchars($content['content_title']); ?>">
+                    <?php
+                      $thumbnail = $content['thumbnail_url'];
+                      $piThumb = is_string($thumbnail) ? pathinfo($thumbnail) : array();
+                      $dirThumb = (isset($piThumb['dirname']) && $piThumb['dirname'] !== '.' && $piThumb['dirname'] !== '') ? $piThumb['dirname'].'/' : '';
+                      $nameThumb = isset($piThumb['filename']) ? $piThumb['filename'] : (isset($piThumb['basename']) ? preg_replace('/\.[^.]*$/','',$piThumb['basename']) : '');
+                      $baseThumb = $dirThumb . $nameThumb;
+                      $jpg640 = $baseThumb !== '' ? $baseThumb . '_640.jpg' : '';
+                      $jpg1280 = $baseThumb !== '' ? $baseThumb . '_1280.jpg' : '';
+                      $webp640 = $baseThumb !== '' ? $baseThumb . '_640.webp' : '';
+                      $webp1280 = $baseThumb !== '' ? $baseThumb . '_1280.webp' : '';
+                      $rootDir = dirname(__FILE__);
+                      $exists_webp640 = ($webp640 !== '') && file_exists($rootDir . '/' . ltrim($webp640, '/'));
+                      $exists_webp1280 = ($webp1280 !== '') && file_exists($rootDir . '/' . ltrim($webp1280, '/'));
+                      $exists_jpg640 = ($jpg640 !== '') && file_exists($rootDir . '/' . ltrim($jpg640, '/'));
+                      $exists_jpg1280 = ($jpg1280 !== '') && file_exists($rootDir . '/' . ltrim($jpg1280, '/'));
+                      $fallbackThumb = !empty($thumbnail) ? $thumbnail : 'common/img/no_image.png';
+                    ?>
+                    <picture>
+                      <?php if ($exists_webp640 || $exists_webp1280): ?>
+                      <source type="image/webp" srcset="<?php echo $exists_webp640 ? htmlspecialchars($webp640, ENT_QUOTES, 'UTF-8').' 640w' : ''; ?><?php echo ($exists_webp640 && $exists_webp1280) ? ', ' : ''; ?><?php echo $exists_webp1280 ? htmlspecialchars($webp1280, ENT_QUOTES, 'UTF-8').' 1280w' : ''; ?>" sizes="(max-width: 768px) 320px, 640px">
+                      <?php endif; ?>
+                      <?php if ($exists_jpg640 || $exists_jpg1280): ?>
+                      <source type="image/jpeg" srcset="<?php echo $exists_jpg640 ? htmlspecialchars($jpg640, ENT_QUOTES, 'UTF-8').' 640w' : ''; ?><?php echo ($exists_jpg640 && $exists_jpg1280) ? ', ' : ''; ?><?php echo $exists_jpg1280 ? htmlspecialchars($jpg1280, ENT_QUOTES, 'UTF-8').' 1280w' : ''; ?>" sizes="(max-width: 768px) 320px, 640px">
+                      <?php endif; ?>
+                      <img src="<?php echo htmlspecialchars($fallbackThumb, ENT_QUOTES, 'UTF-8'); ?>" width="217" height="150" loading="lazy" decoding="async" alt=""/>
+                    </picture>
                   </div>
                   <div class="txt">
-                    <div class="category-info">Lesson <?php echo htmlspecialchars($category_model->getCategoryNumber($content['category_id'])); ?> / Week <?php echo htmlspecialchars($content['content_week']); ?></div>
-                    <div class="title"><?php echo htmlspecialchars($content['content_title']); ?></div>
-                    <div class="summery"><?php echo htmlspecialchars(strip_tags($content['content_text'])); ?></div>
+                    <?php
+                      $category_id = $content['category_id'];
+                      if (!isset($category_cache[$category_id])) {
+                        $category_result = $category_model->select(array('category_id' => $category_id));
+                        $category_cache[$category_id] = !empty($category_result) ? $category_result[0] : null;
+                      }
+                      $category_info = $category_cache[$category_id];
+                      $category_title = ($category_info && !empty($category_info['category_title'])) ? $category_info['category_title'] : 'カテゴリ未設定';
+                    ?>
+                    <div class="category-label">
+                      <?php echo htmlspecialchars($category_title, ENT_QUOTES, 'UTF-8'); ?>
+                    </div>
+                    <div class="number">Week <?php echo $content['content_week']; ?></div>
+                    <div class="title"><?php echo htmlspecialchars($content['content_title'], ENT_QUOTES, 'UTF-8'); ?></div>
+                    <div class="summery"><?php echo strip_tags($content['content_text']); ?></div>
                   </div>
                 </a>
               </li>
-            <?php endforeach; ?>
-          </ul>
+              <?php endforeach; ?>
+            </ul>
+          </section>
         <?php elseif(empty($selected_tag_ids)): ?>
           <p style="text-align: center; color: #555;">タグを選択してコンテンツを検索してください。</p>
         <?php endif; ?>
@@ -229,6 +176,7 @@
 </div><!-- /Wrapper -->
 
 <script src="common/js/smoothscroll.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
   $(document).ready(function() {
     $('#selectAllTags').on('click', function() {

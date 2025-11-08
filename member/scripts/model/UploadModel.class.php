@@ -63,11 +63,14 @@
      * @param int $num アップロードの取得数 nullの場合は全件
      * @return array アップロードリスト
      */
-    public function UploadList($num=null,$member_id) {
+    public function UploadList($member_id, $num = null) {
+      $conditions = array('is_active' => 1, 'member_id' => $member_id);
+      $order = array('note_date' => self::ORDER_DESC);
+
       if(!empty($num)) {
-        $upload_list = $this->select(array('is_active'=>1,'member_id'=>$member_id), array('note_date'=>self::ORDER_DESC), array(self::LIMIT=>$num));
+        $upload_list = $this->select($conditions, $order, array(self::LIMIT => $num));
       } else {
-        $upload_list = $this->select(array('is_active'=>1,'member_id'=>$member_id), array('note_date'=>self::ORDER_DESC));
+        $upload_list = $this->select($conditions, $order);
       }
       return $upload_list;
     }

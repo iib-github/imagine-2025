@@ -21,7 +21,7 @@
   //表示数
   $list_num = '';
   // アップロード情報取得
-  $upload_list = $upload_model->UploadList($list_num,$session->get('member'));
+  $upload_list = $upload_model->UploadList($session->get('member'), $list_num);
 
   if($_SERVER["REQUEST_METHOD"] == "POST") {
     // $tempfile = $_FILES['file']['tmp_name'];

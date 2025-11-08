@@ -3,6 +3,7 @@
         <div class="cnt">
           <ul>
             <a href="/"><li>トップページ</li></a>
+            <a href="/tag-search.php"><li>タグで動画を探す</li></a>
             <a href="/sub-list.php"><li>ダウンロード資料一覧</li></a>
             <a href="https://the-imagine.com/2025/portal/" target="_blank"><li>プレ講座視聴ページ</li></a>
           </ul>
