@@ -286,13 +286,20 @@
     <div id="Main">
       <!-- Main -->
       <section id="ContentsDetail">
-        <?php if ($category['category_number'] == '12'): ?>
-        <h2><span>イマジンラジオ</span><?php echo $content['content_title']; ?></h2>
-        <?php elseif ($category['category_number'] == '11'): ?>
-          <h2><span>QAライブ動画</span><?php echo $content['content_title']; ?></h2>
-        <?php else: ?>
-          <h2><span>Lesson<?php echo $category['category_number']; ?></span>Week<?php echo $content['content_week']; ?> :<?php echo $content['content_title']; ?></h2>
-        <?php endif; ?>
+        <?php
+          $category_title = !empty($category['category_title'])
+            ? $category['category_title']
+            : 'Lesson' . $category['category_number'];
+          $use_week = !isset($category['use_week_flag']) || (int)$category['use_week_flag'] === 1;
+          $should_show_week = $use_week && !empty($content['content_week']);
+        ?>
+        <h2>
+          <span><?php echo htmlspecialchars($category_title, ENT_QUOTES, 'UTF-8'); ?></span>
+          <?php if ($should_show_week): ?>
+            Week<?php echo htmlspecialchars($content['content_week'], ENT_QUOTES, 'UTF-8'); ?> :
+          <?php endif; ?>
+          <?php echo $content['content_title']; ?>
+        </h2>
         <div class="Block">
           <?php if($has_permission): ?>
             <?php if(!empty($content_videos)) : ?>
@@ -482,7 +489,9 @@
                         <img src="<?php echo htmlspecialchars($oth, ENT_QUOTES, 'UTF-8'); ?>" width="217" height="150" loading="lazy" decoding="async" alt=""/>
                       </picture>
                     <div class="txt">
+                      <?php if ($use_week && !empty($cont['content_week'])): ?>
                       <div class="number">Week <?php echo $cont['content_week']; ?></div>
+                      <?php endif; ?>
                       <div class="title"><?php echo $cont['content_title']; ?></div>
                       <div class="summery"><?php echo $cont['content_text']; ?></div>
                     </div>
@@ -499,13 +508,12 @@
     <div id="Side">
       <!-- Side -->
       <div class="Block">
-      <?php if ($category['category_number'] == '12'): ?>
-        <h3>イマジンラジオの達成度</h3>
-      <?php elseif ($category['category_number'] == '11'): ?>
-        <h3>QAライブ動画の達成度</h3>
-      <?php else: ?>
-        <h3>Lesson<?php echo $category['category_number']; ?>の達成度</h3>
-      <?php endif; ?>
+      <?php
+        $category_title = !empty($category['category_title'])
+          ? $category['category_title']
+          : 'Lesson' . $category['category_number'];
+      ?>
+      <h3><?php echo htmlspecialchars($category_title, ENT_QUOTES, 'UTF-8'); ?>の達成度</h3>
         <div class="cnt">
           <div class="col-lg">
             <div id="circle"></div>
@@ -521,13 +529,12 @@
             <?php foreach ($category_list as $c): ?>
             <a href="list.php?ctg_id=<?php echo $c['category_id']; ?>">
               <li>
-              <?php if ($c['category_number'] == '12'): ?>
-                <p class="Month">イマジンラジオ</p>
-              <?php elseif ($c['category_number'] == '11'): ?>
-                <p class="Month">QAライブ動画</p>
-              <?php else: ?>
-                <p class="Month">Lesson<?php echo $c['category_number']; ?></p>
-              <?php endif; ?>
+              <?php
+                $c_title = !empty($c['category_title'])
+                  ? $c['category_title']
+                  : 'Lesson' . $c['category_number'];
+              ?>
+              <p class="Month"><?php echo htmlspecialchars($c_title, ENT_QUOTES, 'UTF-8'); ?></p>
                 <p class="Title"><?php echo $c['category_title']; ?></p>
               </li>
             </a>

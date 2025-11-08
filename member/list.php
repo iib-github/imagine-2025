@@ -40,6 +40,11 @@
     $category = $category[0];
   }
 
+  $category_title = !empty($category['category_title'])
+    ? $category['category_title']
+    : 'Lesson' . $category['category_number'];
+  $category_use_week = !isset($category['use_week_flag']) || (int)$category['use_week_flag'] === 1;
+
   // アクセス制限: ベーシックユーザーがアドバンス専用カテゴリを閲覧できないようにする
   $category_target_course = isset($category['target_course']) ? $category['target_course'] : ContentModel::TARGET_COURSE_ADVANCE;
   if ($course_filter === ContentModel::TARGET_COURSE_BASIC && $category_target_course === ContentModel::TARGET_COURSE_ADVANCE) {
@@ -107,13 +112,7 @@
     <div id="Main">
       <!-- Main -->
       <section id="ContentsDetail">
-      <?php if ($category['category_number'] == '12'): ?>
-        <h2>イマジンラジオ</h2>
-      <?php elseif ($category['category_number'] == '11'): ?>
-        <h2>QAライブ動画</h2>
-      <?php else: ?>
-        <h2>Lesson<?php echo $category['category_number'];?>：<?php echo $category['category_title'];?></h2>
-      <?php endif; ?>
+        <h2><?php echo htmlspecialchars($category_title, ENT_QUOTES, 'UTF-8'); ?></h2>
         <div class="Block">
           <p class="Photo">
             <?php
@@ -178,7 +177,9 @@
                 </picture>
               </div>
               <div class="txt">
+                <?php if ($category_use_week && !empty($c['content_week'])): ?>
                 <div class="number">Week <?php echo $c['content_week']; ?></div>
+                <?php endif; ?>
                 <div class="title"><?php echo htmlspecialchars($c['content_title'], ENT_QUOTES, 'UTF-8'); ?></div>
                 <div class="summery"><?php echo strip_tags($c['content_text']); ?></div>
               </div>
@@ -193,13 +194,7 @@
     <div id="Side">
       <!-- Side -->
       <div class="Block">
-        <?php if ($category['category_number'] == '12'): ?>
-        <h3>イマジンラジオの達成度</h3>
-      <?php elseif ($category['category_number'] == '11'): ?>
-        <h3>QAライブ動画の達成度</h3>
-      <?php else: ?>
-        <h3>Lesson<?php echo $category['category_number']; ?>の達成度</h3>
-      <?php endif; ?>
+      <h3><?php echo htmlspecialchars($category_title, ENT_QUOTES, 'UTF-8'); ?>の達成度</h3>
         <div class="cnt">
           <div class="col-lg">
             <div id="circle"></div>
@@ -215,14 +210,13 @@
             <?php foreach ($category_list as $c): ?>
             <a href="list.php?ctg_id=<?php echo $c['category_id']; ?>">
               <li>
-                <?php if ($c['category_number'] == '12'): ?>
-                <p class="Month">イマジンラジオ</p>
-              <?php elseif ($c['category_number'] == '11'): ?>
-                <p class="Month">QAライブ動画</p>
-              <?php else: ?>
-                <p class="Month">Lesson<?php echo $c['category_number']; ?></p>
-              <?php endif; ?>
-                <p class="Title"><?php echo $c['category_title']; ?></p>
+              <?php
+                $c_title = !empty($c['category_title'])
+                  ? $c['category_title']
+                  : 'Lesson' . $c['category_number'];
+              ?>
+                <p class="Month"><?php echo htmlspecialchars($c_title, ENT_QUOTES, 'UTF-8'); ?></p>
+                <p class="Title"><?php echo htmlspecialchars($c['category_title'], ENT_QUOTES, 'UTF-8'); ?></p>
               </li>
             </a>
             <?php endforeach; ?>

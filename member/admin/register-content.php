@@ -223,6 +223,18 @@
     if(videoContainer.children.length === 0) {
       addVideoField();
     }
+    const categorySelect = document.getElementById('categorySelect');
+    const weekRow = document.getElementById('week-row');
+    function toggleWeekRow() {
+      if(!categorySelect || !weekRow) return;
+      const option = categorySelect.options[categorySelect.selectedIndex];
+      const useWeek = !option || option.getAttribute('data-use-week') !== '0';
+      weekRow.style.display = useWeek ? '' : 'none';
+    }
+    toggleWeekRow();
+    if(categorySelect) {
+      categorySelect.addEventListener('change', toggleWeekRow);
+    }
   });
 </script>
 </head>
@@ -245,19 +257,20 @@
         <tr>
           <th>紐づくカテゴリー</th>
           <td>
-            <select name="category">
+            <select name="category" id="categorySelect">
             <?php
               foreach ($category_list as $category) {
                 $label = !empty($category['category_title'])
                   ? htmlspecialchars($category['category_title'], ENT_QUOTES, 'UTF-8')
                   : 'Lesson' . htmlspecialchars($category['category_number'], ENT_QUOTES, 'UTF-8');
-                echo '<option value="' . $category['category_id'] . '" >' . $label . '</option>';
+                $use_week = isset($category['use_week_flag']) ? (int)$category['use_week_flag'] : 1;
+                echo '<option value="' . $category['category_id'] . '" data-use-week="' . $use_week . '">' . $label . '</option>';
               }
             ?>
             </select>
           </td>
         </tr>
-        <tr>
+        <tr id="week-row">
           <th>week</th>
           <td>
           <select name="week">

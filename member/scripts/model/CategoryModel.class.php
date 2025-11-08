@@ -26,6 +26,12 @@
       // TODO ナンバーのintチェック、桁数チェック
       // TODO ナンバー重複チェック
 
+      if(!isset($data['use_week_flag'])) {
+        $data['use_week_flag'] = 1;
+      } else {
+        $data['use_week_flag'] = (int)$data['use_week_flag'];
+      }
+
       if(empty($data['category_id'])) {
         // insert時
         // insertしたレコードのIDを取得

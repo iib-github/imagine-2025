@@ -21,6 +21,7 @@
       'indicate_flag' => $_POST['indicate_flag'],
       'pub_date' => $_POST['pub_date'],
       'target_course' => isset($_POST['target_course']) ? $_POST['target_course'] : 'all',
+      'use_week_flag' => isset($_POST['use_week_flag']) ? (int)$_POST['use_week_flag'] : 1,
     );
 
     $success = $category_model->registerCategory($category_data);
@@ -115,6 +116,16 @@
               <option value="basic">ベーシック</option>
               <option value="advance" selected="selected">アドバンス</option>
             </select>
+          </td>
+        </tr>
+        <tr>
+          <th>Weekの利用</th>
+          <td>
+            <select name="use_week_flag">
+              <option value="1" selected="selected">Weekを表示する</option>
+              <option value="0">Weekを表示しない</option>
+            </select>
+            <p style="margin:8px 0 0;font-size:12px;color:#555;">※「表示しない」を選択すると、会員画面・管理画面の該当カテゴリでWeek項目が非表示になります。</p>
           </td>
         </tr>
         <tr>
