@@ -21,6 +21,11 @@
     exit;
   }
   
+  $show_login_splash = $session->get('show_login_splash');
+  if($show_login_splash) {
+    $session->clear('show_login_splash');
+  }
+
   $member_id = $session->get('member');
   // 会員モデルとコンテンツモデルを初期化
   $member_model = new MemberModel();
@@ -99,6 +104,13 @@ elm.style.backgroundImage = 'url(common/img/' + url[n] + ')';
 </head>
 
 <body>
+<?php if($show_login_splash): ?>
+<div class="login-splash" id="loginSplash">
+  <div class="login-splash__logo-wrapper">
+    <img src="common/img/login_logo.png" alt="THE Imagine" class="login-splash__logo" loading="lazy" decoding="async">
+  </div>
+</div>
+<?php endif; ?>
 <section id="MV">
   <div class="Cnt">
     <h1><img src="common/img/login_logo.png" width="320" alt="THE Imagine" loading="lazy" decoding="async"/></h1>
@@ -224,5 +236,21 @@ elm.style.backgroundImage = 'url(common/img/' + url[n] + ')';
 </div><!-- /Wrapper -->
 
 <script src="common/js/smoothscroll.js"></script>
+<?php if($show_login_splash): ?>
+<script>
+  (function(){
+    var splash = document.getElementById('loginSplash');
+    if(!splash) return;
+    setTimeout(function(){
+      splash.style.pointerEvents = 'none';
+    }, 400);
+    setTimeout(function(){
+      if(splash.parentNode){
+        splash.parentNode.removeChild(splash);
+      }
+    }, 3700);
+  })();
+</script>
+<?php endif; ?>
 </body>
 </html>

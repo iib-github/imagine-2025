@@ -24,6 +24,7 @@
     if($login_success) { // ログイン成功
       $member = $member_model->getMemberByMail($mail);
       $session->set('member', $member['member_id']);
+      $session->set('show_login_splash', true);
       header("location: index.php");
       exit;
     } else { // ログイン失敗

@@ -644,6 +644,80 @@ ul.UploadList li dl dd.last{
     flex-basis: 100%;
   }
 }
+.login-splash {
+  position: fixed;
+  inset: 0;
+  background: #fff;
+  z-index: 99999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: splashFade 3.7s ease forwards;
+}
+.login-splash::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    repeating-linear-gradient(0deg, rgba(0,0,0,0.03) 0px, rgba(0,0,0,0.03) 2px, rgba(255,255,255,0.03) 2px, rgba(255,255,255,0.03) 4px),
+    repeating-linear-gradient(90deg, rgba(0,0,0,0.02) 0px, rgba(0,0,0,0.02) 1px, rgba(255,255,255,0.02) 1px, rgba(255,255,255,0.02) 3px);
+  opacity: 0;
+  animation: splashNoise 3.2s ease forwards 0.3s;
+  pointer-events: none;
+  mix-blend-mode: multiply;
+}
+.login-splash__logo-wrapper {
+  position: relative;
+  display: inline-block;
+  padding: 24px 28px;
+  border-radius: 18px;
+  background: rgba(255,255,255,0.92);
+  overflow: hidden;
+}
+.login-splash__logo {
+  width: 220px;
+  max-width: 60vw;
+  opacity: 0;
+  transform: scale(0.92);
+  animation: splashLogo 3.2s ease forwards 0.2s;
+}
+.login-splash__logo-wrapper::after {
+  content: '';
+  position: absolute;
+  inset: -60%;
+  background-image:
+    repeating-linear-gradient(0deg, rgba(255,255,255,0.08) 0px, rgba(255,255,255,0.08) 8px, rgba(0,0,0,0.08) 8px, rgba(0,0,0,0.08) 14px),
+    repeating-linear-gradient(90deg, rgba(255,255,255,0.06) 0px, rgba(255,255,255,0.06) 6px, rgba(0,0,0,0.07) 6px, rgba(0,0,0,0.07) 12px);
+  mix-blend-mode: screen;
+  opacity: 0;
+  animation: staticGrain 2.6s steps(10, end) forwards 0.25s;
+  pointer-events: none;
+}
+@keyframes staticGrain {
+  0% { opacity: 0.2; transform: translate3d(0,0,0) scale(1.12); }
+  25% { opacity: 0.55; transform: translate3d(-5%, 3%, 0) scale(1.14); }
+  50% { opacity: 0.45; transform: translate3d(5%, -6%, 0) scale(1.1); }
+  75% { opacity: 0.5; transform: translate3d(-3%, 4%, 0) scale(1.12); }
+  100% { opacity: 0; transform: translate3d(0,0,0) scale(1.05); }
+}
+@keyframes splashLogo {
+  0% { opacity: 0; transform: scale(0.92); filter: contrast(120%) saturate(120%); }
+  18% { opacity: 1; transform: scale(1); filter: contrast(100%) saturate(100%); }
+  60% { opacity: 1; transform: scale(1.02); filter: contrast(105%) saturate(110%); }
+  100% { opacity: 0; transform: scale(1); filter: contrast(90%) saturate(90%); }
+}
+@keyframes splashNoise {
+  0% { opacity: 0; background-position: 0 0, 0 0; }
+  25% { opacity: 0.35; background-position: 40px 25px, -30px 18px; }
+  50% { opacity: 0.22; background-position: -20px -15px, 35px -25px; }
+  75% { opacity: 0.18; background-position: 15px -30px, -45px 15px; }
+  100% { opacity: 0; background-position: 0 0, 0 0; }
+}
+@keyframes splashFade {
+  0% { opacity: 1; }
+  85% { opacity: 1; }
+  100% { opacity: 0; visibility: hidden; }
+}
 .select-wrap {
    position:relative;
   margin-bottom: 20px;
