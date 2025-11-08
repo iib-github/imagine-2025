@@ -53,6 +53,9 @@
     <a href="register-member.php" class="regster">
       <div class="submenu Tab">新規登録</div>
     </a>
+    <a href="import-members.php" class="regster" style="margin-left:10px;">
+      <div class="submenu Tab">CSVインポート</div>
+    </a>
     <table class="member">
       <tr>
         <th style="width: 30px;">ID</th>
