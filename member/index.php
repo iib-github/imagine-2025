@@ -31,6 +31,15 @@
   $member_model = new MemberModel();
   $content_model = new ContentModel();
   
+// テーマ切り替え（デザイン検証用）
+$theme = isset($_GET['theme']) ? $_GET['theme'] : null;
+$theme_class = '';
+if ($theme === 'blue') {
+  $theme_class = 'theme-blue';
+} elseif ($theme === 'teal') {
+  $theme_class = 'theme-teal';
+}
+
   // 会員情報を取得
   $member_info = $member_model->select(array('member_id' => $member_id));
   if (empty($member_info)) {
@@ -103,7 +112,7 @@ elm.style.backgroundImage = 'url(common/img/' + url[n] + ')';
 <?php include 'tmp/analytics.php';?>
 </head>
 
-<body>
+<body class="<?php echo htmlspecialchars($theme_class, ENT_QUOTES, 'UTF-8'); ?>">
 <?php if($show_login_splash): ?>
 <div class="login-splash" id="loginSplash">
   <div class="login-splash__logo-wrapper">
@@ -197,7 +206,7 @@ elm.style.backgroundImage = 'url(common/img/' + url[n] + ')';
                   <div style="position: relative; height: 8px; border-radius: 4px; background: rgba(255,255,255,0.25); overflow: hidden;">
                     <div style="position: absolute; left: 0; top: 0; bottom: 0; width: 100%; border-radius: 4px; background: rgba(0,0,0,0.18);"></div>
                     <div style="position: absolute; left: 2px; right: 2px; top: 2px; bottom: 2px;">
-                      <div style="width: <?php echo $progress_width; ?>%; height: 100%; border-radius: 4px; background: linear-gradient(90deg, #0899ae, #12bfd4);"></div>
+                      <div style="width: <?php echo $progress_width; ?>%; height: 100%; border-radius: 4px; background: linear-gradient(90deg, var(--color-progress-start), var(--color-progress-end));"></div>
                     </div>
                   </div>
                 </div>
@@ -256,7 +265,7 @@ elm.style.backgroundImage = 'url(common/img/' + url[n] + ')';
                   <div style="position: relative; height: 8px; border-radius: 4px; background: rgba(255,255,255,0.25); overflow: hidden;">
                     <div style="position: absolute; left: 0; top: 0; bottom: 0; width: 100%; border-radius: 4px; background: rgba(0,0,0,0.18);"></div>
                     <div style="position: absolute; left: 2px; right: 2px; top: 2px; bottom: 2px;">
-                      <div style="width: <?php echo $progress_width; ?>%; height: 100%; border-radius: 4px; background: linear-gradient(90deg, #ffeb3b, #ffc107);"></div>
+                      <div style="width: <?php echo $progress_width; ?>%; height: 100%; border-radius: 4px; background: linear-gradient(90deg, var(--color-progress-start), var(--color-progress-end));"></div>
                     </div>
                   </div>
                 </div>
