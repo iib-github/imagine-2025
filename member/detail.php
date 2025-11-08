@@ -187,6 +187,7 @@
   }
   .video-thumbnail-item span {
     display: -webkit-box; /* 複数行 ellipsis のために必要 */
+    line-clamp: 2; /* 標準プロパティ */
     -webkit-line-clamp: 2; /* 2行で切り詰める */
     -webkit-box-orient: vertical;
     overflow: hidden;
