@@ -1,8 +1,9 @@
 <?php
   require_once dirname(__FILE__) . '/scripts/Session.class.php';
-  require_once dirname(__FILE__) . '/scripts/model/MemberModel.class.php';
-  require_once dirname(__FILE__) . '/scripts/model/CategoryModel.class.php';
-  require_once dirname(__FILE__) . '/scripts/model/SubModel.class.php';
+require_once dirname(__FILE__) . '/scripts/model/MemberModel.class.php';
+require_once dirname(__FILE__) . '/scripts/model/CategoryModel.class.php';
+require_once dirname(__FILE__) . '/scripts/model/SubModel.class.php';
+require_once dirname(__FILE__) . '/scripts/model/ContentModel.class.php';
   $session = Session::getInstance();
 
   // セッションがなければログイン画面に遷移させる。
@@ -14,20 +15,47 @@
   // カテゴリー取得
   $category_model = new CategoryModel();
 
+  $member_id = $session->get('member');
+  $member_model = new MemberModel();
+  $member_info = $member_model->select(array('member_id' => $member_id));
+  if (empty($member_info)) {
+    header("Location: login.php");
+    exit;
+  }
+  $member_info = $member_info[0];
+  $course_filter = $member_model->getCourseFilter($member_info['select_course']);
+
   // サイドバー（レッスン一覧）表示用
   $category_list = $category_model->select(array('indicate_flag'=>1), array('category_number'=>$category_model::ORDER_ASC));
 
   $number_list = array();
+  $title_list = array();
   foreach ($category_list as $ctg) {
     $number_list[$ctg['category_id']] = $ctg['category_number'];
+    $title_list[$ctg['category_id']] = $ctg['category_title'];
   }
 
   // コンテンツ取得
   $sub_model = new SubModel();
   $subs = $sub_model->select(array(
-    // 'category_id'=>$category['category_id'],
     'indicate_flag'=>$sub_model::ACTIVE,
   ), array('display_order'=>$sub_model::ORDER_ASC));
+
+  // コース別に仕分け
+  $advance_subs = array();
+  $basic_subs = array();
+  foreach ($subs as $sub) {
+    $target_course = isset($sub['target_course']) ? $sub['target_course'] : ContentModel::TARGET_COURSE_ADVANCE;
+    if ($target_course === ContentModel::TARGET_COURSE_BASIC) {
+      if ($course_filter === ContentModel::TARGET_COURSE_BASIC || $course_filter === ContentModel::TARGET_COURSE_ADVANCE) {
+        $basic_subs[] = $sub;
+      }
+    } else {
+      if ($course_filter !== ContentModel::TARGET_COURSE_BASIC) {
+        $advance_subs[] = $sub;
+      }
+    }
+  }
 
 ?><!DOCTYPE html>
 <html>
@@ -69,26 +97,68 @@
         </div>
       </section>
       <section id="Quests">
-        <ul class="flexList">
-          <?php foreach($subs as $s) : ?>
-          <li class="Hv">
-            <a href="<?php echo $s['content_url'];?>" target="_blank">
-              <div class="thumb">
-<?php if (!empty($s['thumbnail_url'])): ?>
-                <img src="<?php echo $s['thumbnail_url']; ?>" width="217" height="150" alt=""/>
-<?php else: ?>
-                <img src="contents/content/cont_86-thumbnail.png" width="217" height="150" alt=""/>
-<?php endif ?>
-              </div>
-              <div class="txt">
-                <div class="number">Lesson<?php echo $number_list[$s['category_id']]; ?></div>
-                <div class="title"><?php echo htmlspecialchars($s['content_title'], ENT_QUOTES, 'UTF-8'); ?></div>
-                <div class="summery"><?php echo strip_tags($s['content_text']); ?></div>
-              </div>
-            </a>
-          </li>
+        <?php
+          $sub_sections = array();
+          if (!empty($advance_subs)) {
+            $sub_sections[] = array('title' => 'Advance', 'items' => $advance_subs);
+          }
+          if (!empty($basic_subs)) {
+            $sub_sections[] = array('title' => 'Basic', 'items' => $basic_subs);
+          }
+        ?>
+        <?php if(!empty($sub_sections)): ?>
+          <?php foreach($sub_sections as $section): ?>
+            <h2 style="margin-bottom: 10px;"><?php echo $section['title']; ?></h2>
+            <ul class="flexList">
+              <?php foreach($section['items'] as $s) : ?>
+              <li class="Hv">
+                <a href="<?php echo $s['content_url'];?>" target="_blank">
+                  <div class="thumb">
+                    <?php
+                      $thumbnail = $s['thumbnail_url'];
+                      $piThumb = is_string($thumbnail) ? pathinfo($thumbnail) : array();
+                      $dirThumb = (isset($piThumb['dirname']) && $piThumb['dirname'] !== '.' && $piThumb['dirname'] !== '') ? $piThumb['dirname'].'/' : '';
+                      $nameThumb = isset($piThumb['filename']) ? $piThumb['filename'] : (isset($piThumb['basename']) ? preg_replace('/\.[^.]*$/','',$piThumb['basename']) : '');
+                      $baseThumb = $dirThumb . $nameThumb;
+                      $jpg640 = $baseThumb !== '' ? $baseThumb . '_640.jpg' : '';
+                      $jpg1280 = $baseThumb !== '' ? $baseThumb . '_1280.jpg' : '';
+                      $webp640 = $baseThumb !== '' ? $baseThumb . '_640.webp' : '';
+                      $webp1280 = $baseThumb !== '' ? $baseThumb . '_1280.webp' : '';
+                      $rootDir = dirname(__FILE__);
+                      $exists_webp640 = ($webp640 !== '') && file_exists($rootDir . '/' . ltrim($webp640, '/'));
+                      $exists_webp1280 = ($webp1280 !== '') && file_exists($rootDir . '/' . ltrim($webp1280, '/'));
+                      $exists_jpg640 = ($jpg640 !== '') && file_exists($rootDir . '/' . ltrim($jpg640, '/'));
+                      $exists_jpg1280 = ($jpg1280 !== '') && file_exists($rootDir . '/' . ltrim($jpg1280, '/'));
+                      $fallbackThumb = !empty($thumbnail) ? $thumbnail : 'common/img/no_image.png';
+                    ?>
+                    <picture>
+                      <?php if ($exists_webp640 || $exists_webp1280): ?>
+                      <source type="image/webp" srcset="<?php echo $exists_webp640 ? htmlspecialchars($webp640, ENT_QUOTES, 'UTF-8').' 640w' : ''; ?><?php echo ($exists_webp640 && $exists_webp1280) ? ', ' : ''; ?><?php echo $exists_webp1280 ? htmlspecialchars($webp1280, ENT_QUOTES, 'UTF-8').' 1280w' : ''; ?>" sizes="(max-width: 768px) 320px, 640px">
+                      <?php endif; ?>
+                      <?php if ($exists_jpg640 || $exists_jpg1280): ?>
+                      <source type="image/jpeg" srcset="<?php echo $exists_jpg640 ? htmlspecialchars($jpg640, ENT_QUOTES, 'UTF-8').' 640w' : ''; ?><?php echo ($exists_jpg640 && $exists_jpg1280) ? ', ' : ''; ?><?php echo $exists_jpg1280 ? htmlspecialchars($jpg1280, ENT_QUOTES, 'UTF-8').' 1280w' : ''; ?>" sizes="(max-width: 768px) 320px, 640px">
+                      <?php endif; ?>
+                      <img src="<?php echo htmlspecialchars($fallbackThumb, ENT_QUOTES, 'UTF-8'); ?>" width="217" height="150" loading="lazy" decoding="async" alt=""/>
+                    </picture>
+                  </div>
+                  <div class="txt">
+                    <div class="category-label">
+                      <?php
+                        $category_title = isset($title_list[$s['category_id']]) ? $title_list[$s['category_id']] : 'THE Imagine';
+                        echo htmlspecialchars($category_title, ENT_QUOTES, 'UTF-8');
+                      ?>
+                    </div>
+                    <div class="title"><?php echo htmlspecialchars($s['content_title'], ENT_QUOTES, 'UTF-8'); ?></div>
+                    <div class="summery"><?php echo strip_tags($s['content_text']); ?></div>
+                  </div>
+                </a>
+              </li>
+              <?php endforeach; ?>
+            </ul>
           <?php endforeach; ?>
-        </ul>
+        <?php else: ?>
+          <p style="text-align:center;">現在閲覧可能な資料はありません。</p>
+        <?php endif; ?>
       </section>
     </div>
     <!-- /Main -->

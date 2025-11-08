@@ -140,7 +140,7 @@ elm.style.backgroundImage = 'url(common/img/' + url[n] + ')';
 
       <?php if(!$is_basic_user && !empty($advance_categories)): ?>
       <section id="Bnr" style="margin-bottom: 0;">
-        <h2>Advance</h2>
+        <h2 style="margin-bottom: 10px;">Advance</h2>
         <ul>
           <?php foreach($advance_categories as $category) : ?>
           <li class="Hv">
@@ -178,7 +178,7 @@ elm.style.backgroundImage = 'url(common/img/' + url[n] + ')';
 
       <?php if(!empty($basic_categories)): ?>
       <section id="Bnr" style="margin-bottom: 8%;">
-        <h2>Basic</h2>
+        <h2 style="margin-bottom: 10px;">Basic</h2>
         <ul>
           <?php foreach($basic_categories as $category) : ?>
           <li class="Hv">

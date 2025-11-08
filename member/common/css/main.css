@@ -381,8 +381,8 @@ Contents
 #News ul {}
 #News ul li { width: 94%; margin: 0 auto; overflow: hidden;border-bottom: 1px dotted #e0e0e0; margin-bottom: 10px;}
 #News ul li dl{ overflow: hidden;}
-#News ul li dl dt{font-weight: bold; width: 100%;}
-#News ul li dl dd{width: 100%;}
+#News ul li dl dt{font-weight: bold; width: 100%;font-size: 14px;}
+#News ul li dl dd{width: 100%;font-size: 14px;}
 
 #Bnr { margin-bottom: 15px;}
 #Bnr ul { width: 96%; margin: 0 auto;}
@@ -393,7 +393,7 @@ Contents
 #Quests li .txt {width: 68%; padding-right: 7%;background-size: 16px auto;}
 #Quests li .txt .category-label {background: #f5a623; float: left; text-align: center; color: #fff; min-width: 90px; padding: 2px 12px; font-weight: bold; font-size: 12px; border-radius: 30px; margin-right: 8px;}
 #Quests li .txt .number {background: #0899ae; float: left; text-align: center; color: #fff; width: 80px; display: block; padding-top: 2px;}
-#Quests li .txt .title {display: block; float: left; width: 100%; font-size: 18px;}
+#Quests li .txt .title {display: block; float: left; width: 100%; font-size: 16px;}
 #Quests li .txt .summery {display: block; float: left; width: 100%; font-size: 12px; color: #7A7A7A}
 
 .BtnBlock {display: block; height: auto;width: 96%;}
@@ -634,8 +634,15 @@ ul.UploadList li dl dd.last{
   justify-content: space-between;
 }
 #Quests .flexList li{
+  display: flex;
+  justify-content: space-between;
   flex-basis: 48%;
   box-sizing: border-box;
+}
+@media screen and (max-width: 780px) {
+  #Quests .flexList li{
+    flex-basis: 100%;
+  }
 }
 .select-wrap {
    position:relative;

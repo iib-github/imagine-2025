@@ -1,8 +1,9 @@
 <?php
   require_once dirname(__FILE__) . '/../scripts/env.php';
   require_once dirname(__FILE__) . '/../scripts/Session.class.php';
-  require_once dirname(__FILE__) . '/../scripts/model/CategoryModel.class.php';
-  require_once dirname(__FILE__) . '/../scripts/model/SubModel.class.php';
+require_once dirname(__FILE__) . '/../scripts/model/CategoryModel.class.php';
+require_once dirname(__FILE__) . '/../scripts/model/SubModel.class.php';
+require_once dirname(__FILE__) . '/../scripts/model/ContentModel.class.php';
   
   // .envファイルを読み込む
   loadEnv();
@@ -26,6 +27,9 @@
       // 編集対象のコンテンツ情報取得
       $sub = $sub_model->select(array('sub_id'=>$_GET['sub_id']));
       $sub = $sub[0];
+      if (!isset($sub['target_course']) || $sub['target_course'] === '' ) {
+        $sub['target_course'] = ContentModel::TARGET_COURSE_ADVANCE;
+      }
 
       // DBからコンテンツが取れなければ一覧画面に飛ばす。
       if(empty($sub)) {
@@ -47,6 +51,7 @@
       'display_order' => $_POST['display_order'],
       'indicate_flag' => $_POST['indicate_flag'],
       'pub_date' => $_POST['pub_date'],
+      'target_course' => isset($_POST['target_course']) ? $_POST['target_course'] : ContentModel::TARGET_COURSE_ADVANCE,
     );
     $result = $sub_model->registerSub($data);
     if ($result) {
@@ -56,6 +61,9 @@
     $toast_message = '更新に失敗しました。';
     $sub = $sub_model->select(array('sub_id'=>$_POST['sub_id']));
     $sub = !empty($sub) ? $sub[0] : $sub;
+    if (!empty($sub) && (!isset($sub['target_course']) || $sub['target_course'] === '')) {
+      $sub['target_course'] = ContentModel::TARGET_COURSE_ADVANCE;
+    }
   }
 
 ?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -84,6 +92,15 @@
       <p><input type="submit" id="btnUpdate" class="Btn" value="更新" name="update"></p>
       <input type="hidden" name="sub_id" value="<?php echo $sub["sub_id"]; ?>">
       <table class="member">
+        <tr>
+          <th>対象コース</th>
+          <td>
+            <select name="target_course">
+              <option value="<?php echo ContentModel::TARGET_COURSE_ADVANCE; ?>"<?php if($sub['target_course'] === ContentModel::TARGET_COURSE_ADVANCE) echo ' selected="selected"'; ?>>アドバンス（全体）</option>
+              <option value="<?php echo ContentModel::TARGET_COURSE_BASIC; ?>"<?php if($sub['target_course'] === ContentModel::TARGET_COURSE_BASIC) echo ' selected="selected"'; ?>>ベーシック</option>
+            </select>
+          </td>
+        </tr>
         <tr>
           <th style="width:150px">コンテンツID</th>
           <td><?php echo $sub['sub_id']; ?></td>

@@ -1,7 +1,8 @@
 <?php
   require_once dirname(__FILE__) . '/../scripts/Session.class.php';
-  require_once dirname(__FILE__) . '/../scripts/model/SubModel.class.php';
-  require_once dirname(__FILE__) . '/../scripts/model/CategoryModel.class.php';
+require_once dirname(__FILE__) . '/../scripts/model/SubModel.class.php';
+require_once dirname(__FILE__) . '/../scripts/model/CategoryModel.class.php';
+require_once dirname(__FILE__) . '/../scripts/model/ContentModel.class.php';
   $session = Session::getInstance();
 
   // セッションがなければログイン画面に遷移させる。
@@ -26,6 +27,7 @@
       'display_order' => $_POST['display_order'],
       'indicate_flag' => $_POST['indicate_flag'],
       'pub_date' => $_POST['pub_date'],
+      'target_course' => isset($_POST['target_course']) ? $_POST['target_course'] : ContentModel::TARGET_COURSE_ADVANCE,
     );
 
     $success = $sub_model->registerSub($sub_data);
@@ -62,6 +64,15 @@
     <form method="POST" action="register-sub.php" enctype="multipart/form-data">
       <p><input type="submit" id="btnRegister" class="Btn" value="登録" name="register"></p>
       <table class="member">
+        <tr>
+          <th>対象コース</th>
+          <td>
+            <select name="target_course">
+              <option value="<?php echo ContentModel::TARGET_COURSE_ADVANCE; ?>">アドバンス（全体）</option>
+              <option value="<?php echo ContentModel::TARGET_COURSE_BASIC; ?>">ベーシック</option>
+            </select>
+          </td>
+        </tr>
         <tr>
           <th>紐づくカテゴリー</th>
           <td>
