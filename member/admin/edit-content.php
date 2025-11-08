@@ -7,8 +7,12 @@
   require_once dirname(__FILE__) . '/../scripts/model/ContentVideoModel.class.php';
   
   // .envファイルを読み込み、エラーハンドリングを初期化
+  $toast_message = '';
   loadEnv();
   initializeErrorHandling();
+  if (isset($_GET['status']) && $_GET['status'] === 'updated') {
+    $toast_message = 'コンテンツを更新しました。';
+  }
   
   $session = Session::getInstance();
 
@@ -59,82 +63,106 @@
       exit;
     }
   } else { // POST時
-    // 入力情報でコンテンツを更新
-    $data = array(
-      'content_id' => $_POST['content_id'],
-      'category_id' => $_POST['category'],
-      'content_week' => $_POST['week'],
-      'content_title' => $_POST['title'],
-      'content_text' => $_POST['discription'],
-      'display_order' => $_POST['order'],
-      'indicate_flag' => $_POST['active'],
-      'pub_date' => $_POST['pub_date'],
-      'target_course' => isset($_POST['target_course']) ? $_POST['target_course'] : ContentModel::TARGET_COURSE_ADVANCE,
-    );
-    if(isset($_POST['is_faq'])) {
-      $data['is_faq'] = $_POST['is_faq'];
+    if(isset($_POST['delete'])) {
+      $target_content_id = isset($_POST['content_id']) ? (int)$_POST['content_id'] : 0;
+      if($target_content_id && $content_model->deleteContent($target_content_id)) {
+        header("Location: list-content.php?status=deleted");
+        exit;
+      }
+      $toast_message = '削除に失敗しました。';
+      $content_fetch = $content_model->select(array('content_id'=>$target_content_id));
+      if (!empty($content_fetch)) {
+        $content = $content_fetch[0];
+        $video_model = new ContentVideoModel();
+        $content_videos = $video_model->getVideosByContentId($content['content_id']);
+        $content_tags = $content_model->getContentTags($content['content_id']);
+      }
     } else {
-      $data['is_faq'] = $content_model::IS_NOT_FAQ;
-    }
-    
-    $content_id = $content_model->registerContent($data);
-    if($content_id) {
-      // タグを関連付け
-      if(!empty($_POST['tags'])) {
-        $tag_ids = array_map('intval', $_POST['tags']);
-        $content_model->setContentTags($content_id, $tag_ids);
+      // 入力情報でコンテンツを更新
+      $data = array(
+        'content_id' => $_POST['content_id'],
+        'category_id' => $_POST['category'],
+        'content_week' => $_POST['week'],
+        'content_title' => $_POST['title'],
+        'content_text' => $_POST['discription'],
+        'display_order' => $_POST['order'],
+        'indicate_flag' => $_POST['active'],
+        'pub_date' => $_POST['pub_date'],
+        'target_course' => isset($_POST['target_course']) ? $_POST['target_course'] : ContentModel::TARGET_COURSE_ADVANCE,
+      );
+      if(isset($_POST['is_faq'])) {
+        $data['is_faq'] = $_POST['is_faq'];
       } else {
-        // タグが選択されていない場合は既存のタグを削除
-        $content_model->setContentTags($content_id, array());
+        $data['is_faq'] = $content_model::IS_NOT_FAQ;
       }
       
-      // 複数動画を登録
-      if(!empty($_POST['video_urls'])) {
-        $video_model = new ContentVideoModel();
-        // 既存の動画を削除
-        $video_model->deleteVideosByContentId($content_id);
+      $content_id = $content_model->registerContent($data);
+      if($content_id) {
+        // タグを関連付け
+        if(!empty($_POST['tags'])) {
+          $tag_ids = array_map('intval', $_POST['tags']);
+          $content_model->setContentTags($content_id, $tag_ids);
+        } else {
+          // タグが選択されていない場合は既存のタグを削除
+          $content_model->setContentTags($content_id, array());
+        }
+        
+        // 複数動画を登録
+        if(!empty($_POST['video_urls'])) {
+          $video_model = new ContentVideoModel();
+          // 既存の動画を削除
+          $video_model->deleteVideosByContentId($content_id);
 
-        $display_order = 1;
-        foreach($_POST['video_urls'] as $index => $video_url) {
-          if(!empty($video_url)) {
-            // サムネイルのアップロード（あれば優先）
-            $thumb_url = '';
-            if(isset($_FILES['video_thumbnails']) && isset($_FILES['video_thumbnails']['name'][$index]) && $_FILES['video_thumbnails']['name'][$index] !== '') {
-              // 一時キーに詰め替えてUploadLibを使う
-              $tmpKey = '__video_thumb';
-              $_FILES[$tmpKey] = array(
-                'name' => $_FILES['video_thumbnails']['name'][$index],
-                'type' => $_FILES['video_thumbnails']['type'][$index],
-                'tmp_name' => $_FILES['video_thumbnails']['tmp_name'][$index],
-                'error' => $_FILES['video_thumbnails']['error'][$index],
-                'size' => $_FILES['video_thumbnails']['size'][$index],
-              );
-              $prefix = 'cont_' . $content_id . '-video_' . $display_order . '-thumb';
-              if(($fname = UploadLib::getInstance()->_upload($tmpKey, 'content', $prefix)) !== false) {
-                $thumb_url = 'contents/content/' . $fname;
+          $display_order = 1;
+          foreach($_POST['video_urls'] as $index => $video_url) {
+            if(!empty($video_url)) {
+              // サムネイルのアップロード（あれば優先）
+              $thumb_url = '';
+              if(isset($_FILES['video_thumbnails']) && isset($_FILES['video_thumbnails']['name'][$index]) && $_FILES['video_thumbnails']['name'][$index] !== '') {
+                // 一時キーに詰め替えてUploadLibを使う
+                $tmpKey = '__video_thumb';
+                $_FILES[$tmpKey] = array(
+                  'name' => $_FILES['video_thumbnails']['name'][$index],
+                  'type' => $_FILES['video_thumbnails']['type'][$index],
+                  'tmp_name' => $_FILES['video_thumbnails']['tmp_name'][$index],
+                  'error' => $_FILES['video_thumbnails']['error'][$index],
+                  'size' => $_FILES['video_thumbnails']['size'][$index],
+                );
+                $prefix = 'cont_' . $content_id . '-video_' . $display_order . '-thumb';
+                if(($fname = UploadLib::getInstance()->_upload($tmpKey, 'content', $prefix)) !== false) {
+                  $thumb_url = 'contents/content/' . $fname;
+                }
+                unset($_FILES[$tmpKey]);
               }
-              unset($_FILES[$tmpKey]);
-            }
-            // アップロードが無ければ既存値（hidden）を利用
-            if(empty($thumb_url) && isset($_POST['thumbnail_urls'][$index])) {
-              $thumb_url = $_POST['thumbnail_urls'][$index];
-            }
+              // アップロードが無ければ既存値（hidden）を利用
+              if(empty($thumb_url) && isset($_POST['thumbnail_urls'][$index])) {
+                $thumb_url = $_POST['thumbnail_urls'][$index];
+              }
 
-            $video_data = array(
-              'content_id' => $content_id,
-              'video_url' => $video_url,
-              'video_title' => isset($_POST['video_titles'][$index]) ? $_POST['video_titles'][$index] : '動画' . $display_order,
-              'thumbnail_url' => $thumb_url,
-              'display_order' => $display_order
-            );
-            $video_model->registerVideo($video_data);
-            $display_order++;
+              $video_data = array(
+                'content_id' => $content_id,
+                'video_url' => $video_url,
+                'video_title' => isset($_POST['video_titles'][$index]) ? $_POST['video_titles'][$index] : '動画' . $display_order,
+                'thumbnail_url' => $thumb_url,
+                'display_order' => $display_order
+              );
+              $video_model->registerVideo($video_data);
+              $display_order++;
+            }
           }
         }
+        
+        header("Location: edit-content.php?cont_id=" . urlencode((string)$content_id) . "&status=updated");
+        exit;
       }
-      
-      header("Location: list-content.php");
-      exit;
+      $toast_message = '更新に失敗しました。';
+      $content_fetch = $content_model->select(array('content_id'=>$_POST['content_id']));
+      if (!empty($content_fetch)) {
+        $content = $content_fetch[0];
+        $video_model = new ContentVideoModel();
+        $content_videos = $video_model->getVideosByContentId($content['content_id']);
+        $content_tags = $content_model->getContentTags($content['content_id']);
+      }
     }
   }
 
@@ -200,6 +228,24 @@
   }
   .add-video-btn:hover {
     background-color: #45a049;
+  }
+  .form-action-buttons {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    margin-bottom: 15px;
+  }
+  .btn-delete {
+    background-color: #f44336;
+    color: #fff;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 14px;
+  }
+  .btn-delete:hover {
+    background-color: #d32f2f;
   }
 </style>
 <script>
@@ -269,6 +315,16 @@
     if(videoContainer.children.length === 0) {
       addVideoField();
     }
+
+    const deleteButton = document.getElementById('btnDelete');
+    if(deleteButton) {
+      deleteButton.addEventListener('click', function(event) {
+        const confirmMessage = 'このコンテンツを削除します。よろしいですか？';
+        if(!confirm(confirmMessage)) {
+          event.preventDefault();
+        }
+      });
+    }
   });
 </script>
 </head>
@@ -285,7 +341,10 @@
 ?>
 
     <form method="POST" action="edit-content.php" enctype="multipart/form-data">
-      <p><input type="submit" id="btnUpdate" class="Btn" value="更新" name="update"></p>
+      <div class="form-action-buttons">
+        <input type="submit" id="btnUpdate" class="Btn" value="更新" name="update">
+        <button type="submit" id="btnDelete" class="btn-delete" name="delete" value="1">削除</button>
+      </div>
       <input type="hidden" name="content_id" value="<?php echo $content["content_id"]; ?>">
       <table class="member">
         <tr>
@@ -474,6 +533,22 @@
   </div><!-- /INBOX -->
 </div>
 <!-- Wrapper ends -->
+
+<?php if (!empty($toast_message)): ?>
+<div class="toast-notice" id="toastNotice"><?php echo htmlspecialchars($toast_message, ENT_QUOTES, 'UTF-8'); ?></div>
+<script>
+(function(){
+  var toast=document.getElementById('toastNotice');
+  if(!toast)return;
+  setTimeout(function(){toast.classList.add('show');},80);
+  setTimeout(function(){toast.classList.remove('show');},3080);
+})();
+</script>
+<style>
+.toast-notice{position:fixed;left:20px;bottom:20px;padding:12px 20px;background:#4CAF50;color:#fff;border-radius:4px;box-shadow:0 2px 12px rgba(0,0,0,0.2);font-size:14px;opacity:0;transform:translateY(20px);transition:opacity .3s ease,transform .3s ease;z-index:9999;}
+.toast-notice.show{opacity:1;transform:translateY(0);}
+</style>
+<?php endif; ?>
 
 </body>
 </html>

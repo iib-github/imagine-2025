@@ -393,5 +393,46 @@
       return isset($courses[$course]) ? $courses[$course] : '不明';
     }
 
+    /**
+     * コンテンツを削除
+     *
+     * @param int $content_id コンテンツID
+     * @return bool 成功時true、失敗時false
+     */
+    public function deleteContent($content_id) {
+      if (empty($content_id)) {
+        return false;
+      }
+
+      $pdo = PdoInterface::getInstance();
+
+      try {
+        $pdo->beginTransaction();
+
+        // 関連する動画を削除
+        $video_model = new ContentVideoModel();
+        if ($video_model->deleteVideosByContentId($content_id) === false) {
+          throw new Exception('動画の削除に失敗しました。');
+        }
+
+        // タグの関連付けを削除
+        $sql = "DELETE FROM content_tag_relation WHERE content_id = ?";
+        if ($pdo->query($sql, array($content_id)) === false) {
+          throw new Exception('タグ関連の削除に失敗しました。');
+        }
+
+        // コンテンツ本体を削除
+        if ($this->delete(array('content_id' => $content_id)) === false) {
+          throw new Exception('コンテンツ削除に失敗しました。');
+        }
+
+        $pdo->commit();
+        return true;
+      } catch (Exception $e) {
+        $pdo->rollback();
+        return false;
+      }
+    }
+
 
   }

@@ -34,7 +34,7 @@
 <title>ご質問BOX - THE Imagine Membersサイト</title>
 <meta name="robots" content="noindex,nofollow" />
 <meta name="viewport" content="width=device-width">
-<link rel="apple-touch-icon" href="/common/img/apple-touch-icon.png">
+<link rel="apple-touch-icon" href="/membership/member/common/img/apple-touch-icon.png">
 <link href="../common/css/main.css" rel="stylesheet">
 <link href="../common/css/main.css" rel="stylesheet">
 <!--[if lt IE 9]>
@@ -108,7 +108,7 @@
     <!-- /Main -->
     <div id="Side">
       <!-- Side -->
-      <?php include '../sidebar-contact.php'; ?>
+      <?php include '../sidebar.php'; ?>
     </div>
     <!-- /Side -->
   </div>

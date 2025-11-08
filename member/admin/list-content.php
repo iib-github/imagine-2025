@@ -93,7 +93,8 @@
   }
   .filter-row {
     display: flex;
-    gap: 20px;
+    flex-direction: column;
+    gap: 10px;
     margin-bottom: 15px;
     flex-wrap: wrap;
     align-items: flex-start;

@@ -130,7 +130,7 @@
 
       if($success) {
         $_SESSION['success_message'] = 'コメント投稿が完了しました。';
-        header("Location:/member/detail.php?". $_SERVER['QUERY_STRING']);
+        header("Location:/detail.php?". $_SERVER['QUERY_STRING']);
         exit;
       } else {
         $_SESSION['success_message'] = 'コメント投稿に失敗しました。';

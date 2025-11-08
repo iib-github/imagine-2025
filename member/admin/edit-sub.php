@@ -48,9 +48,14 @@
       'indicate_flag' => $_POST['indicate_flag'],
       'pub_date' => $_POST['pub_date'],
     );
-    $sub_model->registerSub($data);
-    header("Location: list-sub.php");
-    exit;
+    $result = $sub_model->registerSub($data);
+    if ($result) {
+      header("Location: edit-sub.php?sub_id=" . urlencode($_POST['sub_id']) . "&status=updated");
+      exit;
+    }
+    $toast_message = '更新に失敗しました。';
+    $sub = $sub_model->select(array('sub_id'=>$_POST['sub_id']));
+    $sub = !empty($sub) ? $sub[0] : $sub;
   }
 
 ?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -162,6 +167,22 @@
   </div><!-- /INBOX -->
 </div>
 <!-- Wrapper ends -->
+
+<?php if (!empty($toast_message)): ?>
+<div class="toast-notice" id="toastNotice"><?php echo htmlspecialchars($toast_message, ENT_QUOTES, 'UTF-8'); ?></div>
+<script>
+(function(){
+  var toast=document.getElementById('toastNotice');
+  if(!toast)return;
+  setTimeout(function(){toast.classList.add('show');},80);
+  setTimeout(function(){toast.classList.remove('show');},3080);
+})();
+</script>
+<style>
+.toast-notice{position:fixed;left:20px;bottom:20px;padding:12px 20px;background:#4CAF50;color:#fff;border-radius:4px;box-shadow:0 2px 12px rgba(0,0,0,0.2);font-size:14px;opacity:0;transform:translateY(20px);transition:opacity .3s ease,transform .3s ease;z-index:9999;}
+.toast-notice.show{opacity:1;transform:translateY(0);}
+</style>
+<?php endif; ?>
 
 </body>
 </html>

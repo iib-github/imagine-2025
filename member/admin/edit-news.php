@@ -13,8 +13,14 @@
   $news_id = (int)@$_GET['n_id'];
   $news = $news_model->getNewsById($news_id);
 
+  $toast_message = '';
+  if (isset($_GET['status']) && $_GET['status'] === 'updated') {
+    $toast_message = '更新情報を更新しました。';
+  }
+
   if($_SERVER["REQUEST_METHOD"] == "POST") {
-    if(empty($_POST['news_id'])) {
+    $news_id_post = isset($_POST['news_id']) ? (int)$_POST['news_id'] : 0;
+    if(empty($news_id_post)) {
       // 新規登録時
       $insert_data = array(
         'note_date' => $_POST['note_date'],
@@ -22,7 +28,10 @@
         'text' => $_POST['text'],
         'is_active' => $_POST['active'],
       );
-      $news_model->insert($insert_data);
+      $result = $news_model->insert($insert_data);
+      if ($result) {
+        $news_id_post = $news_model->lastInsertId();
+      }
     } else {
       // 更新時
       $update_data = array(
@@ -31,10 +40,15 @@
         'text' => $_POST['text'],
         'is_active' => $_POST['active'],
       );
-      $news_model->update($update_data, array('id'=>$_POST['news_id']));
+      $result = $news_model->update($update_data, array('id'=>$_POST['news_id']));
     }
-    header("Location: list-news.php");
-    exit;
+    if (!empty($result)) {
+      header("Location: edit-news.php?n_id=" . urlencode($news_id_post) . "&status=updated");
+      exit;
+    }
+    $toast_message = '更新に失敗しました。';
+    $news_id = $news_id_post;
+    $news = $news_model->getNewsById($news_id_post);
   }
 
 ?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -75,7 +89,7 @@
         </tr>
         <tr>
           <th>お知らせ詳細</th>
-          <td><textarea name="text" id="colume" style="width:800px;height:100px;"><?php echo htmlspecialchars($news["text"], ENT_QUOTES, 'UTF-8'); ?></textarea></td>
+          <td><textarea name="text" id="colume" style="width:800px;height:300px;"><?php echo htmlspecialchars($news["text"], ENT_QUOTES, 'UTF-8'); ?></textarea></td>
         </tr>
         <tr>
           <th>表示 / 非表示</th>
@@ -91,6 +105,22 @@
   </div><!-- /INBOX -->
 </div>
 <!-- Wrapper ends -->
+
+<?php if (!empty($toast_message)): ?>
+<div class="toast-notice" id="toastNotice"><?php echo htmlspecialchars($toast_message, ENT_QUOTES, 'UTF-8'); ?></div>
+<script>
+(function(){
+  var toast=document.getElementById('toastNotice');
+  if(!toast)return;
+  setTimeout(function(){toast.classList.add('show');},80);
+  setTimeout(function(){toast.classList.remove('show');},3080);
+})();
+</script>
+<style>
+.toast-notice{position:fixed;left:20px;bottom:20px;padding:12px 20px;background:#4CAF50;color:#fff;border-radius:4px;box-shadow:0 2px 12px rgba(0,0,0,0.2);font-size:14px;opacity:0;transform:translateY(20px);transition:opacity .3s ease,transform .3s ease;z-index:9999;}
+.toast-notice.show{opacity:1;transform:translateY(0);}
+</style>
+<?php endif; ?>
 
 </body>
 </html>

@@ -6,6 +6,11 @@
   // .envファイルを読み込む
   loadEnv();
   
+  $toast_message = '';
+  if (isset($_GET['status']) && $_GET['status'] === 'updated') {
+    $toast_message = 'カテゴリー情報を更新しました。';
+  }
+
   $session = Session::getInstance();
 
   // セッションがなければログイン画面に遷移させる。
@@ -45,9 +50,16 @@
       'target_course' => isset($_POST['target_course']) ? $_POST['target_course'] : 'all',
     );
     $category_model = new CategoryModel();
-    $category_model->registerCategory($data);
-    header("Location: list-category.php");
-    exit;
+    $result = $category_model->registerCategory($data);
+    if ($result) {
+      $category_id = $_POST['category_id'];
+      header("Location: edit-category.php?ctg_id=" . urlencode($category_id) . "&status=updated");
+      exit;
+    } else {
+      $toast_message = '更新に失敗しました。';
+      $category = $category_model->select(array('category_id'=>$_POST['category_id']));
+      $category = !empty($category) ? $category[0] : array();
+    }
   }
 
 ?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -173,6 +185,22 @@
   </div><!-- /INBOX -->
 </div>
 <!-- Wrapper ends -->
+
+<?php if (!empty($toast_message)): ?>
+<div class="toast-notice" id="toastNotice"><?php echo htmlspecialchars($toast_message, ENT_QUOTES, 'UTF-8'); ?></div>
+<script>
+(function(){
+  var toast=document.getElementById('toastNotice');
+  if(!toast)return;
+  setTimeout(function(){toast.classList.add('show');},80);
+  setTimeout(function(){toast.classList.remove('show');},3080);
+})();
+</script>
+<style>
+.toast-notice{position:fixed;left:20px;bottom:20px;padding:12px 20px;background:#4CAF50;color:#fff;border-radius:4px;box-shadow:0 2px 12px rgba(0,0,0,0.2);font-size:14px;opacity:0;transform:translateY(20px);transition:opacity .3s ease,transform .3s ease;z-index:9999;}
+.toast-notice.show{opacity:1;transform:translateY(0);}
+</style>
+<?php endif; ?>
 
 </body>
 </html>

@@ -52,7 +52,7 @@
     <!-- /Main -->
     <div id="Side">
       <!-- Side -->
-      <?php include '../sidebar-contact.php'; ?>
+      <?php include '../sidebar.php'; ?>
     </div>
     <!-- /Side -->
   </div>

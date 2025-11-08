@@ -11,6 +11,10 @@ if($session->get('admin') === false) {
 }
 
 $tag_model = new TagModel();
+$toast_message = '';
+if (isset($_GET['status']) && $_GET['status'] === 'updated') {
+  $toast_message = 'タグを更新しました。';
+}
 $errors = array();
 $tag = null;
 
@@ -58,7 +62,7 @@ if($_SERVER["REQUEST_METHOD"] == "GET") {
     $success = $tag_model->updateTag($update_data, $where_data);
     
     if($success) {
-      header("Location: list-tag.php?message=updated");
+      header("Location: edit-tag.php?tag_id=" . urlencode($_POST['tag_id']) . "&status=updated");
       exit;
     } else {
       $errors[] = 'タグの更新に失敗しました。';
@@ -108,9 +112,10 @@ $use_count = $tag_model->getTagUseCount($tag['tag_id']);
   }
 ?>
 
-    <p><input type="submit" id="btnUpdate" class="Btn" value="更新" name="update"></p>
-    <input type="hidden" name="tag_id" value="<?php echo htmlspecialchars($tag['tag_id']); ?>">
-    <table class="member">
+    <form method="POST" action="edit-tag.php">
+      <p><input type="submit" id="btnUpdate" class="Btn" value="更新" name="update"></p>
+      <input type="hidden" name="tag_id" value="<?php echo htmlspecialchars($tag['tag_id']); ?>">
+      <table class="member">
       <tr>
         <th style="width: 150px;">タグID</th>
         <td><?php echo htmlspecialchars($tag['tag_id']); ?></td>
@@ -133,12 +138,29 @@ $use_count = $tag_model->getTagUseCount($tag['tag_id']);
         <th>使用中のコンテンツ数</th>
         <td><?php echo $use_count; ?> 件</td>
       </tr>
-    </table>
-    <p><input type="submit" id="btnUpdateBottom" class="Btn" value="更新" name="update"></p>
+      </table>
+      <p><input type="submit" id="btnUpdateBottom" class="Btn" value="更新" name="update"></p>
+    </form>
     <p><input type="button" class="Btn" value="一覧に戻る" onclick="location.href='list-tag.php'"></p>
   </div><!-- /INBOX -->
 </div>
 <!-- Wrapper ends -->
+
+<?php if (!empty($toast_message)): ?>
+<div class="toast-notice" id="toastNotice"><?php echo htmlspecialchars($toast_message, ENT_QUOTES, 'UTF-8'); ?></div>
+<script>
+(function(){
+  var toast=document.getElementById('toastNotice');
+  if(!toast)return;
+  setTimeout(function(){toast.classList.add('show');},80);
+  setTimeout(function(){toast.classList.remove('show');},3080);
+})();
+</script>
+<style>
+.toast-notice{position:fixed;left:20px;bottom:20px;padding:12px 20px;background:#4CAF50;color:#fff;border-radius:4px;box-shadow:0 2px 12px rgba(0,0,0,0.2);font-size:14px;opacity:0;transform:translateY(20px);transition:opacity .3s ease,transform .3s ease;z-index:9999;}
+.toast-notice.show{opacity:1;transform:translateY(0);}
+</style>
+<?php endif; ?>
 
 </body>
 </html>
