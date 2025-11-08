@@ -4,6 +4,7 @@
   require_once dirname(__FILE__) . '/scripts/model/MemberModel.class.php';
   require_once dirname(__FILE__) . '/scripts/model/CategoryModel.class.php';
   require_once dirname(__FILE__) . '/scripts/model/ContentModel.class.php';
+require_once dirname(__FILE__) . '/scripts/model/MemberContentRelation.class.php';
   
   // .envファイルを読み込み、エラーハンドリングを初期化
   loadEnv();
@@ -58,6 +59,7 @@
 
   // コンテンツ取得
   $content_model = new ContentModel();
+  $relation_model = new MemberContentRelation();
   
   $where_conditions = array(
     'category_id'=>$category['category_id'],
@@ -83,6 +85,17 @@
   }
   $contents = $filtered_contents;
 
+$completed_content_map = array();
+$completed_records = $relation_model->select(array(
+  'member_id' => $member_id,
+  'category_id' => $category['category_id'],
+));
+foreach ($completed_records as $record) {
+  if (isset($record['content_id'])) {
+    $completed_content_map[(int)$record['content_id']] = true;
+  }
+}
+
 ?><!DOCTYPE html>
 <html>
 <head>
@@ -95,6 +108,24 @@
 <link href="common/css/jquery.circliful.css" rel="stylesheet" type="text/css" />
 <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
 <script src="common/js/jquery.circliful.min.js"></script>
+<style>
+  .status-label{
+    display:inline-block;
+    padding:2px 12px;
+    border-radius:14px;
+    font-size:12px;
+    font-weight:bold;
+    color:#fff;
+  }
+  .label-row{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    margin-bottom:6px;
+  }
+  .status-label--complete{background:#4CAF50;}
+  .status-label--incomplete{background:#9e9e9e;}
+</style>
 <!--[if lt IE 9]>
 <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
 <script src="common/js/respond.min.js"></script>
@@ -177,9 +208,17 @@
                 </picture>
               </div>
               <div class="txt">
-                <?php if ($category_use_week && !empty($c['content_week'])): ?>
-                <div class="number">Week <?php echo $c['content_week']; ?></div>
-                <?php endif; ?>
+                <div class="label-row">
+                  <?php if ($category_use_week && !empty($c['content_week'])): ?>
+                  <div class="number">Week <?php echo $c['content_week']; ?></div>
+                  <?php endif; ?>
+                  <?php
+                    $is_completed = isset($completed_content_map[(int)$c['content_id']]);
+                    $status_label = $is_completed ? '視聴済み' : '未視聴';
+                    $status_class = $is_completed ? 'status-label status-label--complete' : 'status-label status-label--incomplete';
+                  ?>
+                  <div class="<?php echo $status_class; ?>"><?php echo $status_label; ?></div>
+                </div>
                 <div class="title"><?php echo htmlspecialchars($c['content_title'], ENT_QUOTES, 'UTF-8'); ?></div>
                 <div class="summery"><?php echo strip_tags($c['content_text']); ?></div>
               </div>
@@ -214,8 +253,24 @@
                 $c_title = !empty($c['category_title'])
                   ? $c['category_title']
                   : 'Lesson' . $c['category_number'];
+                $course_label = 'アドバンス';
+                if (isset($c['target_course'])) {
+                  switch ($c['target_course']) {
+                    case ContentModel::TARGET_COURSE_BASIC:
+                    case 'basic':
+                      $course_label = 'ベーシック';
+                      break;
+                    case ContentModel::TARGET_COURSE_ADVANCE:
+                    case 'advance':
+                      $course_label = 'アドバンス';
+                      break;
+                    default:
+                      $course_label = '全体';
+                      break;
+                  }
+                }
               ?>
-                <p class="Month"><?php echo htmlspecialchars($c_title, ENT_QUOTES, 'UTF-8'); ?></p>
+                <p class="Month"><?php echo htmlspecialchars($course_label, ENT_QUOTES, 'UTF-8'); ?></p>
                 <p class="Title"><?php echo htmlspecialchars($c['category_title'], ENT_QUOTES, 'UTF-8'); ?></p>
               </li>
             </a>

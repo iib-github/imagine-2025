@@ -533,8 +533,24 @@
                 $c_title = !empty($c['category_title'])
                   ? $c['category_title']
                   : 'Lesson' . $c['category_number'];
+                $course_label = 'アドバンス';
+                if (isset($c['target_course'])) {
+                  switch ($c['target_course']) {
+                    case ContentModel::TARGET_COURSE_BASIC:
+                    case 'basic':
+                      $course_label = 'ベーシック';
+                      break;
+                    case ContentModel::TARGET_COURSE_ADVANCE:
+                    case 'advance':
+                      $course_label = 'アドバンス';
+                      break;
+                    default:
+                      $course_label = '全体';
+                      break;
+                  }
+                }
               ?>
-              <p class="Month"><?php echo htmlspecialchars($c_title, ENT_QUOTES, 'UTF-8'); ?></p>
+              <p class="Month"><?php echo htmlspecialchars($course_label, ENT_QUOTES, 'UTF-8'); ?></p>
                 <p class="Title"><?php echo $c['category_title']; ?></p>
               </li>
             </a>
