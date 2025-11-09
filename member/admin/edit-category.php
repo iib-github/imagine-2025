@@ -76,9 +76,21 @@
       header("Location: list-category.php?status=updated");
       exit;
     } else {
-      $toast_message = '更新に失敗しました。';
+      $error_message = $category_model->getLastErrorMessage();
+      if (!empty($error_message)) {
+        $toast_message = $error_message;
+      } else {
+        $toast_message = '更新に失敗しました。';
+      }
       $category = $category_model->select(array('category_id'=>$_POST['category_id']));
       $category = !empty($category) ? $category[0] : array();
+      $category['category_number'] = $_POST['number'];
+      $category['category_title'] = $_POST['title'];
+      $category['content_text'] = $_POST['discription'];
+      $category['indicate_flag'] = $_POST['indicate_flag'];
+      $category['pub_date'] = $_POST['pub_date'];
+      $category['target_course'] = isset($_POST['target_course']) ? $_POST['target_course'] : $category['target_course'];
+      $category['use_week_flag'] = isset($_POST['use_week_flag']) ? $_POST['use_week_flag'] : $category['use_week_flag'];
       $category_content_count = $content_model->count(array(
         'category_id' => $_POST['category_id'],
         'indicate_flag' => ContentModel::ACTIVE

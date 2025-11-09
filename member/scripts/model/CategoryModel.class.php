@@ -5,6 +5,13 @@
 
   class CategoryModel extends BaseModel {
 
+    /**
+     * 直近のエラーメッセージ
+     *
+     * @var string|null
+     */
+    private $last_error_message = null;
+
     // コンテンツの表示、非表示
     const ACTIVE = 1;
     const INACTIVE = 2;
@@ -23,8 +30,35 @@
      */
     public function registerCategory($data) {
 
+      // 直近のエラーを初期化
+      $this->last_error_message = null;
+
       // TODO ナンバーのintチェック、桁数チェック
-      // TODO ナンバー重複チェック
+
+      if(isset($data['category_number'])) {
+        $data['category_number'] = is_numeric($data['category_number'])
+          ? (int)$data['category_number']
+          : $data['category_number'];
+      }
+
+      // ナンバー重複チェック
+      if(isset($data['category_number'])) {
+        $existing = $this->select(array('category_number' => $data['category_number']));
+        if(!empty($existing)) {
+          $current_id = isset($data['category_id']) ? (int)$data['category_id'] : 0;
+          $conflict = null;
+          foreach ($existing as $item) {
+            if(!empty($item['category_id']) && (int)$item['category_id'] !== $current_id) {
+              $conflict = $item;
+              break;
+            }
+          }
+          if($conflict !== null) {
+            $this->last_error_message = '選択したナンバーは既に使用されています。別のナンバーを選択してください。';
+            return false;
+          }
+        }
+      }
 
       if(!isset($data['use_week_flag'])) {
         $data['use_week_flag'] = 1;
@@ -35,8 +69,16 @@
       if(empty($data['category_id'])) {
         // insert時
         // insertしたレコードのIDを取得
-        parent::insert($data);
-        $category_id = $this->lastInsertId();
+        try {
+          parent::insert($data);
+          $category_id = $this->lastInsertId();
+        } catch (\PDOException $e) {
+          $this->last_error_message = 'カテゴリーの登録に失敗しました。時間をおいて再度お試しください。';
+          if (strpos($e->getMessage(), 'category_number') !== false) {
+            $this->last_error_message = '選択したナンバーは既に使用されています。別のナンバーを選択してください。';
+          }
+          return false;
+        }
       } else {
         // update時
         $category_id = $data['category_id'];
@@ -54,7 +96,15 @@
         $data['category_list_img'] = 'contents/category/' . $fname;
       }
 
-      $result = parent::update($data, array('category_id' => $category_id));
+      try {
+        $result = parent::update($data, array('category_id' => $category_id));
+      } catch (\PDOException $e) {
+        $this->last_error_message = 'カテゴリーの更新に失敗しました。時間をおいて再度お試しください。';
+        if (strpos($e->getMessage(), 'category_number') !== false) {
+          $this->last_error_message = '選択したナンバーは既に使用されています。別のナンバーを選択してください。';
+        }
+        return false;
+      }
 
       // 公開中コンテンツ数を自動集計し反映
       $content_model = new ContentModel();
@@ -65,6 +115,16 @@
       parent::update(array('number_of_contents' => $content_count), array('category_id' => $category_id));
 
       return $result;
+    }
+
+
+    /**
+     * 直近のエラーメッセージを取得
+     *
+     * @return string|null
+     */
+    public function getLastErrorMessage() {
+      return $this->last_error_message;
     }
 
 
