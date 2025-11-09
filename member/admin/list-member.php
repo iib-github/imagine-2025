@@ -41,6 +41,17 @@
 <link href="common/css/reset.css" rel="stylesheet" type="text/css" media="all" />
 <link href="common/css/style.css" rel="stylesheet" type="text/css" media="all" />
 <style>
+  .course-label {
+    display:inline-block;
+    padding:2px 10px;
+    border-radius:999px;
+    font-size:12px;
+    font-weight:bold;
+    color:#fff;
+  }
+  .course-label--advance { background-color:#00695c; }
+  .course-label--basic { background-color:#1e88e5; }
+  .course-label--other { background-color:#757575; }
   .btn-detail {
     display: inline-block;
     padding: 6px 12px;
@@ -106,15 +117,21 @@
       <tr>
         <td><?php echo $member['member_id']; ?></td>
         <td><?php echo htmlspecialchars($member['member_name'], ENT_QUOTES, 'UTF-8'); ?></td>
-        <td><?php
-        if ($member['select_course'] == 1) {
-          echo 'アドバンス';
-        } elseif ($member['select_course'] == 2) {
-          echo 'ベーシック';
-        } elseif ($member['select_course'] == 3) {
-          echo 'その他';
-        }
-        ?></td>
+        <td>
+          <?php
+            $course_value = (int)$member['select_course'];
+            $course_name = 'アドバンス';
+            $course_class = 'course-label course-label--advance';
+            if ($course_value === 2) {
+              $course_name = 'ベーシック';
+              $course_class = 'course-label course-label--basic';
+            } elseif ($course_value === 3) {
+              $course_name = 'その他';
+              $course_class = 'course-label course-label--other';
+            }
+          ?>
+          <span class="<?php echo $course_class; ?>"><?php echo htmlspecialchars($course_name, ENT_QUOTES, 'UTF-8'); ?></span>
+        </td>
         <td><?php echo htmlspecialchars($member['login_mail'], ENT_QUOTES, 'UTF-8'); ?></td>
         <td style="text-align:center"><button type="button" class="btn-detail" onclick="location.href='edit-member.php?mid=<?php echo $member['member_id']; ?>'">詳細</button></td>
         <!--td>

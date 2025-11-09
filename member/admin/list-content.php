@@ -238,7 +238,7 @@
   .status-toggle-header,
   .status-toggle-cell {
     text-align: center;
-    width: 80px;
+    width: 90px;
   }
   .btn-detail {
     display: inline-block;
@@ -255,6 +255,23 @@
   .btn-detail:hover {
     background-color: #1976D2;
     transform: translateY(-1px);
+  }
+  .course-label {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: bold;
+    color: #fff;
+  }
+  .course-label--advance {
+    background-color: #00695c;
+  }
+  .course-label--basic {
+    background-color: #1e88e5;
+  }
+  .course-label--all {
+    background-color: #8e24aa;
   }
 </style>
 <script>
@@ -341,7 +358,19 @@
         <td><?php echo htmlspecialchars(isset($category_map[$content['category_id']]) ? $category_map[$content['category_id']] : '未設定', ENT_QUOTES, 'UTF-8'); ?></td>
         <td><?php echo $content['content_week']; ?></td>
         <td><?php echo htmlspecialchars($content['content_title'], ENT_QUOTES, 'UTF-8'); ?></td>
-        <td><?php echo htmlspecialchars($content_model->getCourseName($content['target_course']), ENT_QUOTES, 'UTF-8'); ?></td>
+        <td>
+          <?php
+            $course_code = isset($content['target_course']) ? $content['target_course'] : ContentModel::TARGET_COURSE_ADVANCE;
+            $course_name = $content_model->getCourseName($course_code);
+            $course_class = 'course-label course-label--advance';
+            if($course_code === ContentModel::TARGET_COURSE_BASIC) {
+              $course_class = 'course-label course-label--basic';
+            } elseif($course_code === 'all' || $course_code === '' || $course_code === null) {
+              $course_class = 'course-label course-label--all';
+            }
+          ?>
+          <span class="<?php echo $course_class; ?>"><?php echo htmlspecialchars($course_name, ENT_QUOTES, 'UTF-8'); ?></span>
+        </td>
         <td>
           <?php if(!empty($content['tags'])): ?>
             <?php foreach($content['tags'] as $tag): ?>

@@ -60,6 +60,9 @@ if (!function_exists('formatDatetimeForInput')) {
         'description' => $_POST['description'],
         'text' => $_POST['text'],
         'is_active' => $_POST['active'],
+        'target_course' => isset($_POST['target_course']) && $_POST['target_course'] !== ''
+          ? $_POST['target_course']
+          : NewsModel::TARGET_COURSE_ALL,
       );
       $result = $news_model->insert($insert_data);
       if ($result) {
@@ -73,6 +76,9 @@ if (!function_exists('formatDatetimeForInput')) {
         'description' => $_POST['description'],
         'text' => $_POST['text'],
         'is_active' => $_POST['active'],
+        'target_course' => isset($_POST['target_course']) && $_POST['target_course'] !== ''
+          ? $_POST['target_course']
+          : NewsModel::TARGET_COURSE_ALL,
       );
       $result = $news_model->update($update_data, array('id'=>$_POST['news_id']));
     }
@@ -124,6 +130,21 @@ if (!function_exists('formatDatetimeForInput')) {
         <tr>
           <th>お知らせ詳細</th>
           <td><textarea name="text" id="colume" style="width:800px;height:300px;"><?php echo htmlspecialchars($news["text"], ENT_QUOTES, 'UTF-8'); ?></textarea></td>
+        </tr>
+        <tr>
+          <th>対象コース</th>
+          <td>
+            <?php
+              $selected_course = isset($news['target_course']) && $news['target_course'] !== ''
+                ? $news['target_course']
+                : NewsModel::TARGET_COURSE_ALL;
+            ?>
+            <select name="target_course">
+              <option value="all"<?php if($selected_course === NewsModel::TARGET_COURSE_ALL) echo ' selected="selected"'; ?>>全体</option>
+              <option value="advance"<?php if($selected_course === 'advance') echo ' selected="selected"'; ?>>アドバンス</option>
+              <option value="basic"<?php if($selected_course === 'basic') echo ' selected="selected"'; ?>>ベーシック</option>
+            </select>
+          </td>
         </tr>
         <tr>
           <th>表示 / 非表示</th>

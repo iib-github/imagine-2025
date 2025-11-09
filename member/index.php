@@ -104,7 +104,7 @@ if ($theme === 'blue') {
 
   // お知らせ取得
   $news_model = new NewsModel();
-  $news_list = $news_model->getNewsList(NEWS_NUM);
+  $news_list = $news_model->getNewsList(NEWS_NUM, $course_filter);
 
 ?><!DOCTYPE html>
 <html>

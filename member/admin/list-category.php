@@ -101,8 +101,19 @@
   .status-toggle-header,
   .status-toggle-cell {
     text-align: center;
-    width: 80px;
+    width: 90px;
   }
+  .course-label {
+    display:inline-block;
+    padding:2px 10px;
+    border-radius:999px;
+    font-size:12px;
+    font-weight:bold;
+    color:#fff;
+  }
+  .course-label--advance { background-color:#00695c; }
+  .course-label--basic { background-color:#1e88e5; }
+  .course-label--all { background-color:#8e24aa; }
   .btn-detail {
     display: inline-block;
     padding: 6px 12px;
@@ -161,20 +172,26 @@
         <td><?php echo htmlspecialchars($category['category_title'], ENT_QUOTES, 'UTF-8'); ?></td>
         <td>
           <?php
-            $target_course = !empty($category['target_course']) ? $category['target_course'] : 'all';
+            $target_course = !empty($category['target_course']) ? $category['target_course'] : 'advance';
+            $course_name = 'アドバンス';
+            $course_class = 'course-label course-label--advance';
             switch($target_course) {
               case 'basic':
-                echo 'ベーシック';
-                break;
-              case 'advance':
-                echo 'アドバンス';
+                $course_name = 'ベーシック';
+                $course_class = 'course-label course-label--basic';
                 break;
               case 'all':
+                $course_name = '全体';
+                $course_class = 'course-label course-label--all';
+                break;
+              case 'advance':
               default:
-                echo 'アドバンス';
+                $course_name = 'アドバンス';
+                $course_class = 'course-label course-label--advance';
                 break;
             }
           ?>
+          <span class="<?php echo $course_class; ?>"><?php echo htmlspecialchars($course_name, ENT_QUOTES, 'UTF-8'); ?></span>
         </td>
         <td><?php echo htmlspecialchars($category["pub_date"], ENT_QUOTES, 'UTF-8'); ?></td>
         <td class="status-toggle-cell">

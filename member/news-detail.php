@@ -1,6 +1,7 @@
 <?php
   require_once dirname(__FILE__) . '/scripts/Session.class.php';
   require_once dirname(__FILE__) . '/scripts/model/NewsModel.class.php';
+  require_once dirname(__FILE__) . '/scripts/model/MemberModel.class.php';
   $session = Session::getInstance();
 
   // セッションがなければログイン画面に遷移させる。
@@ -8,6 +9,16 @@
     header("Location: login.php");
     exit;
   }
+
+  $member_id = $session->get('member');
+  $member_model = new MemberModel();
+  $member_info = $member_model->select(array('member_id' => $member_id));
+  if (empty($member_info)) {
+    header("Location: login.php");
+    exit;
+  }
+  $member_info = $member_info[0];
+  $course_filter = $member_model->getCourseFilter($member_info['select_course']);
 
   // コンテンツ取得
   $news_model = new NewsModel();
@@ -20,6 +31,10 @@
     exit;
   } else {
     $news = $news[0];
+    if (!$news_model->isVisibleForCourse($news, $course_filter)) {
+      header("Location: index.php");
+      exit;
+    }
   }
 
 ?><!DOCTYPE html>
