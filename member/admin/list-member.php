@@ -64,6 +64,11 @@
     line-height: 1.4;
     transition: background-color .2s ease, transform .2s ease;
   }
+  .status-toggle-header,
+  .status-toggle-cell {
+    text-align: center;
+    width: 90px;
+  }
   .btn-detail:hover {
     background-color: #1976D2;
     transform: translateY(-1px);
@@ -107,8 +112,8 @@
       <tr>
         <th style="width: 30px;">ID</th>
         <th>名前</th>
-        <th>コース</th>
         <th>ログインメールアドレス</th>
+        <th class="status-toggle-header">コース</th>
         <th style="width: 50px;">詳細</th>
         <!--th>アカウント連絡</th-->
       </tr>
@@ -117,7 +122,8 @@
       <tr>
         <td><?php echo $member['member_id']; ?></td>
         <td><?php echo htmlspecialchars($member['member_name'], ENT_QUOTES, 'UTF-8'); ?></td>
-        <td>
+        <td><?php echo htmlspecialchars($member['login_mail'], ENT_QUOTES, 'UTF-8'); ?></td>
+        <td class="status-toggle-cell">
           <?php
             $course_value = (int)$member['select_course'];
             $course_name = 'アドバンス';
@@ -132,7 +138,6 @@
           ?>
           <span class="<?php echo $course_class; ?>"><?php echo htmlspecialchars($course_name, ENT_QUOTES, 'UTF-8'); ?></span>
         </td>
-        <td><?php echo htmlspecialchars($member['login_mail'], ENT_QUOTES, 'UTF-8'); ?></td>
         <td style="text-align:center"><button type="button" class="btn-detail" onclick="location.href='edit-member.php?mid=<?php echo $member['member_id']; ?>'">詳細</button></td>
         <!--td>
 

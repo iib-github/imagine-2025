@@ -167,8 +167,8 @@
         <th style="width: 30px;">ID</th>
         <th>カテゴリー</th>
         <th>タイトル</th>
-        <th>対象コース</th>
         <th>公開日</th>
+        <th class="status-toggle-header">対象コース</th>
         <th class="status-toggle-header">表示 / 非表示</th>
         <th style="width: 50px;">詳細</th>
       </tr>
@@ -177,7 +177,8 @@
         <td><?php echo $sub['sub_id']; ?></td>
         <td><?php echo htmlspecialchars(isset($category_map[$sub['category_id']]) ? $category_map[$sub['category_id']] : '未設定', ENT_QUOTES, 'UTF-8'); ?></td>
         <td><?php echo htmlspecialchars($sub['content_title'], ENT_QUOTES, 'UTF-8'); ?></td>
-        <td>
+        <td><?php echo htmlspecialchars($sub["pub_date"], ENT_QUOTES, 'UTF-8'); ?></td>
+        <td class="status-toggle-cell">
           <?php
             $target_course = !empty($sub['target_course']) ? $sub['target_course'] : 'advance';
             $course_name = 'アドバンス';
@@ -200,7 +201,6 @@
           ?>
           <span class="<?php echo $course_class; ?>"><?php echo htmlspecialchars($course_name, ENT_QUOTES, 'UTF-8'); ?></span>
         </td>
-        <td><?php echo htmlspecialchars($sub["pub_date"], ENT_QUOTES, 'UTF-8'); ?></td>
         <td class="status-toggle-cell">
           <form class="status-toggle-form" method="POST" action="toggle-sub-status.php">
             <input type="hidden" name="sub_id" value="<?php echo (int)$sub['sub_id']; ?>">

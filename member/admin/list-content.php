@@ -346,9 +346,9 @@
         <th>カテゴリー</th>
         <th>Week</th>
         <th>タイトル</th>
-        <th>対象コース</th>
         <th>タグ</th>
         <th>公開日</th>
+        <th class="status-toggle-header">対象コース</th>
         <th class="status-toggle-header">表示 / 非表示</th>
         <th style="width: 50px;">詳細</th>
       </tr>
@@ -359,6 +359,16 @@
         <td><?php echo $content['content_week']; ?></td>
         <td><?php echo htmlspecialchars($content['content_title'], ENT_QUOTES, 'UTF-8'); ?></td>
         <td>
+          <?php if(!empty($content['tags'])): ?>
+            <?php foreach($content['tags'] as $tag): ?>
+              <span style="background-color: #e3f2fd; padding: 2px 6px; margin: 1px; border-radius: 3px; font-size: 0.8em;"><?php echo htmlspecialchars($tag['tag_name'], ENT_QUOTES, 'UTF-8'); ?></span>
+            <?php endforeach; ?>
+          <?php else: ?>
+            <span style="color: #999;">タグなし</span>
+          <?php endif; ?>
+        </td>
+        <td><?php echo htmlspecialchars($content["pub_date"], ENT_QUOTES, 'UTF-8'); ?></td>
+        <td class="status-toggle-cell">
           <?php
             $course_code = isset($content['target_course']) ? $content['target_course'] : ContentModel::TARGET_COURSE_ADVANCE;
             $course_name = $content_model->getCourseName($course_code);
@@ -371,16 +381,6 @@
           ?>
           <span class="<?php echo $course_class; ?>"><?php echo htmlspecialchars($course_name, ENT_QUOTES, 'UTF-8'); ?></span>
         </td>
-        <td>
-          <?php if(!empty($content['tags'])): ?>
-            <?php foreach($content['tags'] as $tag): ?>
-              <span style="background-color: #e3f2fd; padding: 2px 6px; margin: 1px; border-radius: 3px; font-size: 0.8em;"><?php echo htmlspecialchars($tag['tag_name'], ENT_QUOTES, 'UTF-8'); ?></span>
-            <?php endforeach; ?>
-          <?php else: ?>
-            <span style="color: #999;">タグなし</span>
-          <?php endif; ?>
-        </td>
-        <td><?php echo htmlspecialchars($content["pub_date"], ENT_QUOTES, 'UTF-8'); ?></td>
         <td class="status-toggle-cell">
           <form class="status-toggle-form" method="POST" action="toggle-content-status.php">
             <input type="hidden" name="content_id" value="<?php echo (int)$content['content_id']; ?>">

@@ -153,8 +153,7 @@
         <th style="width: 30px;">ID</th>
         <th>お知らせ日時(公開日時)</th>
         <th>タイトル</th>
-        <th>対象コース</th>
-        <th>公開日</th>
+        <th class="status-toggle-header">対象コース</th>
         <th class="status-toggle-header">表示 / 非表示</th>
         <th style="width: 50px;">詳細</th>
       </tr>
@@ -164,7 +163,7 @@
         <td><?php echo $n['id']; ?></td>
         <td><?php echo htmlspecialchars(mb_substr($n['note_date'], 0, 10), ENT_QUOTES, 'UTF-8'); ?></td>
         <td><?php echo htmlspecialchars($n['description'], ENT_QUOTES, 'UTF-8'); ?></td>
-        <td>
+        <td class="status-toggle-cell">
           <?php
             $target_course = isset($n['target_course']) ? strtolower(trim($n['target_course'])) : '';
             if ($target_course === '') {
@@ -188,7 +187,6 @@
           ?>
           <span class="<?php echo $course_class; ?>"><?php echo htmlspecialchars($course_name, ENT_QUOTES, 'UTF-8'); ?></span>
         </td>
-        <td><?php echo htmlspecialchars(mb_substr($n['note_date'], 0, 10), ENT_QUOTES, 'UTF-8'); ?></td>
         <td class="status-toggle-cell">
           <form class="status-toggle-form" method="POST" action="toggle-news-status.php">
             <input type="hidden" name="news_id" value="<?php echo (int)$n['id']; ?>">
