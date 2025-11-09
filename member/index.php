@@ -115,12 +115,38 @@ if ($theme === 'blue') {
 <title>THE Imagine Membersサイト</title>
 <link rel="apple-touch-icon" href="/common/img/apple-touch-icon.png">
 <link href="common/css/main.css?date=201707132215" rel="stylesheet">
+<style>
+  #MV {
+    position: relative;
+    overflow: hidden;
+  }
+.mv-video-wrapper {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  background: url('common/img/bg01.png') center/cover no-repeat;
+}
+.mv-video-wrapper video {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 0;
+  }
+  #MV .Cnt {
+    position: relative;
+    z-index: 1;
+  }
+</style>
 <!--[if lt IE 9]>
 <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
 <script src="common/js/respond.min.js"></script>
 <![endif]-->
 <!--[if IE 6]><script src="common/js/minmax.js"></script><![endif]-->
-<script type="text/javascript">
+<!-- <script type="text/javascript">
 window.onload = function(){
 var url=[];
 url[0] = 'bg01.png';
@@ -132,7 +158,7 @@ var n = Math.floor(Math.random() * url.length);
 var elm = document.getElementById('MV');
 elm.style.backgroundImage = 'url(common/img/' + url[n] + ')';
 }
-</script>
+</script> -->
 <?php include 'tmp/analytics.php';?>
 </head>
 
@@ -145,6 +171,11 @@ elm.style.backgroundImage = 'url(common/img/' + url[n] + ')';
 </div>
 <?php endif; ?>
 <section id="MV">
+  <div class="mv-video-wrapper">
+    <video id="mvVideo" autoplay muted loop playsinline preload="auto" poster="common/img/bg01.png">
+      <source src="common/video/mv.mp4" type="video/mp4">
+    </video>
+  </div>
   <div class="Cnt">
     <h1><img src="common/img/login_logo.png" width="320" alt="THE Imagine" loading="lazy" decoding="async"/></h1>
   </div>
@@ -313,6 +344,35 @@ elm.style.backgroundImage = 'url(common/img/' + url[n] + ')';
 </div><!-- /Wrapper -->
 
 <script src="common/js/smoothscroll.js"></script>
+<script>
+  (function() {
+    var video = document.getElementById('mvVideo');
+    if (!video) {
+      return;
+    }
+    var userAgent = window.navigator.userAgent.toLowerCase();
+    if (/firefox\/[0-9]+\./.test(userAgent)) {
+    video.style.display = 'none';
+    var wrapper = video.parentNode;
+    if (wrapper && wrapper.classList.contains('mv-video-wrapper')) {
+      wrapper.style.backgroundImage = "url('common/img/bg01.png')";
+      wrapper.style.backgroundSize = 'cover';
+      wrapper.style.backgroundPosition = 'center';
+    }
+      return;
+    }
+    video.addEventListener('error', function() {
+      video.style.display = 'none';
+    });
+    var playPromise = video.play();
+    if (playPromise !== undefined) {
+      playPromise.catch(function() {
+        video.style.display = 'none';
+        video.style.pointerEvents = 'none';
+      });
+    }
+  })();
+</script>
 <?php if($show_login_splash): ?>
 <script>
   (function(){
