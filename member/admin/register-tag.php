@@ -1,4 +1,7 @@
 <?php
+//エラー
+ini_set('display_errors', 1);
+error_reporting(E_ALL);
 require_once dirname(__FILE__) . '/../scripts/Session.class.php';
 require_once dirname(__FILE__) . '/../scripts/model/TagModel.class.php';
 
@@ -32,9 +35,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
   if(empty($errors)) {
     $tag_data = array(
       'tag_name' => $_POST['tag_name'],
-      'tag_description' => $_POST['tag_description'],
-      'created_date' => date('Y-m-d H:i:s'),
-      'modified_date' => date('Y-m-d H:i:s')
+      'tag_description' => $_POST['tag_description']
     );
 
     $success = $tag_model->registerTag($tag_data);
@@ -98,8 +99,6 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
           </td>
         </tr>
       </table>
-      <p><input type="submit" id="btnRegisterBottom" class="Btn" value="登録" name="register"></p>
-      <p><input type="button" class="Btn" value="一覧に戻る" onclick="location.href='list-tag.php'"></p>
     </form>
   </div><!-- /INBOX -->
 </div>

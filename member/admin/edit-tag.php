@@ -30,48 +30,58 @@ if($_SERVER["REQUEST_METHOD"] == "GET") {
     exit;
   }
 } else { // POST時
-  // バリデーション
-  if(empty($_POST['tag_name'])) {
-    $errors[] = 'タグ名は必須です。';
-  } elseif(strlen($_POST['tag_name']) > 50) {
-    $errors[] = 'タグ名は50文字以内で入力してください。';
-  }
-
-  if(!empty($_POST['tag_description']) && strlen($_POST['tag_description']) > 500) {
-    $errors[] = 'タグの説明は500文字以内で入力してください。';
-  }
-
-  // 名前の重複チェック（自分自身は除外）
-  $existing_tag = $tag_model->getTagByName($_POST['tag_name']);
-  if(!empty($existing_tag) && $existing_tag['tag_id'] != $_POST['tag_id']) {
-    $errors[] = 'このタグ名は既に使用されています。';
-  }
-
-  // エラーがなければ更新
-  if(empty($errors)) {
-    $update_data = array(
-      'tag_name' => $_POST['tag_name'],
-      'tag_description' => $_POST['tag_description'],
-      'modified_date' => date('Y-m-d H:i:s')
-    );
-
-    $where_data = array('tag_id' => $_POST['tag_id']);
-    $success = $tag_model->updateTag($update_data, $where_data);
-    
-    if($success) {
-      header("Location: list-tag.php?status=updated");
+  if(isset($_POST['delete'])) {
+    $delete_id = isset($_POST['tag_id']) ? (int)$_POST['tag_id'] : 0;
+    if($delete_id && $tag_model->deleteTag($delete_id)) {
+      header("Location: list-tag.php?status=deleted");
       exit;
-    } else {
-      $errors[] = 'タグの更新に失敗しました。';
     }
+    $errors[] = 'タグの削除に失敗しました。';
+    $tag = $tag_model->getTagById($delete_id);
+  } else {
+    // バリデーション
+    if(empty($_POST['tag_name'])) {
+      $errors[] = 'タグ名は必須です。';
+    } elseif(strlen($_POST['tag_name']) > 50) {
+      $errors[] = 'タグ名は50文字以内で入力してください。';
+    }
+
+    if(!empty($_POST['tag_description']) && strlen($_POST['tag_description']) > 500) {
+      $errors[] = 'タグの説明は500文字以内で入力してください。';
+    }
+
+    // 名前の重複チェック（自分自身は除外）
+    $existing_tag = $tag_model->getTagByName($_POST['tag_name']);
+    if(!empty($existing_tag) && $existing_tag['tag_id'] != $_POST['tag_id']) {
+      $errors[] = 'このタグ名は既に使用されています。';
+    }
+
+    // エラーがなければ更新
+    if(empty($errors)) {
+      $update_data = array(
+        'tag_name' => $_POST['tag_name'],
+        'tag_description' => $_POST['tag_description'],
+        'modified_date' => date('Y-m-d H:i:s')
+      );
+
+      $where_data = array('tag_id' => $_POST['tag_id']);
+      $success = $tag_model->updateTag($update_data, $where_data);
+      
+      if($success) {
+        header("Location: list-tag.php?status=updated");
+        exit;
+      } else {
+        $errors[] = 'タグの更新に失敗しました。';
+      }
+    }
+    
+    // POST時の表示用に取得
+    $tag = array(
+      'tag_id' => $_POST['tag_id'],
+      'tag_name' => $_POST['tag_name'],
+      'tag_description' => $_POST['tag_description']
+    );
   }
-  
-  // POST時の表示用に取得
-  $tag = array(
-    'tag_id' => $_POST['tag_id'],
-    'tag_name' => $_POST['tag_name'],
-    'tag_description' => $_POST['tag_description']
-  );
 }
 
 // 使用回数を取得
@@ -86,6 +96,15 @@ $use_count = $tag_model->getTagUseCount($tag['tag_id']);
 <title>タグ編集 | ADMIN THE Imagine</title>
 <link href="common/css/reset.css" rel="stylesheet" type="text/css" media="all" />
 <link href="common/css/style.css" rel="stylesheet" type="text/css" media="all" />
+<style>
+  .btn-delete{
+    background-color:#f44336!important;
+    color:#fff;
+  }
+  .btn-delete:hover{
+    background-color:#d32f2f;
+  }
+</style>
 </head>
 
 <body>
@@ -110,7 +129,10 @@ $use_count = $tag_model->getTagUseCount($tag['tag_id']);
 ?>
 
     <form method="POST" action="edit-tag.php">
-      <p><input type="submit" id="btnUpdate" class="Btn" value="更新" name="update"></p>
+      <p style="display:flex; gap:12px;">
+        <input type="submit" id="btnUpdate" class="Btn" value="更新" name="update">
+        <button type="submit" id="btnDelete" class="Btn btn-delete" name="delete" value="1">削除</button>
+      </p>
       <input type="hidden" name="tag_id" value="<?php echo htmlspecialchars($tag['tag_id']); ?>">
       <table class="member">
       <tr>
@@ -156,6 +178,19 @@ $use_count = $tag_model->getTagUseCount($tag['tag_id']);
 .toast-notice.show{opacity:1;transform:translateY(0);}
 </style>
 <?php endif; ?>
+
+<script>
+  (function(){
+    var deleteBtn = document.getElementById('btnDelete');
+    if(!deleteBtn) return;
+    deleteBtn.addEventListener('click', function(event){
+      var msg = 'このタグを削除します。よろしいですか？\n※このタグが付与されているコンテンツからもタグ情報が削除されます。';
+      if(!confirm(msg)){
+        event.preventDefault();
+      }
+    });
+  })();
+</script>
 
 </body>
 </html>
