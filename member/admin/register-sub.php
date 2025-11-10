@@ -1,7 +1,7 @@
 <?php
   require_once dirname(__FILE__) . '/../scripts/Session.class.php';
-  require_once dirname(__FILE__) . '/../scripts/model/SubModel.class.php';
-  require_once dirname(__FILE__) . '/../scripts/model/CategoryModel.class.php';
+require_once dirname(__FILE__) . '/../scripts/model/SubModel.class.php';
+require_once dirname(__FILE__) . '/../scripts/model/CategoryModel.class.php';
   $session = Session::getInstance();
 
   // セッションがなければログイン画面に遷移させる。

@@ -39,48 +39,48 @@ if($_SERVER["REQUEST_METHOD"] == "GET") {
     $errors[] = 'タグの削除に失敗しました。';
     $tag = $tag_model->getTagById($delete_id);
   } else {
-    // バリデーション
-    if(empty($_POST['tag_name'])) {
-      $errors[] = 'タグ名は必須です。';
-    } elseif(strlen($_POST['tag_name']) > 50) {
-      $errors[] = 'タグ名は50文字以内で入力してください。';
-    }
+  // バリデーション
+  if(empty($_POST['tag_name'])) {
+    $errors[] = 'タグ名は必須です。';
+  } elseif(strlen($_POST['tag_name']) > 50) {
+    $errors[] = 'タグ名は50文字以内で入力してください。';
+  }
 
-    if(!empty($_POST['tag_description']) && strlen($_POST['tag_description']) > 500) {
-      $errors[] = 'タグの説明は500文字以内で入力してください。';
-    }
+  if(!empty($_POST['tag_description']) && strlen($_POST['tag_description']) > 500) {
+    $errors[] = 'タグの説明は500文字以内で入力してください。';
+  }
 
-    // 名前の重複チェック（自分自身は除外）
-    $existing_tag = $tag_model->getTagByName($_POST['tag_name']);
-    if(!empty($existing_tag) && $existing_tag['tag_id'] != $_POST['tag_id']) {
-      $errors[] = 'このタグ名は既に使用されています。';
-    }
+  // 名前の重複チェック（自分自身は除外）
+  $existing_tag = $tag_model->getTagByName($_POST['tag_name']);
+  if(!empty($existing_tag) && $existing_tag['tag_id'] != $_POST['tag_id']) {
+    $errors[] = 'このタグ名は既に使用されています。';
+  }
 
-    // エラーがなければ更新
-    if(empty($errors)) {
-      $update_data = array(
-        'tag_name' => $_POST['tag_name'],
-        'tag_description' => $_POST['tag_description'],
-        'modified_date' => date('Y-m-d H:i:s')
-      );
-
-      $where_data = array('tag_id' => $_POST['tag_id']);
-      $success = $tag_model->updateTag($update_data, $where_data);
-      
-      if($success) {
-        header("Location: list-tag.php?status=updated");
-        exit;
-      } else {
-        $errors[] = 'タグの更新に失敗しました。';
-      }
-    }
-    
-    // POST時の表示用に取得
-    $tag = array(
-      'tag_id' => $_POST['tag_id'],
+  // エラーがなければ更新
+  if(empty($errors)) {
+    $update_data = array(
       'tag_name' => $_POST['tag_name'],
-      'tag_description' => $_POST['tag_description']
+      'tag_description' => $_POST['tag_description'],
+      'modified_date' => date('Y-m-d H:i:s')
     );
+
+    $where_data = array('tag_id' => $_POST['tag_id']);
+    $success = $tag_model->updateTag($update_data, $where_data);
+    
+    if($success) {
+        header("Location: list-tag.php?status=updated");
+      exit;
+    } else {
+      $errors[] = 'タグの更新に失敗しました。';
+    }
+  }
+  
+  // POST時の表示用に取得
+  $tag = array(
+    'tag_id' => $_POST['tag_id'],
+    'tag_name' => $_POST['tag_name'],
+    'tag_description' => $_POST['tag_description']
+  );
   }
 }
 
