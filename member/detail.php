@@ -308,9 +308,6 @@
         ?>
         <h2>
           <span><?php echo htmlspecialchars($category_title, ENT_QUOTES, 'UTF-8'); ?></span>
-          <?php if ($should_show_week): ?>
-            Week<?php echo htmlspecialchars($content['content_week'], ENT_QUOTES, 'UTF-8'); ?> :
-          <?php endif; ?>
           <?php echo $content['content_title']; ?>
         </h2>
         <div class="Block">
@@ -516,9 +513,6 @@
                         <img src="<?php echo htmlspecialchars($oth, ENT_QUOTES, 'UTF-8'); ?>" width="217" height="150" loading="lazy" decoding="async" alt=""/>
                       </picture>
                     <div class="txt">
-                      <?php if ($use_week && !empty($cont['content_week'])): ?>
-                      <div class="number">Week <?php echo $cont['content_week']; ?></div>
-                      <?php endif; ?>
                       <div class="title"><?php echo $cont['content_title']; ?></div>
                       <div class="summery"><?php echo $cont['content_text']; ?></div>
                     </div>

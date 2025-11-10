@@ -155,7 +155,6 @@ $all_tags = $tag_model->getTagList(null, array('tag_id' => BaseModel::ORDER_ASC)
                     <div class="category-label">
                       <?php echo htmlspecialchars($category_title, ENT_QUOTES, 'UTF-8'); ?>
                     </div>
-                    <div class="number">Week <?php echo $content['content_week']; ?></div>
                     <div class="title"><?php echo htmlspecialchars($content['content_title'], ENT_QUOTES, 'UTF-8'); ?></div>
                     <div class="summery"><?php echo strip_tags($content['content_text']); ?></div>
                   </div>

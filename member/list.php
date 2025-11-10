@@ -209,9 +209,6 @@ foreach ($completed_records as $record) {
               </div>
               <div class="txt">
                 <div class="label-row">
-                  <?php if ($category_use_week && !empty($c['content_week'])): ?>
-                  <div class="number">Week <?php echo $c['content_week']; ?></div>
-                  <?php endif; ?>
                   <?php
                     $is_completed = isset($completed_content_map[(int)$c['content_id']]);
                     $status_label = $is_completed ? '視聴済み' : '未視聴';
