@@ -15,19 +15,32 @@
   }
 
   $member_id = $session->get('member');
+  $csrf_token = $session->getCsrfToken('contact_csrf');
+  $errMsg = '';
 
   if($_SERVER["REQUEST_METHOD"] == "POST") {
-    if(empty($_POST['f_text'])) {
-      $errMsg = '※入力必須項目です。';
+    $posted_token = isset($_POST['csrf_token']) ? $_POST['csrf_token'] : '';
+    $handle_value = isset($_POST['f_handle']) ? trim($_POST['f_handle']) : '';
+    $text_value = isset($_POST['f_text']) ? trim($_POST['f_text']) : '';
+
+    if(!$session->validateCsrfToken($posted_token, 'contact_csrf')) {
+      $errMsg = 'セッションの有効期限が切れました。もう一度お試しください。';
+      $session->clear('contact_csrf');
+      $csrf_token = $session->getCsrfToken('contact_csrf');
     } else {
-      if(sendInquiry($session->get('member'), $_POST['f_handle'], $_POST['f_text'])) {
+      if(sendInquiry($session->get('member'), $handle_value, $text_value)) {
+        $session->clear('contact_csrf');
         header("Location: complete.php");
         exit;
+      } else {
+        $errMsg = '送信に失敗しました。時間を置いて改めてお試しください。';
       }
     }
   }
-
-?><!DOCTYPE html>
+  $form_handle_value = '';
+  $form_text_value = '';
+?>
+<!DOCTYPE html>
 <html>
 <head>
 <meta charset="UTF-8" >
@@ -109,16 +122,17 @@
 
 <h3 style="margin-top:3rem;">ご質問フォーム</h3>
           <form method="POST" action="#inquiry" name="inquiry" id="inquiry">
+            <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($csrf_token, ENT_QUOTES, 'UTF-8'); ?>">
             <div class="sec">
               <p><strong>お名前</strong>　<span class="red"><sup>*</sup>必須</span> ハンドルネームでも可能（ライブ配信時にこちらのお名前にてお呼びします）</sup></p>
-              <p><input type="text" name="f_handle" value="" required></p>
+              <p><input type="text" name="f_handle" value="<?php echo $form_handle_value; ?>" required></p>
             </div>
             <div class="sec">
               <p><strong>お問合せ内容</strong>　<span class="red"><sup>*</sup>必須</span></p>
-              <?php if(isset($errMsg)): ?>
+              <?php if(isset($errMsg) && $errMsg !== ''): ?>
               <p class="red"><?php echo $errMsg; ?></p>
               <?php endif; ?>
-              <p><textarea name="f_text" rows="10" required><?php if(isset($_POST['back_text'])) echo $_POST['back_text']; ?></textarea></p>
+              <p><textarea name="f_text" rows="10" required><?php echo $form_text_value; ?></textarea></p>
             </div>
             <div id="btn-sendMail">
               <input type="submit" value="入力内容送信">
@@ -148,45 +162,22 @@
 </div>
 <!-- /Wrapper -->
 <script src="../common/js/smoothscroll.js"></script>
+<script src="../common/js/mv-video.js"></script>
 <script>
   (function() {
-    var video = document.getElementById('mvVideo');
-    if (!video) {
-      return;
-    }
+    var form = document.getElementById('inquiry');
+    if (!form) return;
 
-    var wrapper = video.parentNode;
-    var fallback = function() {
-      if (!video) return;
-      video.pause();
-      video.removeAttribute('src');
-      video.load();
-      video.style.display = 'none';
-      video.style.pointerEvents = 'none';
-      if (wrapper && wrapper.classList.contains('mv-video-wrapper')) {
-        wrapper.style.backgroundImage = "url('../common/img/bg01.png')";
-        wrapper.style.backgroundSize = 'cover';
-        wrapper.style.backgroundPosition = 'center';
-        wrapper.classList.add('mv-video-fallback');
+    form.addEventListener('submit', function(event) {
+      if (!form.checkValidity()) {
+        event.preventDefault();
+        form.reportValidity();
+        return;
       }
-    };
-
-    var userAgent = window.navigator.userAgent.toLowerCase();
-    if (/firefox\/[0-9]+\./.test(userAgent)) {
-      fallback();
-      return;
-    }
-
-    video.addEventListener('error', fallback);
-    video.addEventListener('stalled', fallback);
-    video.addEventListener('emptied', fallback);
-
-    var playPromise = video.play();
-    if (playPromise && typeof playPromise.catch === 'function') {
-      playPromise.catch(function() {
-        fallback();
-      });
-    }
+      if (!window.confirm('送信してよろしいですか？')) {
+        event.preventDefault();
+      }
+    });
   })();
 </script>
 </body>

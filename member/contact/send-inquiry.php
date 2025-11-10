@@ -7,6 +7,16 @@ require_once dirname(__FILE__) . '/../scripts/model/ContactModel.class.php';
 loadEnv();
 
 function sendInquiry($mid, $category, $content) {
+  $log_path = env('CONTACT_LOG_PATH', '');
+  $logger = function($message) use ($log_path) {
+    $prefix = '[ContactInquiry] ' . date('c') . ' ';
+    if (!empty($log_path)) {
+      error_log($prefix . $message . PHP_EOL, 3, $log_path);
+    } else {
+      error_log($prefix . $message);
+    }
+  };
+
   // メンバー情報取得
   $member_model = new MemberModel();
   $member = $member_model->select(array('member_id'=>$mid));
@@ -23,6 +33,9 @@ function sendInquiry($mid, $category, $content) {
     'text' => $content,
   );
   $success = $contact_model->registerContact($data);
+  if(!$success) {
+    $logger("Failed to register contact in database (member_id={$mid}).");
+  }
 
   //文字コード設定
   mb_language("Japanese");
@@ -58,6 +71,9 @@ ${content}
 ";
 
   $mail_result = mb_send_mail($to, $subject, $body, $header);
+  if(!$mail_result) {
+    $logger("Failed to send inquiry mail (to={$to}, member_id={$mid}).");
+  }
 
   // Chatwork通知設定
   $chatwork_token = env('CHATWORK_API_TOKEN', '');
@@ -82,8 +98,18 @@ ${content}
     curl_setopt($ch, CURLOPT_HTTPHEADER, array(
       'X-ChatWorkToken: ' . $chatwork_token,
     ));
-    curl_exec($ch);
+    $response = curl_exec($ch);
+    $curl_errno = curl_errno($ch);
+    $http_status = curl_getinfo($ch, CURLINFO_HTTP_CODE);
     curl_close($ch);
+
+    if($response === false || $curl_errno !== 0) {
+      $logger("Failed to post inquiry to Chatwork (member_id={$mid}, curl_errno={$curl_errno}).");
+    } elseif($http_status < 200 || $http_status >= 300) {
+      $logger("Chatwork API returned status {$http_status} for member_id={$mid}. response={$response}");
+    }
+  } else {
+    $logger("Chatwork notification skipped (missing token or room id).");
   }
 
   return $mail_result;

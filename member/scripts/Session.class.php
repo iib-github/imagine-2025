@@ -45,4 +45,20 @@
     {
       var_dump($_SESSION);
     }
+
+    public function getCsrfToken($key = 'csrf_token')
+    {
+      if (empty($_SESSION[$key]) || !is_string($_SESSION[$key])) {
+        $_SESSION[$key] = bin2hex(random_bytes(32));
+      }
+      return $_SESSION[$key];
+    }
+
+    public function validateCsrfToken($token, $key = 'csrf_token')
+    {
+      if (!isset($_SESSION[$key]) || !is_string($token)) {
+        return false;
+      }
+      return hash_equals($_SESSION[$key], $token);
+    }
   }
