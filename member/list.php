@@ -45,6 +45,9 @@ require_once dirname(__FILE__) . '/scripts/model/MemberContentRelation.class.php
     ? $category['category_title']
     : 'Lesson' . $category['category_number'];
   $category_use_week = !isset($category['use_week_flag']) || (int)$category['use_week_flag'] === 1;
+  $category_description_raw = isset($category['content_text']) ? trim($category['content_text']) : '';
+  $has_category_description = (mb_strlen(strip_tags($category_description_raw)) > 0);
+  $photo_margin_class = $has_category_description ? '' : ' category_photo--compact';
 
   // アクセス制限: ベーシックユーザーがアドバンス専用カテゴリを閲覧できないようにする
   $category_target_course = isset($category['target_course']) ? $category['target_course'] : ContentModel::TARGET_COURSE_ADVANCE;
@@ -125,6 +128,9 @@ foreach ($completed_records as $record) {
   }
   .status-label--complete{background:#4CAF50;}
   .status-label--incomplete{background:#9e9e9e;}
+  .category_description--empty {
+    margin: 0 !important;
+  }
 </style>
 <!--[if lt IE 9]>
 <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
@@ -145,7 +151,7 @@ foreach ($completed_records as $record) {
       <section id="ContentsDetail">
         <h2><?php echo htmlspecialchars($category_title, ENT_QUOTES, 'UTF-8'); ?></h2>
         <div class="Block">
-          <p class="Photo">
+          <p class="Photo<?php echo $photo_margin_class; ?>">
             <?php
               $hdr = $category['category_list_img'];
               $piH = pathinfo($hdr);
@@ -170,8 +176,10 @@ foreach ($completed_records as $record) {
               <img src="<?php echo htmlspecialchars($hdr, ENT_QUOTES, 'UTF-8'); ?>" width="712" height="251" loading="lazy" decoding="async" alt=""/>
             </picture>
           </p>
-          <div class="txt">
-            <p><?php echo nl2br($category['content_text']);?></p>
+          <div class="txt<?php echo $has_category_description ? '' : ' category_description--empty'; ?>">
+            <?php if ($has_category_description): ?>
+            <p><?php echo nl2br($category_description_raw);?></p>
+            <?php endif; ?>
           </div>
         </div>
       </section>

@@ -1069,3 +1069,9 @@ select:-moz-focusring {
   padding-left: 15px;
   border-left: 2px solid #ddd;
 }
+.category_description--empty {
+  margin: 0 !important;
+}
+.Photo.category_photo--compact {
+  margin-bottom: 0 !important;
+}
