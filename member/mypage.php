@@ -16,6 +16,8 @@
   $member = $member_list[0];
   $mail = $member['login_mail'];
   $password = $member['login_password'];
+  $course_value = isset($member['select_course']) ? (int)$member['select_course'] : null;
+  $course_label = $member_model->getMemberCourseName($course_value);
 
   if($_SERVER["REQUEST_METHOD"] == "POST") {
     // バリデーション用にデータを加工
@@ -65,6 +67,32 @@
 <meta name="viewport" content="width=device-width">
 <link rel="apple-touch-icon" href="/common/img/apple-touch-icon.png">
 <link href="common/css/main.css" rel="stylesheet">
+<style>
+  #MV {
+    position: relative;
+    overflow: hidden;
+  }
+  .mv-video-wrapper {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    background: url('common/img/bg01.png') center/cover no-repeat;
+  }
+  .mv-video-wrapper video {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 0;
+  }
+  #MV .Cnt {
+    position: relative;
+    z-index: 1;
+  }
+</style>
 <!--[if lt IE 9]>
 <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
 <script src="common/js/respond.min.js"></script>
@@ -75,6 +103,11 @@
 
 <body>
 <section id="MV">
+  <div class="mv-video-wrapper">
+    <video id="mvVideo" autoplay muted loop playsinline preload="auto" poster="common/img/bg01.png">
+      <source src="common/video/mv.mp4" type="video/mp4">
+    </video>
+  </div>
   <div class="Cnt">
     <h1><img src="common/img/login_logo.png" width="320" alt="THE Imagine"/></h1>
   </div>
@@ -99,6 +132,10 @@
               <dt><strong>パスワード</strong></dt>
               <dd><?php echo $password; ?></dd>
             </dl>
+            <dl>
+              <dt><strong>対象コース</strong></dt>
+              <dd><?php echo htmlspecialchars($course_label, ENT_QUOTES, 'UTF-8'); ?></dd>
+            </dl>
           </div>
         </div>
       </section>
@@ -113,5 +150,34 @@
 </div>
 <!-- /Wrapper -->
 <script src="common/js/smoothscroll.js"></script>
+<script>
+  (function() {
+    var video = document.getElementById('mvVideo');
+    if (!video) {
+      return;
+    }
+    var userAgent = window.navigator.userAgent.toLowerCase();
+    if (/firefox\/[0-9]+\./.test(userAgent)) {
+      video.style.display = 'none';
+      var wrapper = video.parentNode;
+      if (wrapper && wrapper.classList.contains('mv-video-wrapper')) {
+        wrapper.style.backgroundImage = "url('common/img/bg01.png')";
+        wrapper.style.backgroundSize = 'cover';
+        wrapper.style.backgroundPosition = 'center';
+      }
+      return;
+    }
+    video.addEventListener('error', function() {
+      video.style.display = 'none';
+    });
+    var playPromise = video.play();
+    if (playPromise !== undefined) {
+      playPromise.catch(function() {
+        video.style.display = 'none';
+        video.style.pointerEvents = 'none';
+      });
+    }
+  })();
+</script>
 </body>
 </html>

@@ -1,7 +1,4 @@
 <?php
-//エラー
-ini_set('display_errors', 1);
-error_reporting(E_ALL);
 require_once dirname(__FILE__) . '/../scripts/Session.class.php';
 require_once dirname(__FILE__) . '/../scripts/model/TagModel.class.php';
 

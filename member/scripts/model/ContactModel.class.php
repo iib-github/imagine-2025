@@ -20,17 +20,15 @@
       // TODO orderのintチェック、桁数チェック
       // TODO order重複チェック
 
-      if(empty($data['contact_id'])) {
+      if(empty($data['id'])) {
         // insert時
-        // insertしたレコードのIDを取得
         parent::insert($data);
-        $contact_id = $this->lastInsertId();
-      } else {
-        // update時
-        $contact_id = $data['contact_id'];
+        return true;
       }
 
-      return parent::update($data, array('contact_id' => $contact_id));
+      // update時
+      $contact_id = $data['id'];
+      return parent::update($data, array('id' => $contact_id));
     }
 
 

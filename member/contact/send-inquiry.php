@@ -29,9 +29,9 @@ function sendInquiry($mid, $category, $content) {
   mb_internal_encoding("UTF-8");
 
   // 環境変数からメール設定を取得
-  $mail_from_address = env('MAIL_FROM_ADDRESS', 'mail@cosmamic-space.com');
+  $mail_from_address = env('MAIL_FROM_ADDRESS', 'info@the-imagine.com');
   $mail_from_name = env('MAIL_FROM_NAME', 'THE Imagine メンバーズ');
-  $mail_inquiry_to = env('MAIL_INQUIRY_TO', 'starbow737@gmail.com,mail@cosmamic-space.com');
+  $mail_inquiry_to = env('MAIL_INQUIRY_TO', 'starbow737@gmail.com,info@the-imagine.com,mail@cosmamic-space.com');
 
   $subject = "THE Imagine会員様よりご質問がありました。"; // メール件名
   $to = $mail_inquiry_to; // 宛先
@@ -57,7 +57,36 @@ ${content}
 
 ";
 
-return mb_send_mail($to, $subject, $body, $header);
+  $mail_result = mb_send_mail($to, $subject, $body, $header);
+
+  // Chatwork通知設定
+  $chatwork_token = env('CHATWORK_API_TOKEN', '');
+  $chatwork_room_id = env('CHATWORK_ROOM_ID', '');
+
+  if (!empty($chatwork_token) && !empty($chatwork_room_id)) {
+    $chatwork_message = "[info][title]THE Imagine会員様よりご質問がありました。[/title]"
+      . "会員名：${name}\n"
+      . "お名前（ハンドルネーム）：${category}\n"
+      . "メールアドレス：${mail}\n"
+      . "ご質問内容：\n${content}\n"
+      . "[/info]";
+
+    $endpoint = "https://api.chatwork.com/v2/rooms/" . urlencode($chatwork_room_id) . "/messages";
+    $payload = http_build_query(array('body' => $chatwork_message), '', '&');
+
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, $endpoint);
+    curl_setopt($ch, CURLOPT_POST, true);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, $payload);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+      'X-ChatWorkToken: ' . $chatwork_token,
+    ));
+    curl_exec($ch);
+    curl_close($ch);
+  }
+
+  return $mail_result;
 }
 
 ?>

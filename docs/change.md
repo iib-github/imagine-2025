@@ -89,7 +89,7 @@ mail@cosmamic-space.com
 **ファイル**: `member/contact/index.php`
 
 ```97:97:member/contact/index.php
-          <a href="mailto:info@hoshino-wataru.com" style="text-decoration: underline;">info@hoshino-wataru.com</a>（THE Imagine事務局　あお）へご連絡ください。</p>
+          <a href="mailto:info@hoshino-wataru.com" style="text-decoration: underline;">info@hoshino-wataru.com</a>（THE Imagine事務局）へご連絡ください。</p>
 ```
 
 **変更内容**:
