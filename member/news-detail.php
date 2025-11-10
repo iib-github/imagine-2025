@@ -79,7 +79,22 @@
             <?php echo mb_substr($news['note_date'], 0, 10); ?>
           </div>
           <div class="txtBlock">
-            <?php echo nl2br($news['text']);?>
+            <?php
+              $news_text = $news['text'];
+              $pattern = '/(https?:\/\/[^\s<>"\']+)/i';
+              $converted_text = preg_replace_callback($pattern, function($matches) {
+                $url = $matches[1];
+                $escaped_url = htmlspecialchars($url, ENT_QUOTES, 'UTF-8');
+                return '<a href="' . $escaped_url . '" target="_blank" rel="noopener">' . $escaped_url . '</a>';
+              }, $news_text);
+              $email_pattern = '/([a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,})/i';
+              $converted_text = preg_replace_callback($email_pattern, function($matches) {
+                $email = $matches[1];
+                $escaped_email = htmlspecialchars($email, ENT_QUOTES, 'UTF-8');
+                return '<a href="mailto:' . $escaped_email . '">' . $escaped_email . '</a>';
+              }, $converted_text);
+              echo nl2br($converted_text);
+            ?>
           </div>
         </div>
       </section>

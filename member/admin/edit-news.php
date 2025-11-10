@@ -48,7 +48,7 @@ if (!function_exists('formatDatetimeForInput')) {
     }
     return '';
   }
-}
+  }
 
   if($_SERVER["REQUEST_METHOD"] == "POST") {
     $news_id_post = isset($_POST['news_id']) ? (int)$_POST['news_id'] : 0;
