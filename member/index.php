@@ -196,6 +196,7 @@ elm.style.backgroundImage = 'url(common/img/' + url[n] + ')';
           <p class="progress-detail-link"><a href="progress.php">進捗詳細を見る</a></p>
         </div>
       </section> -->
+      <?php if (!empty($news_list)): ?>
       <section id="News">
         <h2>更新情報</h2>
         <div class="Block">
@@ -213,6 +214,7 @@ elm.style.backgroundImage = 'url(common/img/' + url[n] + ')';
           </ul>
         </div>
       </section>
+      <?php endif; ?>
 
       <?php if(!$is_basic_user && !empty($advance_categories)): ?>
       <section id="Bnr" style="margin-bottom: 0;">

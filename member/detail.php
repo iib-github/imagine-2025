@@ -64,6 +64,9 @@
     exit;
   }
 
+  // コンテンツタグ取得
+  $content_tags = $content_model->getContentTags($content['content_id']);
+
   // コンテンツ動画取得
   $content_video_model = new ContentVideoModel();
   $content_videos = $content_video_model->getVideosByContentId($content['content_id']);
@@ -82,6 +85,16 @@
     $where_other_contents['target_course'] = $course_filter;
   }
   $content_list = $content_model->select($where_other_contents, array('content_week'=>ContentModel::ORDER_ASC));
+  $other_contents = array();
+  foreach ($content_list as $cont_item) {
+    if ((int)$cont_item['content_id'] === (int)$content['content_id']) {
+      continue;
+    }
+    if (!empty($content['content_week']) && !empty($cont_item['content_week']) && (int)$cont_item['content_week'] === (int)$content['content_week']) {
+      continue;
+    }
+    $other_contents[] = $cont_item;
+  }
 
 
   // コメント取得
@@ -402,6 +415,21 @@
               <div class="GrayBtn">修了済み</div>
             </div>
           <?php endif; ?>
+          <?php if (!empty($content_tags)): ?>
+          <div class="tag-info" style="margin-top:20px;">
+            <?php
+              $tag_names = array();
+              foreach ($content_tags as $tag) {
+                if (!empty($tag['tag_name'])) {
+                  $tag_names[] = htmlspecialchars($tag['tag_name'], ENT_QUOTES, 'UTF-8');
+                }
+              }
+            ?>
+            <?php if (!empty($tag_names)): ?>
+            <p style="font-size:14px;color:#555;">タグ：<?php echo implode('・', $tag_names); ?></p>
+            <?php endif; ?>
+          </div>
+          <?php endif; ?>
           <?php else: ?>
             <div class="Block" style="text-align: center; padding: 50px 20px; background-color: #fff; border: 1px solid #ddd; border-radius: 5px;">
               <p style="font-size: 1.2em; color: #f44336; margin-bottom: 20px;">このコンテンツを閲覧する権限がありません。</p>
@@ -456,12 +484,11 @@
        </section>
 
 
-      <?php if(empty($content_list)): ?>
+      <?php if(!empty($other_contents)): ?>
       <section id="Quests">
       <h2>その他の授業</h2>
       <ul>
-      <?php foreach($content_list as $cont): ?>
-      <?php if($cont['content_week'] == $content['content_week']) continue; ?>
+      <?php foreach($other_contents as $cont): ?>
                 <li class="Hv">
                   <a href="detail.php?cont_id=<?php echo $cont['content_id']; ?>" style="display: inline;">
                     <div class="thumb">
@@ -500,7 +527,6 @@
       <?php endforeach; ?>
        </ul>
        </section>
-       <?php else: ?>
        <?php endif; ?>
 
     </div>
