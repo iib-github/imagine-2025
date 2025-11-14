@@ -1,8 +1,11 @@
 <?php
+  require_once dirname(__FILE__) . '/scripts/env.php';
   require_once dirname(__FILE__) . '/scripts/Session.class.php';
   require_once dirname(__FILE__) . '/scripts/model/MemberModel.class.php';
   require_once dirname(__FILE__) . '/scripts/model/CategoryModel.class.php';
   require_once dirname(__FILE__) . '/scripts/model/ContentModel.class.php';
+  loadEnv();
+  initializeErrorHandling();
   $session = Session::getInstance();
 
   // セッションがなければログイン画面に遷移させる。
@@ -34,7 +37,11 @@
 
   // 全てのカテゴリー取得
   $category_model = new CategoryModel();
-  $category_list = $category_model->select(array('indicate_flag'=>1), array('category_number'=>$category_model::ORDER_ASC));
+  $category_list = (array)$category_model->select(array('indicate_flag'=>1), array('category_number'=>$category_model::ORDER_ASC));
+  $category_list = array_values(array_filter($category_list, function($category) {
+    $pub_date = isset($category['pub_date']) ? $category['pub_date'] : null;
+    return isPublishableNow($pub_date);
+  }));
   
   $categories_with_progress = [];
   foreach ($category_list as $category) {

@@ -1,9 +1,12 @@
 <?php
+  require_once dirname(__FILE__) . '/scripts/env.php';
   require_once dirname(__FILE__) . '/scripts/Session.class.php';
 require_once dirname(__FILE__) . '/scripts/model/MemberModel.class.php';
 require_once dirname(__FILE__) . '/scripts/model/CategoryModel.class.php';
 require_once dirname(__FILE__) . '/scripts/model/SubModel.class.php';
 require_once dirname(__FILE__) . '/scripts/model/ContentModel.class.php';
+  loadEnv();
+  initializeErrorHandling();
   $session = Session::getInstance();
 
   // セッションがなければログイン画面に遷移させる。
@@ -26,7 +29,11 @@ require_once dirname(__FILE__) . '/scripts/model/ContentModel.class.php';
   $course_filter = $member_model->getCourseFilter($member_info['select_course']);
 
   // サイドバー（レッスン一覧）表示用
-  $category_list = $category_model->select(array('indicate_flag'=>1), array('category_number'=>$category_model::ORDER_ASC));
+  $category_list = (array)$category_model->select(array('indicate_flag'=>1), array('category_number'=>$category_model::ORDER_ASC));
+  $category_list = array_values(array_filter($category_list, function($category) {
+    $pub_date = isset($category['pub_date']) ? $category['pub_date'] : null;
+    return isPublishableNow($pub_date);
+  }));
 
   $number_list = array();
   $title_list = array();
@@ -45,6 +52,10 @@ require_once dirname(__FILE__) . '/scripts/model/ContentModel.class.php';
   $advance_subs = array();
   $basic_subs = array();
   foreach ($subs as $sub) {
+    $sub_pub_date = isset($sub['pub_date']) ? $sub['pub_date'] : null;
+    if (!isPublishableNow($sub_pub_date)) {
+      continue;
+    }
     $target_course = isset($sub['target_course']) ? $sub['target_course'] : ContentModel::TARGET_COURSE_ADVANCE;
     if ($target_course === ContentModel::TARGET_COURSE_BASIC) {
       if ($course_filter === ContentModel::TARGET_COURSE_BASIC || $course_filter === ContentModel::TARGET_COURSE_ADVANCE) {

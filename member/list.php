@@ -39,6 +39,11 @@ require_once dirname(__FILE__) . '/scripts/model/MemberContentRelation.class.php
     exit;
   } else {
     $category = $category[0];
+    $category_pub_date = isset($category['pub_date']) ? $category['pub_date'] : null;
+    if (!isPublishableNow($category_pub_date)) {
+      header("Location: index.php");
+      exit;
+    }
   }
 
   $category_title = !empty($category['category_title'])
@@ -75,6 +80,10 @@ require_once dirname(__FILE__) . '/scripts/model/MemberContentRelation.class.php
   // 会員のコースに基づいてフィルタリング
   $filtered_contents = array();
   foreach ($contents as $content) {
+    $content_pub_date = isset($content['pub_date']) ? $content['pub_date'] : null;
+    if (!isPublishableNow($content_pub_date)) {
+      continue;
+    }
     // target_courseがNULLの場合は常に表示
     if (empty($content['target_course']) || $content['target_course'] === ContentModel::TARGET_COURSE_ADVANCE) {
       $filtered_contents[] = $content;

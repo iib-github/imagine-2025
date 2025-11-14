@@ -1,4 +1,5 @@
 <?php
+  require_once dirname(__FILE__) . '/../env.php';
   require_once dirname(__FILE__) . '/../BaseModel.class.php';
   require_once dirname(__FILE__) . '/../UploadLib.class.php';
   require_once dirname(__FILE__) . '/ContentModel.class.php';
@@ -178,6 +179,9 @@
       $filtered_categories = array();
       
       foreach ($categories as $category) {
+      if (!isPublishableNow(isset($category['pub_date']) ? $category['pub_date'] : null)) {
+        continue;
+      }
         // target_courseが'all'またはNULLの場合は常に表示（旧来のコンテンツ）
         if (empty($category['target_course']) || $category['target_course'] === 'all') {
           $filtered_categories[] = $category;

@@ -44,6 +44,11 @@
     exit;
   } else {
     $content = $content[0];
+    $content_pub_date = isset($content['pub_date']) ? $content['pub_date'] : null;
+    if (!isPublishableNow($content_pub_date)) {
+      header("Location: index.php");
+      exit;
+    }
   }
   
   // 閲覧権限チェック
@@ -74,7 +79,16 @@
   // カテゴリー取得
   $category_model = new CategoryModel();
   $category = $category_model->select(array('category_id'=>$content['category_id']));
+  if (empty($category)) {
+    header("Location: index.php");
+    exit;
+  }
   $category = $category[0];
+  $category_pub_date = isset($category['pub_date']) ? $category['pub_date'] : null;
+  if (!isPublishableNow($category_pub_date)) {
+    header("Location: index.php");
+    exit;
+  }
 
   // カテゴリーに紐づくコンテンツ取得（その他の授業表示用）
   $where_other_contents = array(
@@ -88,6 +102,9 @@
   $other_contents = array();
   foreach ($content_list as $cont_item) {
     if ((int)$cont_item['content_id'] === (int)$content['content_id']) {
+      continue;
+    }
+    if (!isPublishableNow(isset($cont_item['pub_date']) ? $cont_item['pub_date'] : null)) {
       continue;
     }
     if (!empty($content['content_week']) && !empty($cont_item['content_week']) && (int)$cont_item['content_week'] === (int)$content['content_week']) {
@@ -112,7 +129,11 @@
   }
 
   // サイドバー（レッスン一覧）表示用
-  $category_list = $category_model->select(array('indicate_flag'=>1), array('category_number'=>$category_model::ORDER_ASC));
+  $category_list = (array)$category_model->select(array('indicate_flag'=>1), array('category_number'=>$category_model::ORDER_ASC));
+  $category_list = array_values(array_filter($category_list, function($ctg) {
+    $pub_date = isset($ctg['pub_date']) ? $ctg['pub_date'] : null;
+    return isPublishableNow($pub_date);
+  }));
 
   // 達成済みのコンテンツかどうか
   $membContRel = new MemberContentRelation(1);

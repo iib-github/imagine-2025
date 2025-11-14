@@ -1,4 +1,5 @@
 <?php
+  require_once dirname(__FILE__) . '/../env.php';
   require_once dirname(__FILE__) . '/../BaseModel.class.php';
   require_once dirname(__FILE__) . '/../PdoInterface.class.php';
   require_once dirname(__FILE__) . '/../model/CategoryModel.class.php';
@@ -39,42 +40,75 @@
 
       $member_data = $member[0];
       $course_filter = $this->getCourseFilter($member_data['select_course']);
-      $pdo = PdoInterface::getInstance();
 
-      $total_sql = "SELECT COUNT(*) AS total
-                    FROM content_master cm
-                    WHERE cm.indicate_flag = ? AND cm.category_id = ?";
-      $total_params = array(ContentModel::ACTIVE, $category_id);
+      $content_model = new ContentModel();
+      $contents = $content_model->select(
+        array(
+          'category_id' => $category_id,
+          'indicate_flag' => ContentModel::ACTIVE,
+        ),
+        array(
+          'display_order' => ContentModel::ORDER_ASC,
+          'content_id' => ContentModel::ORDER_ASC,
+        )
+      );
 
-      if ($course_filter === ContentModel::TARGET_COURSE_BASIC) {
-        $total_sql .= " AND (cm.target_course = ? OR cm.target_course IS NULL OR cm.target_course = '' OR cm.target_course = 'all')";
-        $total_params[] = $course_filter;
+      $available_contents = array();
+      foreach ($contents as $content) {
+        $pub_date = isset($content['pub_date']) ? $content['pub_date'] : null;
+        if (!isPublishableNow($pub_date)) {
+          continue;
+        }
+        if (!$this->isContentVisibleForCourse($content, $course_filter)) {
+          continue;
+        }
+        $content_id = isset($content['content_id']) ? (int)$content['content_id'] : 0;
+        if ($content_id === 0) {
+          continue;
+        }
+        $available_contents[$content_id] = true;
       }
 
-      $pdo->query($total_sql, $total_params);
-      $total_row = $pdo->fetch_assoc();
-      $total = isset($total_row['total']) ? (int)$total_row['total'] : 0;
-
+      $total = count($available_contents);
       if ($total === 0) {
         return array('total' => 0, 'completed' => 0);
       }
 
-      $completed_sql = "SELECT COUNT(*) AS completed
-                        FROM member_content_relation mcr
-                        INNER JOIN content_master cm ON cm.content_id = mcr.content_id
-                        WHERE mcr.member_id = ? AND cm.indicate_flag = ? AND cm.category_id = ?";
-      $completed_params = array($member_id, ContentModel::ACTIVE, $category_id);
+      $relation_model = new MemberContentRelation();
+      $completed_records = $relation_model->select(array(
+        'member_id' => $member_id,
+        'category_id' => $category_id,
+      ));
 
-      if ($course_filter === ContentModel::TARGET_COURSE_BASIC) {
-        $completed_sql .= " AND (cm.target_course = ? OR cm.target_course IS NULL OR cm.target_course = '' OR cm.target_course = 'all')";
-        $completed_params[] = $course_filter;
+      $completed = 0;
+      foreach ($completed_records as $record) {
+        $content_id = isset($record['content_id']) ? (int)$record['content_id'] : 0;
+        if ($content_id !== 0 && isset($available_contents[$content_id])) {
+          $completed++;
+        }
       }
 
-      $pdo->query($completed_sql, $completed_params);
-      $completed_row = $pdo->fetch_assoc();
-      $completed = isset($completed_row['completed']) ? (int)$completed_row['completed'] : 0;
-
       return array('total' => $total, 'completed' => $completed);
+    }
+
+    /**
+     * 会員コースに対してコンテンツが表示可能かを判定
+     *
+     * @param array $content コンテンツ情報
+     * @param string|null $course_filter 会員のコースフィルタ
+     * @return bool
+     */
+    private function isContentVisibleForCourse(array $content, $course_filter) {
+      if ($course_filter === null || $course_filter === ContentModel::TARGET_COURSE_ADVANCE) {
+        return true;
+      }
+
+      $target_course = isset($content['target_course']) ? strtolower((string)$content['target_course']) : '';
+      if ($target_course === '' || $target_course === 'all' || $target_course === ContentModel::TARGET_COURSE_ADVANCE) {
+        return true;
+      }
+
+      return $target_course === $course_filter;
     }
 
 
@@ -246,55 +280,74 @@
       if (empty($member)) {
         return array();
       }
-      
+
       $member_data = $member[0];
       $course_filter = $this->getCourseFilter($member_data['select_course']);
-      
-      $pdo = PdoInterface::getInstance();
-      
-      // 基本クエリ
-      $sql = "SELECT 
-                  cm.content_id,
-                  cm.content_title,
-                  cm.target_course,
-                  CASE 
-                    WHEN mcr.member_id IS NOT NULL THEN 1 
-                    ELSE 0 
-                  END as is_completed,
-                  CASE 
-                    WHEN mcr.member_id IS NOT NULL THEN mcr.created_date 
-                    ELSE NULL 
-                  END as completed_date
-              FROM content_master cm
-              LEFT JOIN member_content_relation mcr ON cm.content_id = mcr.content_id AND mcr.member_id = ?
-              WHERE cm.indicate_flag = ?";
-      
-      $params = array($member_id, ContentModel::ACTIVE);
-      
-      // コースフィルタの適用
-      if ($course_filter === ContentModel::TARGET_COURSE_BASIC) {
-        $sql .= " AND (cm.target_course = ? OR cm.target_course IS NULL OR cm.target_course = '' OR cm.target_course = 'all')";
-        $params[] = $course_filter;
-      } elseif ($course_filter !== null && $course_filter !== ContentModel::TARGET_COURSE_ADVANCE) {
-        $sql .= " AND cm.target_course = ?";
-        $params[] = $course_filter;
-      }
-      
-      // カテゴリーフィルタの適用
+
+      $content_model = new ContentModel();
+      $conditions = array('indicate_flag' => ContentModel::ACTIVE);
       if ($category_id !== null) {
-        $sql .= " AND cm.category_id = ?";
-        $params[] = $category_id;
+        $conditions['category_id'] = $category_id;
       }
-      
-      $sql .= " ORDER BY cm.content_id ASC";
-      
-      $pdo->query($sql, $params);
-      
+
+      $contents = $content_model->select(
+        $conditions,
+        array(
+          'display_order' => ContentModel::ORDER_ASC,
+          'content_id' => ContentModel::ORDER_ASC,
+        )
+      );
+
+      $filtered_contents = array();
+      foreach ($contents as $content) {
+        $pub_date = isset($content['pub_date']) ? $content['pub_date'] : null;
+        if (!isPublishableNow($pub_date)) {
+          continue;
+        }
+        if (!$this->isContentVisibleForCourse($content, $course_filter)) {
+          continue;
+        }
+        $content_id = isset($content['content_id']) ? (int)$content['content_id'] : 0;
+        if ($content_id === 0) {
+          continue;
+        }
+        $filtered_contents[$content_id] = $content;
+      }
+
+      if (empty($filtered_contents)) {
+        return array();
+      }
+
+      $relation_model = new MemberContentRelation();
+      $relation_conditions = array('member_id' => $member_id);
+      if ($category_id !== null) {
+        $relation_conditions['category_id'] = $category_id;
+      }
+      $completed_records = $relation_model->select($relation_conditions);
+
+      $completed_map = array();
+      foreach ($completed_records as $record) {
+        $content_id = isset($record['content_id']) ? (int)$record['content_id'] : 0;
+        if ($content_id !== 0) {
+          $completed_map[$content_id] = $record;
+        }
+      }
+
       $result = array();
-      while($rs = $pdo->fetch_assoc()) {
-        $result[] = $rs;
+      foreach ($filtered_contents as $content_id => $content) {
+        $is_completed = isset($completed_map[$content_id]);
+        $completed_date = $is_completed && isset($completed_map[$content_id]['created_date'])
+          ? $completed_map[$content_id]['created_date']
+          : null;
+        $result[] = array(
+          'content_id' => $content_id,
+          'content_title' => isset($content['content_title']) ? $content['content_title'] : '',
+          'target_course' => isset($content['target_course']) ? $content['target_course'] : null,
+          'is_completed' => $is_completed ? 1 : 0,
+          'completed_date' => $completed_date,
+        );
       }
-      
+
       return $result;
     }
 
@@ -351,73 +404,20 @@
         return array();
       }
 
-      $member_data = $member[0];
-      $course_filter = $this->getCourseFilter($member_data['select_course']);
-
-      $placeholders = implode(',', array_fill(0, count($category_ids), '?'));
-      $pdo = PdoInterface::getInstance();
-
-      $totals_sql = "SELECT cm.category_id, COUNT(*) AS total
-                     FROM content_master cm
-                     WHERE cm.indicate_flag = ?
-                       AND cm.category_id IN ($placeholders)";
-      $totals_params = array_merge(array(ContentModel::ACTIVE), $category_ids);
-
-      if ($course_filter === ContentModel::TARGET_COURSE_BASIC) {
-        $totals_sql .= " AND (cm.target_course = ? OR cm.target_course IS NULL OR cm.target_course = '' OR cm.target_course = 'all')";
-        $totals_params[] = $course_filter;
-      } elseif ($course_filter !== null && $course_filter !== ContentModel::TARGET_COURSE_ADVANCE) {
-        $totals_sql .= " AND cm.target_course = ?";
-        $totals_params[] = $course_filter;
-      }
-
-      $totals_sql .= " GROUP BY cm.category_id";
-
-      $pdo->query($totals_sql, $totals_params);
-      $totals = array();
-      while($row = $pdo->fetch_assoc()) {
-        $category_id = (int)$row['category_id'];
-        $totals[$category_id] = (int)$row['total'];
-      }
-
-      $completes_sql = "SELECT cm.category_id, COUNT(*) AS completed
-                        FROM member_content_relation mcr
-                        INNER JOIN content_master cm ON cm.content_id = mcr.content_id
-                        WHERE mcr.member_id = ?
-                          AND cm.indicate_flag = ?
-                          AND cm.category_id IN ($placeholders)";
-      $completes_params = array_merge(array($member_id, ContentModel::ACTIVE), $category_ids);
-
-      if ($course_filter === ContentModel::TARGET_COURSE_BASIC) {
-        $completes_sql .= " AND (cm.target_course = ? OR cm.target_course IS NULL OR cm.target_course = '' OR cm.target_course = 'all')";
-        $completes_params[] = $course_filter;
-      } elseif ($course_filter !== null && $course_filter !== ContentModel::TARGET_COURSE_ADVANCE) {
-        $completes_sql .= " AND cm.target_course = ?";
-        $completes_params[] = $course_filter;
-      }
-
-      $completes_sql .= " GROUP BY cm.category_id";
-
-      $pdo->query($completes_sql, $completes_params);
-      $completes = array();
-      while($row = $pdo->fetch_assoc()) {
-        $category_id = (int)$row['category_id'];
-        $completes[$category_id] = (int)$row['completed'];
-      }
-
-      $results = array();
+      $progress = array();
       foreach ($category_ids as $category_id) {
-        $total = isset($totals[$category_id]) ? $totals[$category_id] : 0;
-        $completed = isset($completes[$category_id]) ? $completes[$category_id] : 0;
+        $stats = $this->getCategoryContentStats($member_id, $category_id);
+        $total = isset($stats['total']) ? (int)$stats['total'] : 0;
+        $completed = isset($stats['completed']) ? (int)$stats['completed'] : 0;
         $completion_rate = $total > 0 ? (int)round($completed / $total * 100) : 0;
-        $results[$category_id] = array(
+        $progress[$category_id] = array(
           'total_contents' => $total,
           'completed_contents' => $completed,
-          'completion_rate' => $completion_rate
+          'completion_rate' => $completion_rate,
         );
       }
 
-      return $results;
+      return $progress;
     }
 
     /**
@@ -437,12 +437,21 @@
       
       $content_model = new ContentModel();
       $where_conditions = array('indicate_flag' => ContentModel::ACTIVE);
-      
-      if ($course_filter !== null) {
-        $where_conditions['target_course'] = $course_filter;
+
+      $contents = $content_model->select($where_conditions);
+      $available_count = 0;
+      foreach ($contents as $content) {
+        $pub_date = isset($content['pub_date']) ? $content['pub_date'] : null;
+        if (!isPublishableNow($pub_date)) {
+          continue;
+        }
+        if (!$this->isContentVisibleForCourse($content, $course_filter)) {
+          continue;
+        }
+        $available_count++;
       }
-      
-      return $content_model->count($where_conditions);
+
+      return $available_count;
     }
 
 

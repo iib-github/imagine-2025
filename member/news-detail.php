@@ -1,7 +1,10 @@
 <?php
+  require_once dirname(__FILE__) . '/scripts/env.php';
   require_once dirname(__FILE__) . '/scripts/Session.class.php';
   require_once dirname(__FILE__) . '/scripts/model/NewsModel.class.php';
   require_once dirname(__FILE__) . '/scripts/model/MemberModel.class.php';
+  loadEnv();
+  initializeErrorHandling();
   $session = Session::getInstance();
 
   // セッションがなければログイン画面に遷移させる。
@@ -31,6 +34,11 @@
     exit;
   } else {
     $news = $news[0];
+    $publish_date = isset($news['note_date']) ? $news['note_date'] : null;
+    if (!isPublishableNow($publish_date)) {
+      header("Location: index.php");
+      exit;
+    }
     if (!$news_model->isVisibleForCourse($news, $course_filter)) {
       header("Location: index.php");
       exit;

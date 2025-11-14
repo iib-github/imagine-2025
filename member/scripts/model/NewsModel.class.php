@@ -1,4 +1,5 @@
 <?php
+  require_once dirname(__FILE__) . '/../env.php';
   require_once dirname(__FILE__) . '/../BaseModel.class.php';
   require_once dirname(__FILE__) . '/../model/ContentModel.class.php';
 
@@ -44,6 +45,12 @@
         array('is_active'=>1),
         array('note_date'=>self::ORDER_DESC)
       );
+
+      $now = new DateTimeImmutable();
+      $news_list = array_values(array_filter($news_list, function($news) use ($now) {
+        $publishable = isset($news['note_date']) ? $news['note_date'] : null;
+        return isPublishableNow($publishable, $now);
+      }));
 
       if($course_filter === null) {
         if(!empty($num)) {

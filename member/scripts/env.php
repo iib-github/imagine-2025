@@ -75,3 +75,84 @@ function initializeErrorHandling() {
   }
 }
 
+if (!function_exists('parsePublishDateTime')) {
+  /**
+   * 公開日時の文字列を DateTimeImmutable にパースする
+   *
+   * @param mixed $value 日付文字列
+   * @return DateTimeImmutable|null パースできなかった場合はnull
+   */
+  function parsePublishDateTime($value) {
+    if ($value === null) {
+      return null;
+    }
+
+    $normalized = trim((string)$value);
+    if ($normalized === '') {
+      return null;
+    }
+
+    $normalized = str_replace('.', '-', $normalized);
+    // datetime-local の "2024-01-01T12:00" を扱いやすくするため
+    $normalized = preg_replace('/\s+/', ' ', $normalized);
+
+    $formats = array(
+      'Y-m-d H:i:s',
+      'Y-m-d H:i',
+      'Y-m-d',
+      'Y-m-d\TH:i:s',
+      'Y-m-d\TH:i',
+      'Y/m/d H:i:s',
+      'Y/m/d H:i',
+      'Y/m/d',
+    );
+
+    foreach ($formats as $format) {
+      $date = DateTimeImmutable::createFromFormat($format, $normalized);
+      if ($date instanceof DateTimeImmutable) {
+        return $date;
+      }
+    }
+
+    try {
+      return new DateTimeImmutable($normalized);
+    } catch (Exception $e) {
+      return null;
+    }
+  }
+}
+
+if (!function_exists('isPublishableNow')) {
+  /**
+   * 公開日時が現在時刻に到達しているかを判定する
+   *
+   * @param mixed $value 日付文字列
+   * @param DateTimeInterface|string|null $now 判定に利用する現在時刻
+   * @return bool 公開可能ならtrue
+   */
+  function isPublishableNow($value, $now = null) {
+    $nowDate = null;
+    if ($now instanceof DateTimeInterface) {
+      $nowDate = ($now instanceof DateTimeImmutable)
+        ? $now
+        : DateTimeImmutable::createFromInterface($now);
+    } elseif ($now !== null) {
+      try {
+        $nowDate = new DateTimeImmutable((string)$now);
+      } catch (Exception $e) {
+        $nowDate = new DateTimeImmutable();
+      }
+    } else {
+      $nowDate = new DateTimeImmutable();
+    }
+
+    $publishDate = parsePublishDateTime($value);
+
+    if ($publishDate === null) {
+      return true;
+    }
+
+    return $publishDate <= $nowDate;
+  }
+}
+
